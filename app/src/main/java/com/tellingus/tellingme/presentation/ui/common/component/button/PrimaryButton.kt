@@ -37,7 +37,7 @@ fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     enable: Boolean = true,
-    isScaleDown: Boolean = false
+    isScaleDown: Boolean = false,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -57,15 +57,17 @@ fun PrimaryButton(
                 containerColor = if (enable) Primary400 else Gray50,
                 contentColor = Base0
             ),
-            contentPadding = when(size) {
+            contentPadding = when (size) {
                 ButtonSize.LARGE -> PaddingValues(
                     vertical = dimensionResource(R.dimen.button_padding_vertical_large),
                     horizontal = dimensionResource(R.dimen.button_padding_horizontal_large)
                 )
+
                 ButtonSize.MEDIUM -> PaddingValues(
                     vertical = dimensionResource(R.dimen.button_padding_vertical_medium),
                     horizontal = dimensionResource(R.dimen.button_padding_horizontal_medium)
                 )
+
                 ButtonSize.SMALL -> PaddingValues(
                     vertical = dimensionResource(R.dimen.button_padding_vertical_small),
                     horizontal = dimensionResource(R.dimen.button_padding_horizontal_small)
@@ -74,7 +76,7 @@ fun PrimaryButton(
         ) {
             Text(
                 text = text,
-                style = when(size) {
+                style = when (size) {
                     ButtonSize.LARGE -> TellingmeTheme.typography.body1Bold
                     ButtonSize.MEDIUM -> TellingmeTheme.typography.body2Bold
                     ButtonSize.SMALL -> TellingmeTheme.typography.caption1Bold
