@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.tellercardtuning
 
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,11 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -43,20 +41,38 @@ import androidx.navigation.NavController
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
+import com.tellingus.tellingme.presentation.ui.common.component.badge.DiagonalHalfCircleBadge
+import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
+import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLightButton
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCard
+import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray300
 import com.tellingus.tellingme.presentation.ui.theme.Gray50
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
-import com.tellingus.tellingme.presentation.ui.theme.Primary500
 import com.tellingus.tellingme.presentation.ui.theme.Profile100
+import com.tellingus.tellingme.presentation.ui.theme.Profile100_Bottom
 import com.tellingus.tellingme.presentation.ui.theme.Profile200
+import com.tellingus.tellingme.presentation.ui.theme.Profile200_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.Profile300
+import com.tellingus.tellingme.presentation.ui.theme.Profile300_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.Profile400
+import com.tellingus.tellingme.presentation.ui.theme.Profile400_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.Profile500
+import com.tellingus.tellingme.presentation.ui.theme.Profile500_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.Profile600
+import com.tellingus.tellingme.presentation.ui.theme.Profile600_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.Profile700
+import com.tellingus.tellingme.presentation.ui.theme.Profile700_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.Profile800
+import com.tellingus.tellingme.presentation.ui.theme.Profile800_Bottom
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Icon as Icon1
+
 
 @Composable
 fun TellerCardTuningScreen(navController: NavController) {
@@ -93,7 +109,8 @@ fun BadgeChangeSheet() {
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White, shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-            .heightIn(328.dp), horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxHeight()
+            .heightIn(360.dp), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier.padding(top = 20.dp),
@@ -104,15 +121,60 @@ fun BadgeChangeSheet() {
         }
         when (selectedOption) {
             "badge" -> {
-                Box(modifier = Modifier.padding(top = 40.dp)) {
+                Column(modifier = Modifier.padding(top = 40.dp)) {
                     BadgeContent()
+
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 34.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        PrimaryLightButton(modifier = Modifier
+                            .width(163.dp)
+                            .height(50.dp),
+                            size = ButtonSize.LARGE,
+                            text = "되돌리기",
+                            onClick = { /*TODO*/ })
+                        Spacer(modifier = Modifier.width(8.dp))
+                        PrimaryButton(modifier = Modifier
+                            .width(163.dp)
+                            .height(50.dp),
+                            size = ButtonSize.LARGE,
+                            text = "완료",
+                            onClick = { /*TODO*/ })
+                    }
                 }
             }
 
             "bgColor" -> {
-                BgColorContent()
+                Column(modifier = Modifier.padding(top = 40.dp)) {
+                    BgColorContent()
+
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 34.dp)
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        PrimaryLightButton(modifier = Modifier
+                            .width(163.dp)
+                            .height(50.dp),
+                            size = ButtonSize.LARGE,
+                            text = "되돌리기",
+                            onClick = { /*TODO*/ })
+                        Spacer(modifier = Modifier.width(8.dp))
+                        PrimaryButton(modifier = Modifier
+                            .width(163.dp)
+                            .height(50.dp),
+                            size = ButtonSize.LARGE,
+                            text = "완료",
+                            onClick = { /*TODO*/ })
+                    }
+                }
             }
         }
+
     }
 }
 
@@ -137,7 +199,7 @@ fun BadgeContent() {
                     selectedCardIndex = index
                 })
         }
-        
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,24 +209,22 @@ fun BadgeContent() {
         ) {
             Image(painter = painterResource(R.drawable.icon_paging_button_left),
                 contentDescription = "",
-                modifier = Modifier
-                    .clickable {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage > 0) {
-                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                            }
+                modifier = Modifier.clickable {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage > 0) {
+                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
                         }
-                    })
+                    }
+                })
             Image(painter = painterResource(R.drawable.icon_paging_button_right),
                 contentDescription = "",
-                modifier = Modifier
-                    .clickable {
-                        coroutineScope.launch {
-                            if (pagerState.currentPage < pagerState.pageCount - 1) {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
+                modifier = Modifier.clickable {
+                    coroutineScope.launch {
+                        if (pagerState.currentPage < pagerState.pageCount - 1) {
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
-                    })
+                    }
+                })
         }
     }
 }
@@ -177,7 +237,8 @@ fun BadgeCard(
     Card(modifier = Modifier
         .width(106.dp)
         .height(124.dp),
-        colors = CardDefaults.cardColors(Base0), onClick = { onCheckChange(index) }) {
+        colors = CardDefaults.cardColors(Base0),
+        onClick = { onCheckChange(index) }) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
@@ -210,8 +271,94 @@ fun BadgeCard(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BgColorContent() {
+    val items = List(12) { "Item $it" } // 예시로 12개의 아이템 생성
+    val pagerState = rememberPagerState(pageCount = { (items.size + 7) / 8 }) // 각 페이지당 8개 아이템
+    val coroutineScope = rememberCoroutineScope()
+    var selectedCardIndex by remember { mutableStateOf(-1) } // 선택된 카드의 인덱스
+
+    val profileColors = listOf(
+        Pair(Profile100, Profile100_Bottom),
+        Pair(Profile200, Profile200_Bottom),
+        Pair(Profile300, Profile300_Bottom),
+        Pair(Profile400, Profile400_Bottom),
+        Pair(Profile500, Profile500_Bottom),
+        Pair(Profile600, Profile600_Bottom),
+        Pair(Profile700, Profile700_Bottom),
+        Pair(Profile800, Profile800_Bottom)
+    )
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 22.dp, end = 22.dp)
+    ) {
+        HorizontalPager(state = pagerState, modifier = Modifier.heightIn(138.dp)) { page ->
+            // 각 페이지의 아이템 표시
+            val startIndex = page * 8
+            val endIndex = minOf(startIndex + 8, items.size)
+
+            Column {
+                for (i in startIndex until endIndex step 4) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .then(if (i + 4 >= endIndex) Modifier else Modifier.padding(bottom = 20.dp)),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        for (j in 0 until 4) {
+                            val currentIndex = i + j
+                            if (currentIndex < endIndex) {
+
+                                val colorPair = profileColors[currentIndex % profileColors.size]
+                                val topColor = colorPair.first
+                                val bottomColor = colorPair.second
+
+                                DiagonalHalfCircleBadge(bottomColor = bottomColor,
+                                    topColor = topColor,
+                                    index = currentIndex,
+                                    isChecked = selectedCardIndex == currentIndex,
+                                    onCheckChange = { index ->
+                                        selectedCardIndex = index
+                                    })
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Box {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(top = 62.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Image(painter = painterResource(R.drawable.icon_paging_button_left),
+                    contentDescription = "",
+                    modifier = Modifier.clickable {
+                        coroutineScope.launch {
+                            if (pagerState.currentPage > 0) {
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            }
+                        }
+                    })
+                Image(painter = painterResource(R.drawable.icon_paging_button_right),
+                    contentDescription = "",
+                    modifier = Modifier.clickable {
+                        coroutineScope.launch {
+                            if (pagerState.currentPage < pagerState.pageCount - 1) {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        }
+                    })
+            }
+        }
+    }
 
 }
 
