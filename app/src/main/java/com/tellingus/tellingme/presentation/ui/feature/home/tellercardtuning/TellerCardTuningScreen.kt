@@ -25,6 +25,11 @@ fun TellerCardTuningScreen(navController: NavController) {
 }
 
 @Composable
+fun TellerCardTuningScreenContent() {
+
+}
+
+@Composable
 fun TellerCardTuningScreenHeader(navController: NavController) {
     BasicAppBar(modifier = Modifier
         .background(Background100)
