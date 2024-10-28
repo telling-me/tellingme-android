@@ -24,6 +24,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Primary400
 fun BasicAppBar(
     modifier: Modifier = Modifier,
     leftSlot: @Composable (() -> Unit)? = null,
+    centerSlot: @Composable (()-> Unit)? = null,
     rightSlot: @Composable (() -> Unit)? = null
 ) {
     Row(
@@ -31,10 +32,13 @@ fun BasicAppBar(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box() {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
             leftSlot?.let { it() }
         }
-        Box() {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+            centerSlot?.let { it() }
+        }
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
             rightSlot?.let { it() }
         }
     }

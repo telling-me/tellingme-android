@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.mytellerbadge
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,6 +20,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -28,7 +31,9 @@ import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadg
 import com.tellingus.tellingme.presentation.ui.common.component.badge.TellerBadge
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.theme.Background100
+import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import com.tellingus.tellingme.presentation.ui.theme.Typography
 
 @Composable
 fun MyTellerBadgeScreen(navController: NavController) {
@@ -60,23 +65,42 @@ fun MyTellerBadgeScreenContent() {
     )
 
     Column(modifier = Modifier.fillMaxHeight()) {
-        Row(modifier = Modifier.padding(top = 9.dp, start = 20.dp)) {
-            Text(text = "내가 받은", style = TellingmeTheme.typography.head2Regular)
-            Spacer(modifier = Modifier.size(4.dp))
-            Text(text = "텔러 배지", style = TellingmeTheme.typography.head2Bold)
-        }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2), // 2열 그리드
-            modifier = Modifier.fillMaxWidth(), contentPadding = PaddingValues(14.dp), // 그리드의 전체 패딩
-            verticalArrangement = Arrangement.spacedBy(14.dp), // 아이템 간의 세로 간격
-            horizontalArrangement = Arrangement.spacedBy(14.dp) // 아이템 간의 가로 간격
-        ) {
-            items(dummyBadgeList) { badge ->
-                TellerBadge(
-                    title = badge.first, content = badge.second
-                )
+        if (dummyBadgeList.isEmpty()) {
+            EmptyContent()
+        } else {
+            Row(modifier = Modifier.padding(top = 9.dp, start = 20.dp)) {
+                Text(text = "내가 받은", style = TellingmeTheme.typography.head2Regular)
+                Spacer(modifier = Modifier.size(4.dp))
+                Text(text = "텔러 배지", style = TellingmeTheme.typography.head2Bold)
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2), // 2열 그리드
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(14.dp), // 그리드의 전체 패딩
+                verticalArrangement = Arrangement.spacedBy(14.dp), // 아이템 간의 세로 간격
+                horizontalArrangement = Arrangement.spacedBy(14.dp) // 아이템 간의 가로 간격
+            ) {
+                items(dummyBadgeList) { badge ->
+                    TellerBadge(
+                        title = badge.first, content = badge.second
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+fun EmptyContent() {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Image(painter = painterResource(R.drawable.my_teller_badge_empty), contentDescription = "")
+        Text(text = "아직 받은 배지가 없어요.", style = Typography.body1Bold, color = Gray600)
+        Text(text = "첫 글을 작성하면 받을지도 몰라요!", style = Typography.body1Regular, color = Gray600)
     }
 }
 
