@@ -49,5 +49,4 @@ fun TellerBadgeList(modifier: Modifier = Modifier) {
             TellerBadge(title = "또 오셨네요", content = "단골 텔러")
         }
     }
-
 }

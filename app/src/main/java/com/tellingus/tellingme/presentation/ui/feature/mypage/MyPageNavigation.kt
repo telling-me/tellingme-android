@@ -9,6 +9,8 @@ import androidx.navigation.navigation
 import com.tellingus.tellingme.presentation.ui.common.navigation.AuthDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.feature.mypage.alarm.AlarmScreen
+import com.tellingus.tellingme.presentation.ui.feature.mypage.mylog.MyLogScreen
+import com.tellingus.tellingme.presentation.ui.feature.mypage.setting.SettingScreen
 import com.tellingus.tellingme.presentation.ui.feature.mypage.signout.SignOutScreen
 
 fun NavGraphBuilder.myPageGraph(
@@ -23,6 +25,12 @@ fun NavGraphBuilder.myPageGraph(
         }
         composable(route = MyPageDestinations.ALARM) {
             AlarmScreen(navController)
+        }
+        composable(route = MyPageDestinations.MY_LOG) {
+            MyLogScreen(navController = navController)
+        }
+        composable(route = MyPageDestinations.SETTING) {
+            SettingScreen(navController = navController)
         }
 
         composable(route = MyPageDestinations.SIGN_OUT) {
