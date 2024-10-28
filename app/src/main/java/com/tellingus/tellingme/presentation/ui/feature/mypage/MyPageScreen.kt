@@ -41,6 +41,8 @@ import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
+import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
@@ -52,16 +54,10 @@ import com.tellingus.tellingme.util.AppUtils
 
 @Composable
 fun MyPageScreen(
-    navController: NavController,
-    viewModel: MyPageViewModel = hiltViewModel()
+    navController: NavController, viewModel: MyPageViewModel = hiltViewModel()
 ) {
     MainLayout(header = {
-        MyPageScreenHeader(
-            navController = navController,
-            signOut = {
-                viewModel.signOutUser()
-            }
-        )
+        MyPageScreenHeader(navController = navController)
     }, content = {
         MyPageScreenContent(navController)/*
             Button(
@@ -77,8 +73,7 @@ fun MyPageScreen(
 
 @Composable
 fun MyPageScreenHeader(
-    navController: NavController,
-    signOut: () -> Unit
+    navController: NavController
 ) {
     BasicAppBar(modifier = Modifier
         .background(Background100)
@@ -91,9 +86,7 @@ fun MyPageScreenHeader(
             modifier = Modifier
                 .size(24.dp)
                 .clickable(onClick = {
-                    signOut()
-//                    navController.navigate(MyPageDestinations.설정)
-//                    [5-2. 설정] 이동
+                    navController.navigate(MyPageDestinations.SETTING)
                 }),
             tint = Gray200
         )
@@ -215,9 +208,8 @@ fun MyPageScreenContent(navController: NavController) {
                         .background(Gray200)
                 )
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { navController.navigate(HomeDestinations.MY_TELLER_BADGE) }) {
                     Image(
                         painter = painterResource(R.drawable.icon_badge), contentDescription = ""
                     )
@@ -240,7 +232,8 @@ fun MyPageScreenContent(navController: NavController) {
                 )
 
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { navController.navigate(MyPageDestinations.MY_LOG) }
                 ) {
                     Image(
                         painter = painterResource(R.drawable.icon_pencil), contentDescription = ""
@@ -437,7 +430,10 @@ fun MyPageScreenContent(navController: NavController) {
 
                         Row {
                             if (item.id === "tellingme_introduce") {
-                                Text(text = "v. $appVersion", style = TellingmeTheme.typography.body2Bold)
+                                Text(
+                                    text = "v. $appVersion",
+                                    style = TellingmeTheme.typography.body2Bold
+                                )
                             }
                             Icon(
                                 painter = painterResource(id = R.drawable.icon_caret_right),

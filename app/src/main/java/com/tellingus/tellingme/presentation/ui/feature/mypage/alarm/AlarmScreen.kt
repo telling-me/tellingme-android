@@ -88,8 +88,6 @@ fun AlarmScreenHeader(navigateToPreviousScreen: () -> Unit) {
 fun AlarmScreenContent(
     viewModel: AlarmViewModel = hiltViewModel(),
 ) {
-
-
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
