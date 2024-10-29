@@ -22,6 +22,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppB
 import com.tellingus.tellingme.presentation.ui.common.component.button.TellingmeIconButton
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
+import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
@@ -30,15 +31,24 @@ import com.tellingus.tellingme.presentation.ui.theme.Typography
 @Composable
 fun SettingScreen(navController: NavController, viewModel: MyPageViewModel = hiltViewModel()) {
 
-    MainLayout(header = { SettingScreenHeader { navController.popBackStack() } }, content = {
-        Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
-            RowItem(text = "개인정보 수정", hasArrow = true, onClick = {})
-            RowItem(text = "로그아웃", hasArrow = false, onClick = {
-                viewModel.signOutUser()
-            })
-            RowItem(text = "탈퇴하기", hasArrow = true, onClick = {})
-        }
-    }, isScrollable = false, background = Color.White
+    MainLayout(
+        header = { SettingScreenHeader { navController.popBackStack() } },
+        content = {
+            Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
+                RowItem(
+                    text = "개인정보 수정",
+                    hasArrow = true,
+                    onClick = { navController.navigate(MyPageDestinations.MY_INFO_EDIT) })
+                RowItem(text = "로그아웃", hasArrow = false, onClick = {
+                    viewModel.signOutUser()
+                })
+                RowItem(text = "탈퇴하기", hasArrow = true, onClick = {
+                    navController.navigate(MyPageDestinations.WITH_DRAW)
+                })
+            }
+        },
+        isScrollable = false,
+        background = Color.White
     )
 }
 
