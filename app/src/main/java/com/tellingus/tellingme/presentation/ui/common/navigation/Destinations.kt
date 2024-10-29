@@ -52,5 +52,7 @@ object MyPageDestinations {
     const val ALARM = "alarm"
     const val MY_LOG = "myLog"
     const val SETTING = "setting"
+    const val MY_INFO_EDIT = "myInfoEdit"
+    const val WITH_DRAW = "withDraw"
 
 }
