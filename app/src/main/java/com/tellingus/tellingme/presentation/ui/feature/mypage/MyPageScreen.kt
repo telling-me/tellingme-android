@@ -2,6 +2,8 @@ package com.tellingus.tellingme.presentation.ui.feature.mypage
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -35,13 +37,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
-import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
+import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
+import com.tellingus.tellingme.presentation.ui.common.model.ToolTipType
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background100
@@ -87,9 +91,6 @@ fun MyPageScreenHeader(
             modifier = Modifier
                 .size(24.dp)
                 .clickable(onClick = {
-//                    signOut()
-//                    navController.navigate(MyPageDestinations.설정)
-//                    [5-2. 설정] 이동
                     navController.navigate(MyPageDestinations.SETTING)
                 }),
             tint = Gray200
@@ -101,6 +102,7 @@ fun MyPageScreenHeader(
 fun MyPageScreenContent(navController: NavController) {
     val context = LocalContext.current
     val appVersion = AppUtils.getAppVersion(context)
+    var isTooltipVisible by remember { mutableStateOf(false) }
 
     val items = remember {
         mutableStateOf(
@@ -188,9 +190,13 @@ fun MyPageScreenContent(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround // Spacing between columns
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable {
+                        isTooltipVisible = true
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            isTooltipVisible = false
+                        }, 1000)
+                    }) {
                     Image(
                         painter = painterResource(R.drawable.icon_cheese), contentDescription = ""
                     )
@@ -235,10 +241,8 @@ fun MyPageScreenContent(navController: NavController) {
                         .background(Gray200)
                 )
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.clickable { navController.navigate(MyPageDestinations.MY_LOG) }
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.clickable { navController.navigate(MyPageDestinations.MY_LOG) }) {
                     Image(
                         painter = painterResource(R.drawable.icon_pencil), contentDescription = ""
                     )
@@ -255,10 +259,17 @@ fun MyPageScreenContent(navController: NavController) {
             }
         }
 
+        if (isTooltipVisible) {
+            ToolTip(
+                type = ToolTipType.HELP,
+                text = "현재 보유 중인 치즈는 총 19,403개예요!",
+                hasTriangle = true,
+            )
+        }
+        Spacer(modifier = Modifier.height(if (isTooltipVisible) 0.dp else 40.dp))
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 40.dp)
                 .height(78.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(Color(0xFF93A0FF)),
