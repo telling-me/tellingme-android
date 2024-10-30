@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +37,8 @@ fun CheckBox(
     url: String = "",
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
-    showRightIcon: Boolean = false
+    showRightIcon: Boolean = false,
+    horizontalArrangement : Arrangement.Horizontal = Arrangement.Start
 ) {
     val context = LocalContext.current
 
@@ -49,7 +51,8 @@ fun CheckBox(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
             ),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = horizontalArrangement
     ) {
         Image(
             imageVector = ImageVector.vectorResource(
@@ -64,9 +67,11 @@ fun CheckBox(
             color = Gray600
         )
         if (showRightIcon) {
-            Spacer(modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
             Image(
                 modifier = modifier
                     .size(20.dp)
@@ -87,17 +92,17 @@ fun CheckBoxPreview() {
     Column {
         CheckBox(
             text = "Text",
-            onClick = {  },
+            onClick = { },
             isSelected = false
         )
         CheckBox(
             text = "Text",
-            onClick = {  },
+            onClick = { },
             isSelected = true
         )
         CheckBox(
             text = "Text",
-            onClick = {  },
+            onClick = { },
             isSelected = false,
             showRightIcon = true
         )

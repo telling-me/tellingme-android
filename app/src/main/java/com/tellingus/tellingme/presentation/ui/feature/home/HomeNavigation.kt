@@ -9,6 +9,7 @@ import com.tellingus.tellingme.presentation.ui.feature.home.mytellerbadge.MyTell
 import com.tellingus.tellingme.presentation.ui.feature.home.record.RecordScreen
 import com.tellingus.tellingme.presentation.ui.feature.home.tellercard.TellerCardScreen
 import com.tellingus.tellingme.presentation.ui.feature.home.tellercardtuning.TellerCardTuningScreen
+import com.tellingus.tellingme.presentation.ui.feature.home.userfeedback.UserFeedbackScreen
 
 fun NavGraphBuilder.homeGraph(
     navController: NavController
@@ -33,6 +34,9 @@ fun NavGraphBuilder.homeGraph(
         }
         composable(route = HomeDestinations.TELLER_CARD_TUNING) {
             TellerCardTuningScreen(navController = navController)
+        }
+        composable(route = HomeDestinations.USER_FEEDBACK) {
+            UserFeedbackScreen(navController = navController)
         }
 
     }
