@@ -85,7 +85,7 @@ fun ShowDoubleButtonDialog(
     leftButton: @Composable RowScope.() -> Unit,
     rightButton: @Composable RowScope.() -> Unit
 ) {
-    Dialog(
+     Dialog(
         onDismissRequest = {},
         properties = DialogProperties(
             dismissOnBackPress = false,
