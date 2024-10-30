@@ -1,6 +1,9 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.userfeedback
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,17 +11,25 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -30,14 +41,23 @@ import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLi
 import com.tellingus.tellingme.presentation.ui.common.component.button.TellingmeIconButton
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
+import com.tellingus.tellingme.presentation.ui.feature.otherspace.detail.ComplaintBottomSheet
+import com.tellingus.tellingme.presentation.ui.theme.Background100
+import com.tellingus.tellingme.presentation.ui.theme.Gray100
+import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
+import com.tellingus.tellingme.presentation.ui.theme.Gray700
 import com.tellingus.tellingme.presentation.ui.theme.Typography
+import kotlinx.coroutines.launch
 
 @Composable
 fun UserFeedbackScreen(navController: NavController) {
-    MainLayout(header = { UserFeedbackScreenHeader { navController.popBackStack() } },
-        content = { UserFeedbackScreenContent() })
+
+
+    MainLayout(header = { UserFeedbackScreenHeader { navController.popBackStack() } }, content = {
+        UserFeedbackScreenContent()
+    })
 }
 
 @Composable
@@ -45,6 +65,8 @@ fun UserFeedbackScreenContent() {
     var isChecked by remember {
         mutableStateOf(false)
     }
+    var isInfoBottomSheetOpen by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,7 +84,9 @@ fun UserFeedbackScreenContent() {
             Row {
                 Text(text = "오늘 질문은 어땠나요?", style = Typography.head3Bold, color = Gray600)
                 Spacer(modifier = Modifier.width(4.dp))
-                Image(painter = painterResource(id = R.drawable.icon_info), contentDescription = "")
+                Image(painter = painterResource(id = R.drawable.icon_info),
+                    contentDescription = "",
+                    modifier = Modifier.clickable { isInfoBottomSheetOpen = true })
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "의견을 반영해서 더 좋은 질문을 드리고 싶어요!", style = Typography.body2Bold, color = Gray600)
@@ -91,8 +115,7 @@ fun UserFeedbackScreenContent() {
         Spacer(modifier = Modifier.height(114.dp))
 
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()
         ) {
             Text(
                 text = "직접 질문을 제안하고 싶다면",
@@ -122,6 +145,57 @@ fun UserFeedbackScreenContent() {
             }
         }
     }
+
+    if (isInfoBottomSheetOpen) {
+        InfoBottomSheet(onDismiss = { isInfoBottomSheetOpen = false })
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InfoBottomSheet(onDismiss: () -> Unit = {}) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        modifier = Modifier.heightIn(min = 300.dp)
+    ) {
+        Text(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            text = "오늘의 질문",
+            style = Typography.body1Bold,
+            color = Gray600
+        )
+
+        Column(
+            modifier = Modifier
+                .padding(vertical = 12.dp, horizontal = 16.dp)
+                .background(Background100, shape = RoundedCornerShape(8.dp))
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "텔링미를 사용하실 때\n" + "어떤 기분과 생각을 하시나요?",
+                style = Typography.body2Regular,
+                color = Gray700
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "하루 한번 질문에 답변하며 나를 깨닫는 시간", style = Typography.body2Regular, color = Gray500
+            )
+
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        PrimaryButton(modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
+            size = ButtonSize.LARGE,
+            text = "확인",
+            onClick = { /*TODO*/ })
+    }
+
 }
 
 @Composable
