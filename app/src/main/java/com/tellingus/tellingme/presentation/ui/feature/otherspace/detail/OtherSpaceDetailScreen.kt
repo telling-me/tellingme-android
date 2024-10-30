@@ -117,8 +117,6 @@ fun ComplaintBottomSheet(onDismiss: () -> Unit = {}) {
             Text("신고하기")
         }
     }
-
-
 }
 
 @Composable
