@@ -52,7 +52,8 @@ fun TellingMeNavHost(
     navController: NavHostController,
     viewModel: TellingMeViewModel = hiltViewModel(),
 //    startDestination: String = AuthDestinations.ROUTE,
-    startDestination: String = HomeDestinations.ROUTE,
+//    startDestination: String = HomeDestinations.ROUTE,
+        startDestination: String = MyPageDestinations.ROUTE,
     uri: Uri? = null,
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
