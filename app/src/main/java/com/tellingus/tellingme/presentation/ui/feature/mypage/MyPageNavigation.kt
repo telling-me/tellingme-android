@@ -5,6 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
+import com.tellingus.tellingme.presentation.ui.feature.mypage.abouttellingme.AboutTellingMe
 import com.tellingus.tellingme.presentation.ui.feature.mypage.alarm.AlarmScreen
 import com.tellingus.tellingme.presentation.ui.feature.mypage.myinfoedit.MyInfoEditScreen
 import com.tellingus.tellingme.presentation.ui.feature.mypage.mylog.MyLogScreen
@@ -35,6 +36,9 @@ fun NavGraphBuilder.myPageGraph(
         }
         composable(route = MyPageDestinations.WITH_DRAW) {
             WithDrawScreen(navController = navController)
+        }
+        composable(route = MyPageDestinations.ABOUT_TELLING_ME) {
+            AboutTellingMe(navController = navController)
         }
     }
 }

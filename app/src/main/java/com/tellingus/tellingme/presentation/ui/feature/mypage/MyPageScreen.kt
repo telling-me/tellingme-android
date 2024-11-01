@@ -137,7 +137,7 @@ fun MyPageScreenContent(navController: NavController) {
                     iconResId = R.drawable.icon_planet,
                     text = "텔링미를 소개해요",
                     actionType = ActionType.NAVIGATE_SCREEN,
-                    destination = "TellingMeScreen"
+                    destination = MyPageDestinations.ABOUT_TELLING_ME
                 ),
                 IconTextItem(
                     id = "tellingme_instagram",
@@ -462,7 +462,7 @@ fun MyPageScreenContent(navController: NavController) {
                                     }
 
                                     ActionType.NAVIGATE_SCREEN -> {
-                                        // navController.navigate(item.destination)
+                                         navController.navigate(item.destination)
                                     }
 
                                     ActionType.SEND_EMAIL -> {
