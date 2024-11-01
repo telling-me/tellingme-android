@@ -552,7 +552,6 @@ sealed class ConcernType(val label: String, val value: String) {
     object Others : ConcernType("기타", "others")
 }
 
-// TODO: 액션시트 만들기
 sealed class JobType(val label: String, val value: String) {
     object Student : JobType("중·고등학생", "student")
     object Academic : JobType("대학(원)생", "academic")
