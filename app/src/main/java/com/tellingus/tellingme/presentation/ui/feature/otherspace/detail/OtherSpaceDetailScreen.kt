@@ -1,8 +1,13 @@
 package com.tellingus.tellingme.presentation.ui.feature.otherspace.detail
 
+import android.text.style.AlignmentSpan
+import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -40,6 +45,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import com.holix.android.bottomsheetdialog.compose.BottomSheetBehaviorProperties
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
+import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
+import com.holix.android.bottomsheetdialog.compose.NavigationBarProperties
+import com.tellingus.tellingme.presentation.ui.common.component.bottomsheet.CustomBottomSheet
+import com.tellingus.tellingme.presentation.ui.common.component.box.CheckBox
+import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
+import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLightButton
+import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowSingleButtonDialog
+import com.tellingus.tellingme.presentation.ui.theme.Base0
+import com.tellingus.tellingme.presentation.ui.theme.Gray100
+import com.tellingus.tellingme.presentation.ui.theme.Gray600
+import com.tellingus.tellingme.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,8 +65,10 @@ fun OtherSpaceDetailScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
 ) {
-
     var isComplaintBottomSheetOpen by remember { mutableStateOf(false) }
+    var isComplainReasonBottomSheetOpen by remember { mutableStateOf(false) }
+    var selectedComplainReason by remember { mutableStateOf("") }
+    var isComplainConfirmModalOpen by remember { mutableStateOf(false) }
 
     MainLayout(header = {
         BasicAppBar(modifier = modifier
@@ -68,55 +88,146 @@ fun OtherSpaceDetailScreen(
                     isComplaintBottomSheetOpen = true
                 })
         })
-    }, content = {
-        OtherSpaceDetailScreenContent()
-        if (isComplaintBottomSheetOpen) {
-            ComplaintBottomSheet(onDismiss = { isComplaintBottomSheetOpen = false })
-        }
-    })
+    },
+        content = {
+            OtherSpaceDetailScreenContent()
+            if (isComplaintBottomSheetOpen) {
+                ComplaintBottomSheet(
+                    onDismiss = { isComplaintBottomSheetOpen = false },
+                    onClick = { isComplainReasonBottomSheetOpen = true })
+            }
+            if (isComplainReasonBottomSheetOpen) {
+                ComplainReasonBottomSheet(
+                    onDismiss = {
+                        isComplaintBottomSheetOpen = false
+                        isComplainReasonBottomSheetOpen = false
+                    },
+                    onConfirm = {
+                        isComplaintBottomSheetOpen = false
+                        selectedComplainReason = it
+                        isComplainConfirmModalOpen = true
+                    }
+                )
+            }
+            if (isComplainConfirmModalOpen) {
+                ShowSingleButtonDialog(title = "신고가 접수되었습니다.",
+                    contents = "",
+                    completeButton = {
+                        PrimaryButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            size = ButtonSize.LARGE,
+                            text = "확인",
+                            onClick = {
+                                isComplainConfirmModalOpen = false
+                            }
+                        )
+                    }
+                )
+            }
+        })
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComplaintBottomSheet(onDismiss: () -> Unit = {}) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        modifier = Modifier.height(138.dp)
+fun ComplainReasonBottomSheet(onConfirm: (String) -> Unit = {}, onDismiss: () -> Unit) {
+    var checkedValue by remember { mutableStateOf("") }
+    BottomSheetDialog(
+        onDismissRequest = { onDismiss }, properties = BottomSheetDialogProperties(
+            navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),
+            /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
+            dismissOnClickOutside = false,
+            behaviorProperties = BottomSheetBehaviorProperties(isDraggable = true)
+        )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 17.5.dp, bottom = 17.5.dp, start = 12.dp)
-                .clickable(enabled = true,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = {
-                        scope
-                            .launch { sheetState.hide() }
-                            .invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    // TODO: 신고하기 기능
-                                    onDismiss();
-                                }
-                            }
-                    }),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Image(
-                imageVector = ImageVector.vectorResource(
-                    id = R.drawable.icon_siren
-                ), contentDescription = null
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("신고하기")
+        CustomBottomSheet {
+            Column() {
+                Text(text = "신고 사유를 알려주세요.", style = Typography.head3Bold, color = Gray600)
+                Column(modifier = Modifier.padding(top = 8.dp)) {
+                    listOf(
+                        ComplainReasonType.Abuse,
+                        ComplainReasonType.Pornography,
+                        ComplainReasonType.Advertising,
+                        ComplainReasonType.PersonalInfoInfringement,
+                        ComplainReasonType.Fishing,
+                        ComplainReasonType.Others,
+                    ).forEach {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp)
+                                .background(
+                                    color = if (checkedValue == it.value) Gray100 else Base0,
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                        ) {
+                            CheckBox(
+                                text = it.label,
+                                onClick = { checkedValue = it.value },
+                                isSelected = checkedValue == it.value,
+                                isIconCircle = true
+                            )
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    PrimaryLightButton(
+                        modifier = Modifier.weight(1f),
+                        size = ButtonSize.LARGE,
+                        text = "취소",
+                        onClick = { onDismiss() })
+                    Spacer(modifier = Modifier.width(4.dp))
+                    PrimaryButton(
+                        modifier = Modifier.weight(1f),
+                        size = ButtonSize.LARGE, text = "확인", onClick = {
+                            onConfirm(checkedValue)
+                            onDismiss()
+                        })
+                }
+            }
         }
     }
+
+}
+
+@Composable
+fun ComplaintBottomSheet(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
+    BottomSheetDialog(
+        onDismissRequest = { onDismiss }, properties = BottomSheetDialogProperties(
+            navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),
+            /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
+            dismissOnClickOutside = false,
+            behaviorProperties = BottomSheetBehaviorProperties(isDraggable = true)
+        )
+    ) {
+        CustomBottomSheet {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 17.5.dp, bottom = 17.5.dp, start = 12.dp)
+                    .clickable(enabled = true,
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { onClick() }
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Image(
+                    imageVector = ImageVector.vectorResource(
+                        id = R.drawable.icon_siren
+                    ), contentDescription = null
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("신고하기")
+            }
+        }
+    }
+
+
 }
 
 @Composable
@@ -170,3 +281,12 @@ val mockData = OpinionItem(
     feeling = "excited",
     description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
 )
+
+sealed class ComplainReasonType(val label: String, val value: String) {
+    object Abuse : ComplainReasonType(label = "욕설", value = "abuse")
+    object Pornography : ComplainReasonType(label = "음란물", value = "pornography")
+    object Advertising : ComplainReasonType(label = "광고", value = "advertising")
+    object PersonalInfoInfringement : ComplainReasonType(label = "개인정보 침해", value = "personalInfo")
+    object Fishing : ComplainReasonType(label = "낚시성 콘텐츠", value = "fishing")
+    object Others : ComplainReasonType(label = "기타", value = "others")
+}

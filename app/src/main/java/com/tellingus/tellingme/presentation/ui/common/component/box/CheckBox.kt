@@ -38,7 +38,8 @@ fun CheckBox(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     showRightIcon: Boolean = false,
-    horizontalArrangement : Arrangement.Horizontal = Arrangement.Start
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    isIconCircle: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -54,12 +55,22 @@ fun CheckBox(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = horizontalArrangement
     ) {
-        Image(
-            imageVector = ImageVector.vectorResource(
-                id = if (isSelected) R.drawable.icon_check_box_on else R.drawable.icon_check_box_off
-            ),
-            contentDescription = null
-        )
+        if (isIconCircle) {
+            Image(
+                imageVector = ImageVector.vectorResource(
+                    id = if (isSelected) R.drawable.icon_check_box_on else R.drawable.icon_check_box_off
+                ),
+                contentDescription = null
+            )
+        } else {
+            Image(
+                imageVector = ImageVector.vectorResource(
+                    id = if (isSelected) R.drawable.icon_check_circle_on else R.drawable.icon_check_circle_off
+                ),
+                contentDescription = null
+            )
+        }
+
         Spacer(modifier = Modifier.size(8.dp))
         Text(
             text = text,
