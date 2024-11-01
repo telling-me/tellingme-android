@@ -55,5 +55,6 @@ object MyPageDestinations {
     const val SETTING = "setting"
     const val MY_INFO_EDIT = "myInfoEdit"
     const val WITH_DRAW = "withDraw"
+    const  val ABOUT_TELLING_ME = "aboutTellingMe"
 
 }
