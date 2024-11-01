@@ -435,11 +435,8 @@ fun MyPageScreenContent(navController: NavController) {
                     }
 
                     Switch(checked = isAlarmChecked, onCheckedChange = {
-                        isAlarmChecked = it
-                        var intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                        }
-                        context.startActivity(intent)
+//                        isAlarmChecked = it
+                        isShowAlarmAllow = true
                     })
                 }
 
@@ -462,7 +459,7 @@ fun MyPageScreenContent(navController: NavController) {
                                     }
 
                                     ActionType.NAVIGATE_SCREEN -> {
-                                         navController.navigate(item.destination)
+                                        navController.navigate(item.destination)
                                     }
 
                                     ActionType.SEND_EMAIL -> {
