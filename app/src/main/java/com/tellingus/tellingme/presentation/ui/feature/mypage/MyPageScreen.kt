@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,14 +38,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
+import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
+import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLightButton
+import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowDoubleButtonDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
+import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.model.ToolTipType
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
@@ -146,7 +150,8 @@ fun MyPageScreenContent(navController: NavController) {
         )
     }
 
-    var checked by remember { mutableStateOf(true) }
+    var isAlarmChecked by remember { mutableStateOf(false) }
+    var isShowAlarmAllow by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.padding(start = 20.dp, end = 20.dp)
@@ -314,7 +319,12 @@ fun MyPageScreenContent(navController: NavController) {
                 modifier = Modifier
                     .weight(1f)
                     .height(74.dp)
-                    .background(Color.White, RoundedCornerShape(12.dp)),
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .clickable {
+                        val intent =
+                            Intent(Intent.ACTION_VIEW, Uri.parse("https://tally.so/r/3Nlvlp"))
+                        context.startActivity(intent)
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -336,7 +346,16 @@ fun MyPageScreenContent(navController: NavController) {
                 modifier = Modifier
                     .weight(1f)
                     .height(74.dp)
-                    .background(Color.White, RoundedCornerShape(12.dp)),
+                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .clickable {
+                        val intent =
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://doana.notion.site/f7a045872c3b4b02bce5e9f6d6cfc2d8?pvs=4")
+                            )
+                        context.startActivity(intent)
+
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
@@ -355,13 +374,44 @@ fun MyPageScreenContent(navController: NavController) {
             }
         }
 
+        if (isShowAlarmAllow) {
+            ShowDoubleButtonDialog(
+                title = "알림을 허용하기 위해 설정으로 이동해요.",
+                contents = "",
+                leftButton = {
+                    PrimaryLightButton(
+                        modifier = Modifier.weight(1f),
+                        size = ButtonSize.LARGE,
+                        text = "나중에",
+                        onClick = {
+                            isShowAlarmAllow = false
+                        }
+                    )
+                },
+                rightButton = {
+                    PrimaryButton(
+                        modifier = Modifier.weight(1f),
+                        size = ButtonSize.LARGE,
+                        text = "이동하기",
+                        onClick = {
+                            isShowAlarmAllow = false
+                            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                            }
+                            context.startActivity(intent)
+
+                        }
+                    )
+                }
+            )
+        }
+
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 40.dp)
                 .background(Color.White)
         ) {
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -384,8 +434,12 @@ fun MyPageScreenContent(navController: NavController) {
                         Text(text = "푸시 알림 받기")
                     }
 
-                    Switch(checked = checked, onCheckedChange = {
-                        checked = it
+                    Switch(checked = isAlarmChecked, onCheckedChange = {
+                        isAlarmChecked = it
+                        var intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                        }
+                        context.startActivity(intent)
                     })
                 }
 
