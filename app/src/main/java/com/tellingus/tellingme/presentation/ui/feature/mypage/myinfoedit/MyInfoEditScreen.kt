@@ -526,21 +526,23 @@ fun DropdownSelect(text: String = "", modifier: Modifier = Modifier) {
 fun MyInfoEditScreenHeader(navController: NavController) {
     BasicAppBar(modifier = Modifier
         .fillMaxWidth()
-        .padding(start = 12.dp, top = 5.dp, bottom = 5.dp, end = 10.dp), leftSlot = {
-        TellingmeIconButton(iconRes = R.drawable.icon_caret_left,
-            size = ButtonSize.MEDIUM,
-            color = Gray500,
-            onClick = {
+        .padding(start = 12.dp, top = 5.dp, bottom = 5.dp, end = 10.dp),
+        leftSlot = {
+            TellingmeIconButton(iconRes = R.drawable.icon_caret_left,
+                size = ButtonSize.MEDIUM,
+                color = Gray500,
+                onClick = {
 
-                navController.popBackStack()
-            })
-    }, rightSlot = {
-        Row {
-            SingleButton(size = ButtonSize.LARGE, text = "완료", onClick = {
+                    navController.popBackStack()
+                })
+        },
+        rightSlot = {
+            Row {
+                SingleButton(size = ButtonSize.LARGE, text = "완료", onClick = {
 
-            })
-        }
-    })
+                })
+            }
+        })
 }
 
 sealed class ConcernType(val label: String, val value: String) {

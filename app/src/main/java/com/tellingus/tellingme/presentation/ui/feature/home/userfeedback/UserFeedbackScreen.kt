@@ -41,6 +41,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLi
 import com.tellingus.tellingme.presentation.ui.common.component.button.TellingmeIconButton
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
+import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.feature.otherspace.detail.ComplaintBottomSheet
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray100
@@ -55,13 +56,15 @@ import kotlinx.coroutines.launch
 fun UserFeedbackScreen(navController: NavController) {
 
 
-    MainLayout(header = { UserFeedbackScreenHeader { navController.popBackStack() } }, content = {
-        UserFeedbackScreenContent()
-    })
+    MainLayout(
+        header = { UserFeedbackScreenHeader { navController.navigate(HomeDestinations.HOME) } },
+        content = {
+            UserFeedbackScreenContent(navController = navController)
+        })
 }
 
 @Composable
-fun UserFeedbackScreenContent() {
+fun UserFeedbackScreenContent(navController: NavController) {
     var isChecked by remember {
         mutableStateOf(false)
     }
@@ -96,12 +99,16 @@ fun UserFeedbackScreenContent() {
             PrimaryButton(modifier = Modifier.fillMaxWidth(),
                 size = ButtonSize.LARGE,
                 text = "좋았어요!",
-                onClick = { /*TODO*/ })
+                onClick = {
+                    navController.navigate(HomeDestinations.USER_FEEDBACK_GOOD)
+                })
             Spacer(modifier = Modifier.height(20.dp))
             PrimaryLightButton(modifier = Modifier.fillMaxWidth(),
                 size = ButtonSize.LARGE,
                 text = "아쉬워요..",
-                onClick = {})
+                onClick = {
+                    navController.navigate(HomeDestinations.USER_FEEDBACK_BAD)
+                })
 
             Spacer(modifier = Modifier.height(24.dp))
             CheckBox(
@@ -147,15 +154,17 @@ fun UserFeedbackScreenContent() {
     }
 
     if (isInfoBottomSheetOpen) {
-        InfoBottomSheet(onDismiss = { isInfoBottomSheetOpen = false })
+        InfoBottomSheet(
+            onConfirm = { isInfoBottomSheetOpen = false },
+            onDismiss = { isInfoBottomSheetOpen = false }
+        )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InfoBottomSheet(onDismiss: () -> Unit = {}) {
+fun InfoBottomSheet(onConfirm: () -> Unit, onDismiss: () -> Unit = {}) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -193,7 +202,7 @@ fun InfoBottomSheet(onDismiss: () -> Unit = {}) {
             .padding(horizontal = 20.dp),
             size = ButtonSize.LARGE,
             text = "확인",
-            onClick = { /*TODO*/ })
+            onClick = { onConfirm() })
     }
 
 }
