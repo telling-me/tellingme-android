@@ -57,3 +57,8 @@ val Error600 = Color(0xFFFF3838)
 val Error700 = Color(0xFFE92215)
 
 val Shadow = Color(0x14000000)
+
+val Gray7 = Color(0xFF4D534F)
+val Side200 = Color(0xFFF9F7F2)
+val Side300 = Color(0xFFE6E4E2)
+val Side500 = Color(0xFF807F7D)

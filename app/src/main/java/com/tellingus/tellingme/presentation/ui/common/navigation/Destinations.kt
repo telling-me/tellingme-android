@@ -32,6 +32,8 @@ object HomeDestinations {
     const val MY_TELLER_BADGE = "mytellerBadge"
     const val TELLER_CARD_TUNING = "tellercardTuning"
     const val USER_FEEDBACK = "userFeedback"
+    const val USER_FEEDBACK_GOOD = "userFeedbackGood"
+    const val USER_FEEDBACK_BAD = "userFeedbackBad"
 }
 
 object MySpaceDestinations {
@@ -55,6 +57,6 @@ object MyPageDestinations {
     const val SETTING = "setting"
     const val MY_INFO_EDIT = "myInfoEdit"
     const val WITH_DRAW = "withDraw"
-    const  val ABOUT_TELLING_ME = "aboutTellingMe"
+    const val ABOUT_TELLING_ME = "aboutTellingMe"
 
 }
