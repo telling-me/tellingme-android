@@ -1,5 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.userfeedback
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -65,6 +68,7 @@ fun UserFeedbackScreen(navController: NavController) {
 
 @Composable
 fun UserFeedbackScreenContent(navController: NavController) {
+    val context = LocalContext.current
     var isChecked by remember {
         mutableStateOf(false)
     }
@@ -100,14 +104,25 @@ fun UserFeedbackScreenContent(navController: NavController) {
                 size = ButtonSize.LARGE,
                 text = "좋았어요!",
                 onClick = {
-                    navController.navigate(HomeDestinations.USER_FEEDBACK_GOOD)
+                    val intent =
+                        Intent(
+                            Intent.ACTION_VIEW,
+                            Uri.parse("https://walla.my/v/dZcLYuN8kgVeh5iZFgdb")
+                        )
+                    context.startActivity(intent)
+//                    navController.navigate(HomeDestinations.USER_FEEDBACK_GOOD)
                 })
             Spacer(modifier = Modifier.height(20.dp))
             PrimaryLightButton(modifier = Modifier.fillMaxWidth(),
                 size = ButtonSize.LARGE,
                 text = "아쉬워요..",
                 onClick = {
-                    navController.navigate(HomeDestinations.USER_FEEDBACK_BAD)
+                    val intent = Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://walla.my/v/dJFQAPUTccxEDCaG3KkW")
+                    )
+                    context.startActivity((intent))
+//                    navController.navigate(HomeDestinations.USER_FEEDBACK_BAD)
                 })
 
             Spacer(modifier = Modifier.height(24.dp))

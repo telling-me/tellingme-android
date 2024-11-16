@@ -1,5 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.home
 
+import com.tellingus.tellingme.data.model.home.HomeData
+import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.presentation.ui.common.base.UiEffect
 import com.tellingus.tellingme.presentation.ui.common.base.UiEvent
 import com.tellingus.tellingme.presentation.ui.common.base.UiState
@@ -8,7 +10,7 @@ class HomeContract {
     data class State(
         val isLoading: Boolean = false,
         val todayQuestionCardInfo: TodayQuestionCardInfo = TodayQuestionCardInfo(),
-        val isShowNotificationDialog: Boolean = false,
+        val mainData: HomeData? = null,
     ) : UiState {
         data class TodayQuestionCardInfo(val title: String = "", val content: String = "")
     }
