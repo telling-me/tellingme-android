@@ -1,6 +1,8 @@
 package com.tellingus.tellingme.data.network
 
 import com.tellingus.tellingme.data.model.common.BasicResponse
+import com.tellingus.tellingme.data.model.home.HomeRequest
+import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
@@ -80,4 +82,9 @@ interface NetworkService {
         @Query("month") month: String
     ): ApiResult<AnswerListResponse>
 
+    // 메인화면용 API
+    @POST("${END_POINT}/v2/mobile/main")
+    suspend fun getMain(
+        @Body homeRequest: HomeRequest
+    ): ApiResult<HomeResponse>
 }

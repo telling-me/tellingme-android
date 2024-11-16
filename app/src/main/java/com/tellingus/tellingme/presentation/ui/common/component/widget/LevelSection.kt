@@ -27,7 +27,7 @@ import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 fun LevelSection(
     modifier: Modifier = Modifier,
     level: Int,
-    levelDescription: String = "연속 10일만 작성하면 LV.1 달성!",
+    levelDescription: String = "연속 n일만 작성하면 LV.${level + 1} 달성!",
     percent: Int,
     itemColor: Color = Profile100
 ) {
@@ -59,7 +59,7 @@ fun LevelSection(
             ) {
                 PercentBar(
                     modifier = modifier.weight(1f),
-                    progress = percent/100f,
+                    progress = percent / 100f,
                     progressColor = itemColor
                 )
                 Spacer(modifier = modifier.size(11.dp))

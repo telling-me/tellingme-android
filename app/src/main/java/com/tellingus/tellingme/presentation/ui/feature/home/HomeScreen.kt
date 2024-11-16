@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +27,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.card.OpinionCard
 import com.tellingus.tellingme.presentation.ui.common.component.chip.ActionChip
@@ -40,24 +42,35 @@ import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import com.tellingus.tellingme.presentation.ui.theme.Typography
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val TAG: String = "로그"
     val context = LocalContext.current
 
-    MainLayout(
-        header = {
-            HomeScreenHeader(navController)
-        },
-        content = {
-            HomeScreenContent(
-                navController = navController
-            )
-        }
-    )
+    val mainData = viewModel.currentState.mainData
+
+    mainData?.let {
+        MainLayout(
+            header = {
+                HomeScreenHeader(navController, viewModel = viewModel)
+            },
+            content = {
+                HomeScreenContent(
+                    navController = navController,
+                    viewModel = viewModel
+                )
+            }
+        )
+    }
+
+
 
     LaunchedEffect(key1 = false) {
         viewModel.getNotice()
@@ -66,7 +79,7 @@ fun HomeScreen(
 }
 
 @Composable
-fun HomeScreenHeader(navController: NavController) {
+fun HomeScreenHeader(navController: NavController, viewModel: HomeViewModel) {
     BasicAppBar(
         modifier = Modifier
             .background(Background100)
@@ -97,6 +110,7 @@ fun HomeScreenHeader(navController: NavController) {
 @Composable
 fun HomeScreenContent(
     navController: NavController,
+    viewModel: HomeViewModel,
 ) {
     val cardList = listOf(
         "happy",
@@ -113,75 +127,101 @@ fun HomeScreenContent(
         "excited",
     )
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
-            ProfileWidget(
-                nickname = "듀이듀이",
-                description = "연속 1일째 기록",
-                modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
-        }
-        Box(modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp)) {
-            LevelSection(level = 1, percent = 50)
-        }
-        Column(modifier = Modifier.padding(top = 32.dp, start = 20.dp, end = 20.dp)) {
-            Text(text = "오늘의 질문", style = TellingmeTheme.typography.body1Bold)
-            Text(
-                modifier = Modifier.padding(top = 5.dp),
-                text = "12명이 대답했어요!",
-                style = TellingmeTheme.typography.caption1Regular
-            )
-            QuestionSection(
-                modifier = Modifier.padding(top = 12.dp),
-                title = "지금까지의 나의 인생을 두 단계로\n나눈다면 어느 시점에 구분선을 둘 건가요?",
-                description = "그 역활이 나의 성향을 반영할 수 있어요",
-                onClickButton = {
-                    navController.navigate(HomeDestinations.RECORD)
-                }
-            )
-        }
 
-        Column(modifier = Modifier.padding(start = 20.dp, top = 32.dp)) {
-            Text(text = "나와 비슷한 텔러들의 이야기", style = TellingmeTheme.typography.body1Bold)
+    val TAG: String = "로그"
+    Log.d(
+        TAG,
+        "HomeScreenContent viewModel.currentState.mainData: ${viewModel.currentState.mainData}"
+    )
 
-            val pagerState = rememberPagerState { cardList.size }
+    val mainData = viewModel.currentState.mainData
 
-            HorizontalPager(
-                modifier = Modifier.padding(top = 12.dp),
-                state = pagerState,
-                contentPadding = PaddingValues(end = 32.dp),
-            ) { page ->
-                val item = cardList[page]
-                OpinionCard(
-                    modifier = Modifier.padding(end = 12.dp),
-                    heartCount = 1234,
-                    buttonState = ButtonState.SELECTED,
-                    feeling = item
-                )
-            }
-        }
+    mainData?.let {
         Column(
-            modifier = Modifier
-                .padding(top = 14.dp, bottom = 30.dp)
-                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            ActionChip(
-                text = "더보기",
-                onClick = {
-
+            Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
+                ProfileWidget(
+                    nickname = mainData.userNickname,
+                    description = "연속 ${mainData.recordCount} 일째 기록",
+                    modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
+            }
+            Box(modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp)) {
+                mainData?.userLevel?.let {
+                    LevelSection(
+                        level = mainData.userLevel,
+                        percent = mainData.userExp
+                    )
                 }
-            )
-        }
+            }
+            Column(modifier = Modifier.padding(top = 32.dp, start = 20.dp, end = 20.dp)) {
+                Text(text = "오늘의 질문", style = TellingmeTheme.typography.body1Bold)
+                Text(
+                    modifier = Modifier.padding(top = 5.dp),
+                    text = "${mainData?.todayAnswerCount} 명이 대답했어요!",
+                    style = TellingmeTheme.typography.caption1Regular
+                )
+                QuestionSection(
+                    modifier = Modifier.padding(top = 12.dp),
+                    title = "${mainData.questionTitle}",
+                    description = "${mainData.questionPhrase}",
+                    onClickButton = {
+                        navController.navigate(HomeDestinations.RECORD)
+                    }
+                )
+            }
+
+            Column(modifier = Modifier.padding(start = 20.dp, top = 32.dp)) {
+                Text(text = "나와 비슷한 텔러들의 이야기", style = TellingmeTheme.typography.body1Bold)
+
+                if (mainData.communicationList.isNotEmpty()) {
+                    val pagerState = rememberPagerState { cardList.size }
+
+                    HorizontalPager(
+                        modifier = Modifier.padding(top = 12.dp),
+                        state = pagerState,
+                        contentPadding = PaddingValues(end = 32.dp),
+                    ) { page ->
+                        val item = cardList[page]
+                        OpinionCard(
+                            modifier = Modifier.padding(end = 12.dp),
+                            heartCount = 1234,
+                            buttonState = ButtonState.SELECTED,
+                            feeling = item
+                        )
+                    }
+                } else {
+                    Text(text = "아직 등록된 내용이 없어요ㅠㅠ", style = Typography.head3Bold)
+                }
+
+            }
+
+            if (mainData.communicationList.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 14.dp, bottom = 30.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ActionChip(
+                        text = "더보기",
+                        onClick = {
+
+                        }
+                    )
+                }
+            }
+
+        } //    Column END
     }
+
 }
 
 
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenHeaderPreview() {
-    HomeScreenHeader(navController = rememberNavController())
+    HomeScreenHeader(navController = rememberNavController(), hiltViewModel())
 }
 
 @Preview
