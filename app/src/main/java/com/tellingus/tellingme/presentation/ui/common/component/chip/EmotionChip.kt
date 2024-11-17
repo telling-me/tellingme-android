@@ -16,7 +16,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 
 @Composable
-fun EmotionChip(modifier: Modifier = Modifier, feeling: String = "happy") {
+fun EmotionChip(modifier: Modifier = Modifier, feeling: String = "happy", emotion: Int = 0) {
     Column(
         modifier = modifier
             .background(Background100, shape = RoundedCornerShape(4.dp))
@@ -26,9 +26,7 @@ fun EmotionChip(modifier: Modifier = Modifier, feeling: String = "happy") {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = getFeeling(feeling),
-            style = TellingmeTheme.typography.body2Bold,
-            color = Gray600
+            text = getEmotion(emotion), style = TellingmeTheme.typography.body2Bold, color = Gray600
         )
     }
 }
@@ -38,5 +36,13 @@ fun getFeeling(data: String): String {
         "happy" -> "행복해요"
         "excited" -> "신나요"
         else -> "기본값"
+    }
+}
+
+fun getEmotion(data: Int): String {
+    return when (data) {
+        0 -> "행복해요"
+        1 -> "신나요"
+        else -> ""
     }
 }

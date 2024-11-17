@@ -175,22 +175,24 @@ fun HomeScreenContent(
                 Text(text = "나와 비슷한 텔러들의 이야기", style = TellingmeTheme.typography.body1Bold)
 
                 if (mainData.communicationList.isNotEmpty()) {
-                    val pagerState = rememberPagerState { cardList.size }
+                    val pagerState = rememberPagerState { mainData.communicationList.size }
 
                     HorizontalPager(
                         modifier = Modifier.padding(top = 12.dp),
                         state = pagerState,
                         contentPadding = PaddingValues(end = 32.dp),
                     ) { page ->
-                        val item = cardList[page]
+                        val item = mainData.communicationList[page]
                         OpinionCard(
                             modifier = Modifier.padding(end = 12.dp),
-                            heartCount = 1234,
-                            buttonState = ButtonState.SELECTED,
-                            feeling = item
+                            heartCount = item.likeCount,
+                            buttonState = if (item.isLiked) ButtonState.SELECTED else ButtonState.ENABLED,
+                            description = item.content,
+                            emotion = item.emotion,
                         )
                     }
                 } else {
+                    // Empty 디자인 없음
                     Text(text = "아직 등록된 내용이 없어요ㅠㅠ", style = Typography.head3Bold)
                 }
 
