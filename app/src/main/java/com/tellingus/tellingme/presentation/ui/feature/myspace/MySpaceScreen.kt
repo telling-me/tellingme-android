@@ -2,7 +2,6 @@ package com.tellingus.tellingme.presentation.ui.feature.myspace
 
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.Space
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -310,6 +309,8 @@ fun MySpaceScreen(
     }
 
     if (isShowDatePicker) {
+        var datePickerState by remember { mutableStateOf(Pair(0, 0)) }
+
         BottomSheetDialog(
             onDismissRequest = { isShowDatePicker = false },
             properties = BottomSheetDialogProperties(
@@ -342,7 +343,15 @@ fun MySpaceScreen(
                     modifier = modifier
                         .padding(top = 4.dp, bottom = 8.dp, start = 8.5.dp, end = 8.5.dp)
                 ) {
-                    PickerExample()
+                    CustomDatePicker(
+                        startYear = uiState.currentDate.year,
+                        startMonth = uiState.currentDate.monthValue,
+                        selectedDate = { year, month ->
+                                if (year.isNotEmpty() && month.isNotEmpty()) {
+                                datePickerState = Pair(year.toInt(), month.toInt())
+                            }
+                        }
+                    )
                 }
 
                 PrimaryButton(
@@ -353,6 +362,12 @@ fun MySpaceScreen(
                     text = "확인",
                     onClick = {
                         isShowDatePicker = false
+                        viewModel.processEvent(
+                            MySpaceContract.Event.OnClickDatePickButton(
+                                year = datePickerState.first,
+                                month = datePickerState.second
+                            )
+                        )
                     }
                 )
             }
@@ -550,6 +565,13 @@ fun MySpaceScreen(
             is MySpaceContract.Effect.ScrollToToday -> {
                 calendarPagerState.animateScrollToPage(
                     page = (uiState.today.year - CALENDAR_RANGE.startYear) * 12 + uiState.today.monthValue - 1,
+                    animationSpec = spring(stiffness = 1000f)
+                )
+            }
+
+            is MySpaceContract.Effect.ScrollToDate -> {
+                calendarPagerState.animateScrollToPage(
+                    page = (effect.year - CALENDAR_RANGE.startYear) * 12 + effect.month - 1,
                     animationSpec = spring(stiffness = 1000f)
                 )
             }

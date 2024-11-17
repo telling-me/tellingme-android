@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,7 +34,6 @@ import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tellingus.tellingme.presentation.ui.theme.Gray100
@@ -46,11 +43,16 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 @Composable
-fun PickerExample() {
-    val year = remember { (2000..2025).map { it.toString() + "년" } }
-    val month = remember { (1..12).map { it.toString() + "월" } }
+fun CustomDatePicker(
+    startYear: Int,
+    startMonth: Int,
+    selectedDate: (String, String) -> Unit
+) {
+    val year = remember { (2000..2025).map { it.toString() } }
+    val month = remember { (1..12).map { it.toString() } }
     val yearPickerState = rememberPickerState()
     val monthPickerState = rememberPickerState()
+    var dateHeight by remember { mutableStateOf(0) }
 
     Surface {
         Column(
@@ -60,24 +62,43 @@ fun PickerExample() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            Row {
-                Picker(
-                    state = yearPickerState,
-                    items = year,
-                    visibleItemsCount = 3,
-                    textModifier = Modifier.padding(8.dp),
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(pixelsToDp(dateHeight))
+                        .background(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Gray100
+                        )
                 )
-                Spacer(modifier = Modifier.size(28.dp))
-                Picker(
-                    state = monthPickerState,
-                    items = month,
-                    visibleItemsCount = 3,
-                    textModifier = Modifier.padding(8.dp),
-                )
+
+                Row {
+                    Picker(
+                        state = yearPickerState,
+                        items = year,
+                        startIndex = year.indexOf(startYear.toString()),
+                        visibleItemsCount = 3,
+                        onChangedDateHeight = { dateHeight = it },
+                        isYear = true
+                    )
+                    Spacer(modifier = Modifier.size(28.dp))
+                    Picker(
+                        state = monthPickerState,
+                        items = month,
+                        startIndex = month.indexOf(startMonth.toString()),
+                        visibleItemsCount = 3,
+                        onChangedDateHeight = { dateHeight = it },
+                        isYear = false
+                    )
+                }
             }
 
-            Text(
-                text = "Selected : ${yearPickerState.selectedItem} ${monthPickerState.selectedItem}",
+            selectedDate(
+                yearPickerState.selectedItem,
+                monthPickerState.selectedItem
             )
         }
     }
@@ -91,7 +112,8 @@ fun Picker(
     state: PickerState = rememberPickerState(),
     startIndex: Int = 0,
     visibleItemsCount: Int = 3,
-    textModifier: Modifier = Modifier,
+    onChangedDateHeight: (Int) -> Unit = {},
+    isYear: Boolean
 ) {
     val visibleItemsMiddle = visibleItemsCount / 2
     val listScrollCount = Integer.MAX_VALUE
@@ -121,13 +143,7 @@ fun Picker(
             .collect { item -> state.selectedItem = item }
     }
 
-    Box(
-        modifier = modifier
-            .background(
-                shape = RoundedCornerShape(8.dp),
-                color = Gray100
-            )
-    ) {
+    Box {
         LazyColumn(
             state = listState,
             flingBehavior = flingBehavior,
@@ -139,9 +155,12 @@ fun Picker(
             items(listScrollCount) { index ->
                 Text(
                     modifier = modifier
-                        .onSizeChanged { size -> itemHeightPixels.value = size.height }
-                        .then(textModifier),
-                    text = getItem(index),
+                        .onSizeChanged { size ->
+                            itemHeightPixels.value = size.height
+                            onChangedDateHeight(size.height)
+                        }
+                        .then(Modifier.padding(8.dp)),
+                    text = if (isYear) getItem(index) + "년" else getItem(index) + "월",
                     style = TellingmeTheme.typography.head2Regular.copy(
                         color = Gray600,
                         fontSize = 20.sp
@@ -149,28 +168,6 @@ fun Picker(
                 )
             }
         }
-        Box(
-            modifier = modifier
-                .height(itemHeightDp)
-                .background(color = Gray600)
-                .align(Alignment.Center)
-        )
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(itemHeightDp)
-//                .offset(y = itemHeightDp * (visibleItemsMiddle + 1))
-//                .background(color = Gray600)
-//        )
-//        Divider(
-//            color = Gray600,
-//            modifier = Modifier.offset(y = itemHeightDp * visibleItemsMiddle)
-//        )
-//
-//        Divider(
-//            color = Gray600,
-//            modifier = Modifier.offset(y = itemHeightDp * (visibleItemsMiddle + 1))
-//        )
     }
 }
 

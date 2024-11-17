@@ -29,10 +29,19 @@ class MySpaceContract {
             val month: Int,
             val day: Int
         ): Event()
+
+        data class OnClickDatePickButton(
+            val year: Int,
+            val month: Int
+        ): Event()
     }
 
     sealed class Effect: UiEffect {
         object ScrollToToday: Effect()
+        data class ScrollToDate(
+            val year: Int,
+            val month: Int
+        ): Effect()
         object ShowAnswerListPagerDialog: Effect()
         object ShowAnswerEmptyDialog: Effect()
     }

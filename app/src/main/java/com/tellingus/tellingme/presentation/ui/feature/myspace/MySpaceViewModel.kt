@@ -67,6 +67,15 @@ class MySpaceViewModel @Inject constructor(
                     postEffect(MySpaceContract.Effect.ShowAnswerEmptyDialog)
                 }
             }
+
+            is MySpaceContract.Event.OnClickDatePickButton -> {
+                postEffect(
+                    MySpaceContract.Effect.ScrollToDate(
+                        year = event.year,
+                        month = event.month
+                    )
+                )
+            }
         }
     }
 
