@@ -34,16 +34,28 @@ fun OpinionCard(
     modifier: Modifier = Modifier,
     heartCount: Int,
     buttonState: ButtonState,
-    feeling: String,
-    description: String = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다.",
+    feeling: String = "",
+    description: String = "",
     onClick: () -> Unit = {},
-    type: String = "default"
+    type: String = "default",
+    emotion: Int = 0,
 ) {
 
     if (type === "default") {
-        DefaultCard(modifier, heartCount, buttonState, feeling, description, onClick)
+        DefaultCard(
+            modifier,
+            heartCount,
+            buttonState,
+            feeling,
+            description,
+            onClick,
+            emotion,
+        )
     } else if (type === "full") {
-        FullCard(modifier, heartCount, buttonState, feeling, description, onClick)
+        FullCard(
+            modifier, heartCount, buttonState,
+            feeling, description, onClick, emotion
+        )
     }
 }
 
@@ -53,8 +65,9 @@ fun DefaultCard(
     heartCount: Int,
     buttonState: ButtonState,
     feeling: String,
-    description: String = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다.",
+    description: String,
     onClick: () -> Unit = {},
+    emotion: Int,
 ) {
     Box(
         modifier = modifier
@@ -81,7 +94,7 @@ fun DefaultCard(
                 )
             }
             Column() {
-                EmotionChip(feeling = feeling)
+                EmotionChip(feeling = feeling, emotion = emotion)
                 Text(
                     modifier = Modifier.padding(top = 8.dp),
                     text = description,
@@ -106,8 +119,9 @@ fun FullCard(
     heartCount: Int,
     buttonState: ButtonState,
     feeling: String,
-    description: String = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다.",
+    description: String,
     onClick: () -> Unit = {},
+    emotion: Int,
 ) {
     Box(
         modifier = modifier
@@ -125,14 +139,15 @@ fun FullCard(
                     contentDescription = "",
                     modifier = Modifier.size(52.dp),
                 )
-                EmotionChip(modifier = Modifier.padding(top = 9.5.dp), feeling = feeling)
+                EmotionChip(
+                    modifier = Modifier.padding(top = 9.5.dp),
+                    feeling = feeling,
+                    emotion = emotion
+                )
 
                 Column(
                     modifier = Modifier.padding(
-                        top = 24.dp,
-                        bottom = 24.dp,
-                        start = 16.dp,
-                        end = 16.dp
+                        top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp
                     )
                 ) {
                     Text(text = "첫 직장에 입사했을 때인 것 같아. 대학 다니면서는 알지 못했던 새로운 분야도 많이 알게 되고 시야도 그 시점에 많이 넓어졌어. 동료들과 어울리고 조직 문화에 적응하면서 업무에 대해 이해하는 시간을 갖느라 긴장하면서 열심히 다녔어. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 첫 직장에 입사했을 때인 것 같아. 대학 다니면서는 알지 못했던 새로운 분야도 많이 알게 되고 시야도 그 시점에 많이 넓어졌어. 동료들과 어울리고 조직 문화에 적응하면서 업무에 대해 이해하는 시간을 갖느라 긴장하면서 열심히 다녔어. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 대학 다니면서는 알지 못했던 새로운 분야도 많이 알게 되고 시야도 그 시점에 많이 넓어졌어. 동료들과 어울리고 조직 문화에 적응하면서 업무에 대해 이해하는 시간을 갖느라 긴장하면서 열심히 다녔어. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 하하하")
@@ -158,7 +173,8 @@ fun OpinionCardPreview() {
             heartCount = 1234,
             buttonState = ButtonState.SELECTED,
             feeling = "happy",
-            type = "default"
+            type = "default",
+            description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
         )
     }
 }

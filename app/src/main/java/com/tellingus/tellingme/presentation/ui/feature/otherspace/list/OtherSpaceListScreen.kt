@@ -121,6 +121,7 @@ fun OtherSpaceListScreenContent(navController: NavController) {
                     onClick = {
                         navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${it.id}")
                     }
+
                 )
             }
         }
