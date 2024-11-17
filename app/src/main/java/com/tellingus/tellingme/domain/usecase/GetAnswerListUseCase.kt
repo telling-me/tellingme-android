@@ -13,10 +13,7 @@ import javax.inject.Singleton
 class GetAnswerListUseCase @Inject constructor(
     private val mySpaceRepository: MySpaceRepository
 ) {
-    suspend operator fun invoke(
-        year: String,
-        month: String
-    ) : ApiResult<AnswerListResponse> {
-        return mySpaceRepository.getAnswerList(year, month)
+    suspend operator fun invoke() : ApiResult<AnswerListResponse> {
+        return mySpaceRepository.getAnswerList()
     }
 }

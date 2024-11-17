@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.common.component.card
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,18 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray300
 import com.tellingus.tellingme.presentation.ui.theme.Gray50
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Locale
 
 @Composable
 fun CalendarCardView(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    title: String,
+    subTitle: String,
+    emotion: Int,
+    date: LocalDate,
+    contents: String
 ) {
     Column(
         modifier = modifier
@@ -61,7 +70,7 @@ fun CalendarCardView(
         Text(
             modifier = Modifier
                 .padding(top = 10.dp),
-            text = "소속된 집단에서 내가 주로 맡는 역할은?",
+            text = title,
             style = TellingmeTheme.typography.body1Regular.copy(
                 color = Gray300,
                 fontSize = 14.sp
@@ -72,7 +81,7 @@ fun CalendarCardView(
         Text(
             modifier = Modifier
                 .padding(top = 7.dp),
-            text = "그 역할이 나의 성향을 반영할 수 있어요.",
+            text = subTitle,
             style = TellingmeTheme.typography.body1Regular.copy(
                 color = Gray600,
                 fontSize = 12.sp
@@ -111,7 +120,7 @@ fun CalendarCardView(
 
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = "2023.08.26",
+            text = date.toString().replace("-", "."),
             style = TellingmeTheme.typography.body1Regular.copy(
                 color = Gray600,
                 fontSize = 12.sp
@@ -122,7 +131,7 @@ fun CalendarCardView(
 
         Text(
             modifier = Modifier.fillMaxSize(),
-            text = "첫 직장에 입사했을 때인 것 같아. 대학 다니면서는 알지 못했던 새로운 분야도 많이 알게 되고 시야도 그 시점에 많이 넓어졌어. 동료들과 어울리고 조직 문화에 적응하면서 업무에 대해 이해하는 시간을 갖느라 긴장하면서 열심히 다녔어.",
+            text = contents,
             style = TellingmeTheme.typography.body1Regular.copy(
                 color = Gray600,
                 fontSize = 14.sp
@@ -130,10 +139,4 @@ fun CalendarCardView(
             textAlign = TextAlign.Start
         )
     }
-}
-
-@Preview
-@Composable
-fun CalendarCardViewPreview() {
-    CalendarCardView()
 }

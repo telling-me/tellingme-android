@@ -74,10 +74,7 @@ interface NetworkService {
     ): ApiResult<BasicResponse>
 
     // 내 답변 리스트 조회 API
-    @GET("${END_POINT}/answer/list")
-    suspend fun getAnswerList(
-        @Query("year") year: String,
-        @Query("month") month: String
-    ): ApiResult<AnswerListResponse>
+    @GET("${END_POINT}/answer/list/all")
+    suspend fun getAnswerList(): ApiResult<AnswerListResponse>
 
 }
