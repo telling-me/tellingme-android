@@ -1,7 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.myspace
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -58,8 +57,8 @@ import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.button.FloatingButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
 import com.tellingus.tellingme.presentation.ui.common.component.card.CalendarCardView
-import com.tellingus.tellingme.presentation.ui.common.getEmotionText
-import com.tellingus.tellingme.presentation.ui.common.getMediumEmotion
+import com.tellingus.tellingme.presentation.ui.common.const.getEmotionText
+import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background200

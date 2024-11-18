@@ -1,4 +1,4 @@
-package com.tellingus.tellingme.presentation.ui.common
+package com.tellingus.tellingme.presentation.ui.common.const
 
 import com.tellingus.tellingme.R
 
