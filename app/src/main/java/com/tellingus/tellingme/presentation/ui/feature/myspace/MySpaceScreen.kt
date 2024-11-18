@@ -421,7 +421,7 @@ fun MySpaceScreen(
                             title = uiState.answerList[index].title,
                             subTitle = uiState.answerList[index].phrase,
                             emotion = getMediumEmotion(index = uiState.answerList[index].emotion),
-                            emotionText = getEmotionText(index = uiState.answerList[index].emotion),
+                            emotionDesc = getEmotionText(index = uiState.answerList[index].emotion),
                             date = LocalDate.of(uiState.answerList[index].date[0], uiState.answerList[index].date[1], uiState.answerList[index].date[2]),
                             contents = uiState.answerList[index].content,
                         )
