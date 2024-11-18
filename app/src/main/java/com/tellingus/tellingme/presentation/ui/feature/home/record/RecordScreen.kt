@@ -59,20 +59,20 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.holix.android.bottomsheetdialog.compose.NavigationBarProperties
 import com.tellingus.tellingme.R
-import com.tellingus.tellingme.core.moddel.Emotion
-import com.tellingus.tellingme.core.moddel.emotionList
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLightButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.SingleButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.TellingmeIconButton
-import com.tellingus.tellingme.presentation.ui.common.component.dialog.DoubleButtonDialog
 import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowDoubleButtonDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.toast.TellingmeToast
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.model.ToolTipType
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
+import com.tellingus.tellingme.presentation.ui.common.const.LargeEmotionList
+import com.tellingus.tellingme.presentation.ui.common.const.getEmotionText
+import com.tellingus.tellingme.presentation.ui.common.const.getLargeEmotion
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray300
@@ -253,7 +253,7 @@ fun RecordScreenContent(
                                 modifier = modifier.size(52.dp),
                                 imageVector = if (uiState.selectedEmotion == -1) {
                                     ImageVector.vectorResource(R.drawable.emotion_circle)
-                                } else ImageVector.vectorResource(emotionList[uiState.selectedEmotion].icon),
+                                } else ImageVector.vectorResource(getLargeEmotion(uiState.selectedEmotion + 1)),
                                 contentDescription = null
                             )
                             Spacer(modifier = modifier.size(4.dp))
@@ -265,7 +265,7 @@ fun RecordScreenContent(
                                         shape = RoundedCornerShape(4.dp)
                                     )
                                     .padding(horizontal = 6.dp, vertical = 1.5.dp),
-                                text = if (uiState.selectedEmotion == -1) "?" else emotionList[uiState.selectedEmotion].description,
+                                text = if (uiState.selectedEmotion == -1) "?" else getEmotionText(uiState.selectedEmotion + 1),
                                 textAlign = TextAlign.Center,
                                 style = TellingmeTheme.typography.body2Bold,
                                 color = Gray600
@@ -398,7 +398,7 @@ fun EmotionBottomSheet(
             )
             Spacer(modifier = modifier.size(4.dp))
             Text(
-                text = if (selectedEmotion == -1) "듀이 감정티콘을 선택해주세요" else emotionList[selectedEmotion].description,
+                text = if (selectedEmotion == -1) "듀이 감정티콘을 선택해주세요" else getEmotionText(selectedEmotion + 1),
                 style = TellingmeTheme.typography.body2Regular.copy(
                     color = Gray600
                 ),
@@ -415,7 +415,7 @@ fun EmotionBottomSheet(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     contentPadding = PaddingValues(vertical = 24.dp)
                 ) {
-                    itemsIndexed(emotionList) {position, item ->
+                    itemsIndexed(LargeEmotionList) { position, item ->
                         Box(
                             modifier = modifier
                                 .alpha(
@@ -440,7 +440,7 @@ fun EmotionBottomSheet(
                                             }
                                         }
                                     ),
-                                imageVector = ImageVector.vectorResource(item.icon),
+                                imageVector = ImageVector.vectorResource(item.emotionRes),
                                 contentDescription = "emotion"
                             )
                             if (position >= 6) {
