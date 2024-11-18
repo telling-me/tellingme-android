@@ -15,10 +15,7 @@ import javax.inject.Singleton
 class MySpaceRepositoryImpl @Inject constructor(
     private val networkService: NetworkService
 ): MySpaceRepository {
-    override suspend fun getAnswerList(
-        year: String,
-        month: String
-    ): ApiResult<AnswerListResponse> {
-        return networkService.getAnswerList(year, month)
+    override suspend fun getAnswerList(): ApiResult<AnswerListResponse> {
+        return networkService.getAnswerList()
     }
 }

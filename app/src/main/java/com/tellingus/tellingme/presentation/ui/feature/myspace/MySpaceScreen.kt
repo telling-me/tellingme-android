@@ -1,7 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.myspace
 
 import android.annotation.SuppressLint
-import android.widget.Space
+import android.util.Log
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -58,6 +58,8 @@ import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.button.FloatingButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
 import com.tellingus.tellingme.presentation.ui.common.component.card.CalendarCardView
+import com.tellingus.tellingme.presentation.ui.common.getEmotionText
+import com.tellingus.tellingme.presentation.ui.common.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background200
@@ -232,11 +234,11 @@ fun MySpaceScreen(
                                         .fillMaxWidth()
                                         .clickable(
                                             onClick = {
-//                                                isShowAnswerListPagerDialog = true
                                                 viewModel.processEvent(
                                                     MySpaceContract.Event.OnClickCalendarDate(
-                                                        year = "2024",
-                                                        month = "10"
+                                                        year = date.year,
+                                                        month = date.monthValue,
+                                                        day = date.dayOfMonth
                                                     )
                                                 )
                                             },
@@ -254,28 +256,41 @@ fun MySpaceScreen(
                                                     color = Primary400
                                                 )
                                                 .size(6.dp)
-                                                .align(Alignment.TopCenter)
+                                                .align(
+                                                    if (uiState.isAnsweredDateList.contains(uiState.today)) {
+                                                        Alignment.TopEnd
+                                                    } else {
+                                                        Alignment.TopCenter
+                                                    }
+                                                )
                                         )
                                     }
 
                                     Column(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Text(
-                                            modifier = modifier
-                                                .padding(vertical = 13.dp),
-                                            text = date.dayOfMonth.toString(),
-                                            style = TellingmeTheme.typography.body1Bold.copy(
-                                                color = if ((index + emptyCount) % 7 == 0) Error400 else Gray500,
-                                                fontSize = 16.sp
-                                            ),
-                                            textAlign = TextAlign.Center
-                                        )
-//                                        Image(
-//                                            modifier = modifier.size(50.dp),
-//                                            imageVector = ImageVector.vectorResource(R.drawable.emotion_angry_medium),
-//                                            contentDescription = null
-//                                        )
+                                        if (uiState.isAnsweredDateList.contains(date)) {
+                                            Image(
+                                                modifier = modifier.size(50.dp),
+                                                imageVector = ImageVector.vectorResource(
+                                                    getMediumEmotion(
+                                                        index = uiState.answerList[uiState.isAnsweredDateList.indexOf(date)].emotion
+                                                    )
+                                                ),
+                                                contentDescription = null
+                                            )
+                                        } else {
+                                            Text(
+                                                modifier = modifier
+                                                    .padding(vertical = 13.dp),
+                                                text = date.dayOfMonth.toString(),
+                                                style = TellingmeTheme.typography.body1Bold.copy(
+                                                    color = if ((index + emptyCount) % 7 == 0) Error400 else Gray500,
+                                                    fontSize = 16.sp
+                                                ),
+                                                textAlign = TextAlign.Center
+                                            )
+                                        }
 
                                         Spacer(modifier = Modifier.height(24.dp))
                                     }
@@ -300,12 +315,14 @@ fun MySpaceScreen(
     }
 
     if (isShowDatePicker) {
+        var datePickerState by remember { mutableStateOf(Pair(0, 0)) }
+
         BottomSheetDialog(
             onDismissRequest = { isShowDatePicker = false },
             properties = BottomSheetDialogProperties(
                 navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),
                 dismissOnClickOutside = false,
-                behaviorProperties = BottomSheetBehaviorProperties(isDraggable = true)
+                behaviorProperties = BottomSheetBehaviorProperties(isDraggable = false)
             )
         ) {
             Column(
@@ -328,16 +345,35 @@ fun MySpaceScreen(
                     )
                 }
 
-                
-                Spacer(modifier = Modifier.size(8.dp))
+                Box(
+                    modifier = modifier
+                        .padding(top = 4.dp, bottom = 8.dp, start = 8.5.dp, end = 8.5.dp)
+                ) {
+                    CustomDatePicker(
+                        startYear = uiState.currentDate.year,
+                        startMonth = uiState.currentDate.monthValue,
+                        selectedDate = { year, month ->
+                                if (year.isNotEmpty() && month.isNotEmpty()) {
+                                datePickerState = Pair(year.toInt(), month.toInt())
+                            }
+                        }
+                    )
+                }
+
                 PrimaryButton(
                     modifier = modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     size = ButtonSize.LARGE,
-                    text = "완료",
+                    text = "확인",
                     onClick = {
                         isShowDatePicker = false
+                        viewModel.processEvent(
+                            MySpaceContract.Event.OnClickDatePickButton(
+                                year = datePickerState.first,
+                                month = datePickerState.second
+                            )
+                        )
                     }
                 )
             }
@@ -345,7 +381,10 @@ fun MySpaceScreen(
     }
 
     if (isShowAnswerListPagerDialog) {
-        val pagerState = rememberPagerState { 5 }
+        val pagerState = rememberPagerState(
+            initialPage = uiState.initialAnswerPageIndex,
+            pageCount = { uiState.answerList.size }
+        )
 
         Dialog(
             onDismissRequest = {
@@ -379,7 +418,13 @@ fun MySpaceScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         CalendarCardView(
-                            modifier = modifier.weight(1f)
+                            modifier = modifier.weight(1f),
+                            title = uiState.answerList[index].title,
+                            subTitle = uiState.answerList[index].phrase,
+                            emotion = getMediumEmotion(index = uiState.answerList[index].emotion),
+                            emotionText = getEmotionText(index = uiState.answerList[index].emotion),
+                            date = LocalDate.of(uiState.answerList[index].date[0], uiState.answerList[index].date[1], uiState.answerList[index].date[2]),
+                            contents = uiState.answerList[index].content,
                         )
                         Spacer(modifier = Modifier.size(16.dp))
 
@@ -531,8 +576,15 @@ fun MySpaceScreen(
                 )
             }
 
-            is MySpaceContract.Effect.ShowAnswerListPagerDialog -> {
+            is MySpaceContract.Effect.ScrollToDate -> {
+                calendarPagerState.animateScrollToPage(
+                    page = (effect.year - CALENDAR_RANGE.startYear) * 12 + effect.month - 1,
+                    animationSpec = spring(stiffness = 1000f)
+                )
+            }
 
+            is MySpaceContract.Effect.ShowAnswerListPagerDialog -> {
+                isShowAnswerListPagerDialog = true
             }
 
             is MySpaceContract.Effect.ShowAnswerEmptyDialog -> {

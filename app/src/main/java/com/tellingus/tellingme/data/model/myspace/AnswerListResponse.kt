@@ -10,7 +10,7 @@ data class Answer(
     val emotion: Int = 0,
     val title: String = "",
     val phrase: String = "",
-    val date: String = "",
+    val date: List<Int> = emptyList(),
     val content: String = "",
     val spareTitle: String = "",
     val sparePhrase: String = "",

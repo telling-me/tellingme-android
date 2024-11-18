@@ -51,8 +51,10 @@ class LoginViewModel @Inject constructor(
         // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
             if (error != null) {
+                Log.d("taag", "2")
                 Log.e(TAG, "카카오계정으로 로그인 실패", error)
             } else if (token != null) {
+                Log.d("taag", "3")
                 Log.i(TAG, "카카오계정으로 로그인 성공 ${token.accessToken}")
                 loginFromKakao(token.accessToken)
             }
