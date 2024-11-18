@@ -1,6 +1,5 @@
 package com.tellingus.tellingme.presentation.ui.common.component.card
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,17 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.theme.Gray300
 import com.tellingus.tellingme.presentation.ui.theme.Gray50
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.Locale
 
 @Composable
 fun CalendarCardView(
@@ -37,7 +32,7 @@ fun CalendarCardView(
     title: String,
     subTitle: String,
     emotion: Int,
-    emotionText: String,
+    emotionDesc: String,
     date: LocalDate,
     contents: String
 ) {
@@ -110,7 +105,7 @@ fun CalendarCardView(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = emotionText,
+                    text = emotionDesc,
                     style = TellingmeTheme.typography.body1Regular.copy(
                         color = Gray300,
                         fontSize = 14.sp
