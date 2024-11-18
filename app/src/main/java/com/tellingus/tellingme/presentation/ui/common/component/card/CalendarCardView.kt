@@ -37,6 +37,7 @@ fun CalendarCardView(
     title: String,
     subTitle: String,
     emotion: Int,
+    emotionText: String,
     date: LocalDate,
     contents: String
 ) {
@@ -91,10 +92,11 @@ fun CalendarCardView(
 
         Column(
             modifier = Modifier
-                .padding(top = 10.dp)
+                .padding(top = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                imageVector = ImageVector.vectorResource(R.drawable.emotion_angry_medium),
+                imageVector = ImageVector.vectorResource(emotion),
                 contentDescription = null
             )
             Spacer(modifier = Modifier.size(4.dp))
@@ -108,7 +110,7 @@ fun CalendarCardView(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "설레요",
+                    text = emotionText,
                     style = TellingmeTheme.typography.body1Regular.copy(
                         color = Gray300,
                         fontSize = 14.sp

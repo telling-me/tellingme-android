@@ -58,6 +58,8 @@ import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.button.FloatingButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
 import com.tellingus.tellingme.presentation.ui.common.component.card.CalendarCardView
+import com.tellingus.tellingme.presentation.ui.common.getEmotionText
+import com.tellingus.tellingme.presentation.ui.common.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background200
@@ -270,7 +272,11 @@ fun MySpaceScreen(
                                         if (uiState.isAnsweredDateList.contains(date)) {
                                             Image(
                                                 modifier = modifier.size(50.dp),
-                                                imageVector = ImageVector.vectorResource(R.drawable.emotion_angry_medium),
+                                                imageVector = ImageVector.vectorResource(
+                                                    getMediumEmotion(
+                                                        index = uiState.answerList[uiState.isAnsweredDateList.indexOf(date)].emotion
+                                                    )
+                                                ),
                                                 contentDescription = null
                                             )
                                         } else {
@@ -415,7 +421,8 @@ fun MySpaceScreen(
                             modifier = modifier.weight(1f),
                             title = uiState.answerList[index].title,
                             subTitle = uiState.answerList[index].phrase,
-                            emotion = 0,
+                            emotion = getMediumEmotion(index = uiState.answerList[index].emotion),
+                            emotionText = getEmotionText(index = uiState.answerList[index].emotion),
                             date = LocalDate.of(uiState.answerList[index].date[0], uiState.answerList[index].date[1], uiState.answerList[index].date[2]),
                             contents = uiState.answerList[index].content,
                         )
