@@ -10,6 +10,7 @@ class HomeContract {
     data class State(
         val isLoading: Boolean = false,
         val todayQuestionCardInfo: TodayQuestionCardInfo = TodayQuestionCardInfo(),
+        val isShowNotificationDialog: Boolean = false,
         val mainData: HomeData? = null,
     ) : UiState {
         data class TodayQuestionCardInfo(val title: String = "", val content: String = "")
