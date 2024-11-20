@@ -2,6 +2,7 @@ package com.tellingus.tellingme.presentation.ui.feature.home
 
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,7 @@ import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestination
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
+import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
@@ -69,13 +71,6 @@ fun HomeScreen(
             }
         )
     }
-
-
-
-    LaunchedEffect(key1 = false) {
-        viewModel.getNotice()
-    }
-
 }
 
 @Composable
@@ -138,7 +133,6 @@ fun HomeScreenContent(
 
     mainData?.let {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
                 ProfileWidget(
@@ -192,8 +186,18 @@ fun HomeScreenContent(
                         )
                     }
                 } else {
-                    // Empty 디자인 없음
-                    Text(text = "아직 등록된 내용이 없어요ㅠㅠ", style = Typography.head3Bold)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painter = painterResource(id = R.drawable.empty_character),
+                            contentDescription = "empty_character"
+                        )
+                        Text(
+                            text = "나와 비슷한 텔러들의 이야기가 없어요",
+                            style = Typography.body2Bold,
+                            color = Gray600
+                        )
+                    }
+
                 }
 
             }
@@ -207,9 +211,7 @@ fun HomeScreenContent(
                 ) {
                     ActionChip(
                         text = "더보기",
-                        onClick = {
-
-                        }
+                        onClick = {}
                     )
                 }
             }
