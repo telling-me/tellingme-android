@@ -6,7 +6,7 @@ import com.tellingus.tellingme.presentation.ui.common.base.UiState
 
 class MyPageContract {
     data class State(
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
     ) : UiState
 
     sealed class Event : UiEvent {

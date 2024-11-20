@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
@@ -23,23 +24,42 @@ class TellingMeFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
 
-        /**
-         * background / foreground 감지
-         * @description Verify if the message contains data
-         */
         if (remoteMessage.data.isNotEmpty()) {
             Log.d(TAG, "remoteMessage.data: ${remoteMessage.data}")
-            sendMessageByData(remoteMessage)
+//            sendMessageByData(remoteMessage)
         }
 
-        /**
-         * background / foreground 감지
-         * background시 상태표시줄에서 표시
-         * @description Verify if the message contains notification
-         */
-        remoteMessage?.notification?.let {
-            Log.d(TAG, "remoteMessage.notification: ${it.title}, ${it.body} ")
-            sendMessageByNotification(remoteMessage)
+        remoteMessage.notification?.let {
+            Log.d("taag", "remoteMessage.notification: ${it.title}, ${it.body} ")
+
+            val intent = Intent(this, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            val pendingIntent = PendingIntent.getActivity(
+                this, 0, intent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.tellingme_logo)
+                .setContentTitle(it.title)
+                .setContentText(it.body)
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent)
+
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    NOTIFICATION_CHANNEL_ID,
+                    NOTIFICATION_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            notificationManager.notify(0, notificationBuilder.build())
         }
     }
 
@@ -55,7 +75,6 @@ class TellingMeFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun createNotificationChannel(manager: NotificationManager) {
-
         var notificationChannel: NotificationChannel? = null
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationChannel = NotificationChannel(
@@ -71,29 +90,6 @@ class TellingMeFirebaseMessagingService : FirebaseMessagingService() {
             manager.createNotificationChannel(notificationChannel!!)
         }
     }
-
-    private fun sendMessageByData(remoteMessage: RemoteMessage) {
-        val (uniId, pendingIntent) = setNotificationIntent()
-        val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) // 알림 소리
-        val notificationManager =
-            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createNotificationChannel(notificationManager);
-        }
-
-        // 알림에 대한 UI 정보와 작업을 지
-        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.tellingme_logo) // 아이콘 설정
-            .setContentTitle(remoteMessage.data["title"].toString()) // 제목
-            .setContentText(remoteMessage.data["body"].toString()) // 메시지 내용
-            .setAutoCancel(true)
-            .setSound(soundUri) // 알림 소리
-            .setContentIntent(pendingIntent) // 알림 실행 시 Intent
-
-        notificationManager.notify(uniId, notificationBuilder.build()) // 알림 생성
-    }
-
     private fun sendMessageByNotification(remoteMessage: RemoteMessage) {
         val (uniId, pendingIntent) = setNotificationIntent()
         val soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION) // 알림 소리

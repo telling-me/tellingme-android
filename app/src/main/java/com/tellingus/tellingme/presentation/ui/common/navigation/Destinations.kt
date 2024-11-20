@@ -47,5 +47,6 @@ object MyPageDestinations {
 
     const val MY_PAGE = "myPageSpace"
     const val ALARM = "alarm"
+    const val SIGN_OUT = "signOut"
 
 }

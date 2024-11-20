@@ -7,7 +7,8 @@ import com.tellingus.tellingme.presentation.ui.common.base.UiState
 class HomeContract {
     data class State(
         val isLoading: Boolean = false,
-        val todayQuestionCardInfo: TodayQuestionCardInfo = TodayQuestionCardInfo()
+        val todayQuestionCardInfo: TodayQuestionCardInfo = TodayQuestionCardInfo(),
+        val isShowNotificationDialog: Boolean = false,
     ) : UiState {
         data class TodayQuestionCardInfo(val title: String = "", val content: String = "")
     }

@@ -33,6 +33,8 @@ class HomeViewModel @Inject constructor(
 
                 }
         }
+
+//        if ()
     }
 
     val state = HomeContract.State(

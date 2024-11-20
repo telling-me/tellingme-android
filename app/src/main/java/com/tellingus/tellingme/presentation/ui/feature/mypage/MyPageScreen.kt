@@ -41,6 +41,7 @@ import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
+import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
@@ -91,7 +92,8 @@ fun MyPageScreenHeader(
             modifier = Modifier
                 .size(24.dp)
                 .clickable(onClick = {
-                    signOut()
+                    navController.navigate(MyPageDestinations.SIGN_OUT)
+//                    signOut()
 //                    navController.navigate(MyPageDestinations.설정)
 //                    [5-2. 설정] 이동
                 }),
