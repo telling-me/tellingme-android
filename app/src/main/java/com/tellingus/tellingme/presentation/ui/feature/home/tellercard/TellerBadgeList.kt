@@ -26,8 +26,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.badge.TellerBadge
+import com.tellingus.tellingme.presentation.ui.common.component.chip.ActionChip
 import com.tellingus.tellingme.presentation.ui.theme.Base0
+import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import com.tellingus.tellingme.presentation.ui.theme.Typography
 
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -49,4 +52,32 @@ fun TellerBadgeList(modifier: Modifier = Modifier) {
             TellerBadge(title = "또 오셨네요", content = "단골 텔러")
         }
     }
+
+
+    // empty 일때 노출
+//    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//        Image(
+//            painter = painterResource(id = R.drawable.empty_character),
+//            contentDescription = "empty_character"
+//        )
+//        Text(text = "아직 텔러들의 이야기가 없어요", style = Typography.body2Bold, color = Gray600)
+//        Text(
+//            text = "첫 글을 작성하면 받을지도 몰라요!",
+//            style = Typography.body2Regular,
+//            color = Gray600
+//        )
+//
+//        Column(
+//            modifier = Modifier
+//                .padding(top = 14.dp)
+//                .fillMaxWidth(),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            ActionChip(
+//                text = "글 작성하기",
+//                onClick = {}
+//            )
+//        }
+//    }
+
 }

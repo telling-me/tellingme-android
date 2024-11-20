@@ -1,16 +1,15 @@
 package com.tellingus.tellingme.domain.usecase.notice
 
-import com.tellingus.tellingme.data.model.notice.LoadNoticeResponse
+import com.tellingus.tellingme.data.model.common.BasicResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.NoticeRepository
 import javax.inject.Inject
 
-class LoadNoticeUseCase @Inject constructor(
+class NoticeReadAllUseCase @Inject constructor(
     private val noticeRepository: NoticeRepository
 ) {
-    suspend operator fun invoke(): ApiResult<LoadNoticeResponse> {
-        return noticeRepository.loadNotice()
+
+    suspend operator fun invoke(): ApiResult<BasicResponse> {
+        return noticeRepository.noticeReadAll()
     }
-
-
 }
