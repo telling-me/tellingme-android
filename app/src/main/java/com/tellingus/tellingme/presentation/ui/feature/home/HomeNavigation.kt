@@ -25,7 +25,7 @@ fun NavGraphBuilder.homeGraph(
         }
         composable(route = HomeDestinations.RECORD) {
             RecordScreen(
-                navController = navController
+                navController = navController,
             )
         }
         composable(route = HomeDestinations.TELLER_CARD) {
