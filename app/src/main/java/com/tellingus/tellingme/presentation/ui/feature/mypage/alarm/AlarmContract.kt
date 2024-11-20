@@ -14,7 +14,12 @@ class AlarmContract {
     ) : UiState
 
     sealed class Event : UiEvent {
-      object OnClickTotalRead: Event()
+        object OnClickTotalRead : Event()
+        data class OnClickItemRead(
+            val noticeId: Int,
+        ) : Event()
+
+        data class OnClickItemDelete(val noticeId: Int) : Event()
     }
 
     sealed class Effect : UiEffect {}

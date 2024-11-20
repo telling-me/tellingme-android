@@ -84,4 +84,16 @@ interface NetworkService {
     suspend fun getMain(
         @Body homeRequest: HomeRequest
     ): ApiResult<HomeResponse>
+
+
+    // 알림 전체 읽음
+    @POST("${END_POINT}/notice/readAll")
+    suspend fun noticeReadAll(): ApiResult<BasicResponse>
+
+    // 특정 알림 읽음
+    @POST("${END_POINT}/notice/read/{noticeId}")
+    suspend fun noticeReadByNoticeId(
+        @Path("noticeId") noticeId: Int,
+    ): ApiResult<BasicResponse>
+
 }

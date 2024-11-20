@@ -1,6 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.mypage.alarm
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -88,6 +89,14 @@ fun AlarmScreenHeader(navigateToPreviousScreen: () -> Unit) {
 fun AlarmScreenContent(
     viewModel: AlarmViewModel = hiltViewModel(),
 ) {
+    val isLoading = viewModel.currentState.isLoading
+    val list = viewModel.currentState.list;
+
+    val TAG: String = "로그"
+    Log.d(TAG, " - AlarmScreenContent() called $list")
+
+    val hasUnread = list.any { !it.isRead }
+
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -99,19 +108,27 @@ fun AlarmScreenContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "알림")
-            ActionChip(onClick = {
-                viewModel.processEvent(AlarmContract.Event.OnClickTotalRead)
-            }, text = "전체 읽음", hasArrow = false)
+            if (hasUnread) {
+                ActionChip(onClick = {
+                    viewModel.processEvent(AlarmContract.Event.OnClickTotalRead)
+                }, text = "전체 읽음", hasArrow = false)
+            }
         }
         LazyColumn() {
             items(items = dummyList) {
                 it
                 AlarmCard(
-                    alarmType = it.alarmType,
+                    alarmType = "",
                     title = it.title,
                     content = it.content,
                     date = it.date,
-                    isRead = it.isRead
+                    isRead = it.isRead,
+                    onClick = {
+                        viewModel.processEvent(AlarmContract.Event.OnClickItemRead(it.id))
+                    },
+                    onDelete = {
+                        // TODO: delete
+                    }
                 )
             }
         }
@@ -122,7 +139,13 @@ fun AlarmScreenContent(
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun AlarmCard(
-    alarmType: String, title: String, content: String = "", date: String, isRead: Boolean = false
+    alarmType: String,
+    title: String,
+    content: String = "",
+    date: String,
+    isRead: Boolean = false,
+    onClick: () -> Unit = {},
+    onDelete: () -> Unit = {}
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -149,13 +172,15 @@ fun AlarmCard(
         Box(
             modifier = Modifier.align(Alignment.CenterEnd)
         ) {
-            TextButton(modifier = Modifier
-                .width(80.dp)
-                .fillMaxHeight()
-                .background(Error600),
+            TextButton(
+                modifier = Modifier
+                    .width(80.dp)
+                    .fillMaxHeight()
+                    .background(Error600),
                 onClick = {
                     coroutineScope.launch {
                         swipeableState.animateTo(0, tween(600, 0))
+                        onDelete()
                     }
                 }) {
                 Text(text = "삭제", color = Color.White)
@@ -182,7 +207,8 @@ fun AlarmCard(
                     .clickable(
                         interactionSource = interactionSource,
                         indication = null,
-                        onClick = {})
+                        onClick = onClick
+                    )
             ) {
                 Text(
                     text = getAlarmCardTypeText(alarmType),
