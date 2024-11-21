@@ -22,10 +22,10 @@ class TokenInterceptor @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
 ): Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-//        val accessToken = runBlocking { dataStoreRepository.getAccessToken().firstOrNull() }
-//        val refreshToken = runBlocking { dataStoreRepository.getRefreshToken().firstOrNull() }
-        val accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmZGQ1MGE1YS0yNzdlLTQzNDktOTdkMC0xODgxYjIyZTk1NjMiLCJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTc5OTkxNjA1MX0.bHTOmJoBYReF63EpFagHrAzpAGOVnTvwpJTuqSDgXtg";
-        val refreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTczNTQ4MTI1MX0.8OFMazWoYKTlYAP7l8soZE3pEl-Tbwcy8lS0RCFx8Yg";
+        val accessToken = runBlocking { dataStoreRepository.getAccessToken().firstOrNull() }
+        val refreshToken = runBlocking { dataStoreRepository.getRefreshToken().firstOrNull() }
+//        val accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmZGQ1MGE1YS0yNzdlLTQzNDktOTdkMC0xODgxYjIyZTk1NjMiLCJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTc5OTkxNjA1MX0.bHTOmJoBYReF63EpFagHrAzpAGOVnTvwpJTuqSDgXtg";
+//        val refreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTczNTQ4MTI1MX0.8OFMazWoYKTlYAP7l8soZE3pEl-Tbwcy8lS0RCFx8Yg";
         var request = chain.request()
 
         if (accessToken != null) {
@@ -34,8 +34,8 @@ class TokenInterceptor @Inject constructor(
                 .build()
         }
 
-        // 첫 번째 응답을 진행
         val response = chain.proceed(request)
+        // 첫 번째 응답을 진행
 
         // 만약 응답 코드가 401 또는 403이면 토큰 갱신을 시도
         if (response.code == 403) {

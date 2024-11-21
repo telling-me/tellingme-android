@@ -89,6 +89,8 @@ fun RecordScreen(
     modifier: Modifier = Modifier,
     viewModel: RecordViewModel = hiltViewModel(),
     navController: NavController,
+    title: String,
+    phrase: String,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -132,7 +134,9 @@ fun RecordScreen(
         },
         content = {
             RecordScreenContent(
-                viewModel = viewModel
+                viewModel = viewModel,
+                title = title,
+                phrase = phrase
             )
         },
         isScrollable = false
@@ -199,7 +203,9 @@ fun RecordScreen(
 @Composable
 fun RecordScreenContent(
     modifier: Modifier = Modifier,
-    viewModel: RecordViewModel
+    viewModel: RecordViewModel,
+    title: String,
+    phrase: String,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isEmotionBottomSheetOpen by remember { mutableStateOf(false) }
@@ -214,14 +220,14 @@ fun RecordScreenContent(
                 .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 31.dp)
         ) {
             Text(
-                text = "지금까지 나의 인생을 두 단계로\n나눈다면 어느 시점에 구분선을 둘 건가요?",
+                text = title,
                 style = TellingmeTheme.typography.body1Regular.copy(
                     color = Gray700,
                 ),
             )
             Spacer(modifier = modifier.size(8.dp))
             Text(
-                text = "스스로 크게 변화한 시점을 떠올려봐요.",
+                text = phrase,
                 style = TellingmeTheme.typography.body2Regular,
                 color = Gray500
             )

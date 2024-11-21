@@ -160,7 +160,9 @@ fun HomeScreenContent(
                     title = "${mainData.questionTitle}",
                     description = "${mainData.questionPhrase}",
                     onClickButton = {
-                        navController.navigate(HomeDestinations.RECORD)
+                        navController.navigate(
+                            ("${HomeDestinations.RECORD}/${mainData.questionTitle}/${mainData.questionPhrase}")
+                        )
                     }
                 )
             }

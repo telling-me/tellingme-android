@@ -1,5 +1,7 @@
 package com.tellingus.tellingme.data.repositoryimpl
 
+import com.tellingus.tellingme.data.model.common.BasicResponse
+import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
@@ -30,6 +32,10 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun getMain(req: HomeRequest): ApiResult<HomeResponse> {
         return networkService.getMain(req)
 
+    }
+
+    override suspend fun writeAnswer(answer: AnswerRequest): ApiResult<BasicResponse> {
+        TODO("Not yet implemented")
     }
 
 
