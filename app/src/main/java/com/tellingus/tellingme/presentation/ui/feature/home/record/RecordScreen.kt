@@ -1,7 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
 import android.widget.Toast
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -26,8 +24,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -43,10 +39,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -115,20 +109,13 @@ fun RecordScreen(
                     )
                 },
                 rightSlot = {
-                    Row {
-                        SingleButton(
-                            size = ButtonSize.LARGE,
-                            text = "질문바꾸기",
-                            onClick = { showTodayQuestionChangeBottomSheet = true }
-                        )
-                        SingleButton(
-                            size = ButtonSize.LARGE,
-                            text = "완료",
-                            onClick = {
-                                viewModel.processEvent(RecordContract.Event.OnClickRecordButton)
-                            }
-                        )
-                    }
+                    SingleButton(
+                        size = ButtonSize.LARGE,
+                        text = "완료",
+                        onClick = {
+                            viewModel.processEvent(RecordContract.Event.OnClickRecordButton)
+                        }
+                    )
                 }
             )
         },
@@ -161,11 +148,15 @@ fun RecordScreen(
                     size = ButtonSize.LARGE,
                     text = "완료",
                     onClick = {
-                        Toast.makeText(context, "완료 후 홈으로 이동", Toast.LENGTH_SHORT).show()
+                        viewModel.processEvent(RecordContract.Event.RecordAnswer)
                     }
                 )
             }
         )
+    }
+
+    if (uiState.isCompleteWriteAnswer) {
+        navController.popBackStack()
     }
 
     if (showTodayQuestionChangeBottomSheet) {
@@ -339,7 +330,7 @@ fun RecordScreenContent(
             Spacer(modifier = modifier.size(10.dp))
             Switch(
                 modifier = modifier.scale(0.8f),
-                checked = uiState.isOpen,
+                checked = uiState.isPublic,
                 onCheckedChange = {
                     viewModel.processEvent(RecordContract.Event.OnClickOpenSwitch)
                 },

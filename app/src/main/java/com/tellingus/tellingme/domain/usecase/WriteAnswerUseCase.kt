@@ -1,11 +1,18 @@
 package com.tellingus.tellingme.domain.usecase
 
+import com.tellingus.tellingme.data.model.common.BasicResponse
+import com.tellingus.tellingme.data.model.home.AnswerRequest
+import com.tellingus.tellingme.data.model.home.AnswerResponse
+import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
+import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.HomeRepository
 
 class WriteAnswerUseCase(
-    homeRepository: HomeRepository
+    private val homeRepository: HomeRepository
 ) {
-    suspend operator fun invoke() {
-
+    suspend operator fun invoke(
+        answerRequest: AnswerRequest
+    ) : ApiResult<BasicResponse> {
+        return homeRepository.writeAnswer(answerRequest)
     }
 }

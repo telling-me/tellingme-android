@@ -7,15 +7,16 @@ import com.tellingus.tellingme.presentation.ui.common.base.UiState
 class RecordContract {
     data class State(
         val selectedEmotion: Int = -1,
+        val isCompleteWriteAnswer: Boolean = false,
         val answer: String = "",
         val today: String = "",
-        val isOpen: Boolean = true,
+        val isPublic: Boolean = true
     ) : UiState
 
     sealed class Event : UiEvent {
         object OnClickRecordButton : Event()
         object OnClickOpenSwitch : Event()
-        object MoreButtonClicked : Event()
+        object RecordAnswer: Event()
     }
 
     sealed class Effect : UiEffect {
