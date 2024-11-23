@@ -66,8 +66,7 @@ interface NetworkService {
     @POST("${END_POINT}/answer")
     suspend fun writeAnswer(
         @Body answerRequest: AnswerRequest
-    ): ApiResult<AnswerResponse>
-
+    ): ApiResult<BasicResponse>
 
     // 알림 조회 API
     @GET("${END_POINT}/notice")
