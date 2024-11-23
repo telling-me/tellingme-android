@@ -22,7 +22,7 @@ class OtherSpaceRepositoryImpl @Inject constructor(
         date: String,
         page: Int,
         size: Int,
-        sort: Int
+        sort: String,
     ): ApiResult<CommunicationListResponse> {
         return service.getCommunicationList(date, page, size, sort)
     }

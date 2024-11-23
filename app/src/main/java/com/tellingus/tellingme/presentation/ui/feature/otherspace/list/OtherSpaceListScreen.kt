@@ -8,12 +8,17 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
@@ -38,12 +45,19 @@ import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
+import com.tellingus.tellingme.presentation.ui.theme.Typography
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun OtherSpaceListScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    otherSpaceListViewModel: OtherSpaceListViewModel = hiltViewModel(),
+    date: String = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 ) {
+    val uiState by otherSpaceListViewModel.uiState.collectAsStateWithLifecycle()
+
     MainLayout(
         header = {
             BasicAppBar(modifier = modifier
@@ -59,7 +73,13 @@ fun OtherSpaceListScreen(
                 })
         },
         content = {
-            OtherSpaceListScreenContent(navController = navController)
+            OtherSpaceListScreenContent(
+                navController = navController,
+                uiState,
+                viewModel = otherSpaceListViewModel,
+                date,
+
+                )
         },
         isScrollable = false,
     )
@@ -67,8 +87,22 @@ fun OtherSpaceListScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OtherSpaceListScreenContent(navController: NavController) {
+fun OtherSpaceListScreenContent(
+    navController: NavController,
+    uiState: OtherSpaceListContract.State,
+    viewModel: OtherSpaceListViewModel,
+    date: String,
+) {
     var isSelected by remember { mutableStateOf("recently") }
+
+    val lazyListState = rememberLazyListState() // LazyListState를 사용하여 스크롤 상태를 관리
+    val communicationListData =
+        uiState.communicationListData // ViewModel에서 communicationListData를 관찰
+    var isLoading by remember { mutableStateOf(false) } // 로딩 상태 관리
+    var isLastPage by remember { mutableStateOf(false) } // 마지막 페이지 상태 관리
+    val questionData = uiState.questionData
+
+
 
     Box(
         modifier = Modifier
@@ -82,56 +116,84 @@ fun OtherSpaceListScreenContent(navController: NavController) {
                 .zIndex(1f)
         ) {}
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(
-                top = 0.dp, bottom = 24.dp
-            )
-        ) {
-            item {
-                QuestionSection(
-                    title = "지금까지의 나의 인생을 두 단계로\n" + "나눈다면 어느 시점에 구분선을 둘 건가요?",
-                    description = "스스로 크게 변화한 시점을 떠올려봐요.",
-                    isButtonVisible = false,
-                    bgColor = Background100
-                )
+
+        if (communicationListData.content.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "내용이 없어요", style = Typography.body2Bold)
             }
-            stickyHeader {
-                Row(
-                    modifier = Modifier
-                        .padding(top = 0.dp, bottom = 16.dp)
-                        .background(Background100)
-                        .fillMaxWidth()
-                ) {
-                    ChoiceChip(selected = isSelected == "recently", text = "최신순", onClick = {
-                        isSelected = "recently"
-                    })
+        } else {
+            LazyColumn(
+                state = lazyListState,
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(
+                    top = 0.dp, bottom = 24.dp
+                )
+            ) {
+                item {
+                    QuestionSection(
+                        title = "${questionData.title}",
+                        description = "${questionData.phrase}",
+                        isButtonVisible = false,
+                        bgColor = Background100
+                    )
+                }
+                stickyHeader {
+                    Row(
+                        modifier = Modifier
+                            .padding(top = 0.dp, bottom = 16.dp)
+                            .background(Background100)
+                            .fillMaxWidth()
+                    ) {
+                        ChoiceChip(selected = isSelected == "recently", text = "최신순", onClick = {
+                            isSelected = "recently"
+                            viewModel.processEvent(OtherSpaceListContract.Event.OnClickRecently(date))
+                        })
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                    ChoiceChip(selected = isSelected == "related", text = "관련순", onClick = {
-                        isSelected = "related"
-                    })
+                        ChoiceChip(selected = isSelected == "related", text = "관련순", onClick = {
+                            isSelected = "related"
+                            viewModel.processEvent(OtherSpaceListContract.Event.OnClickRelative(date))
+                        })
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                    ChoiceChip(selected = isSelected == "sympathy", text = "공감순", onClick = {
-                        isSelected = "sympathy"
-                    })
+                        ChoiceChip(selected = isSelected == "sympathy", text = "공감순", onClick = {
+                            isSelected = "sympathy"
+                            viewModel.processEvent(OtherSpaceListContract.Event.OnClickEmpathy(date))
+                        })
+                    }
+                }
+                items(items = communicationListData.content) {
+                    OpinionCard(
+                        heartCount = it.likeCount,
+                        buttonState = if (it.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
+                        emotion = it.emotion,
+                        description = it.content,
+                        onClick = {
+                            navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${it.answerId}")
+                        }
+                    )
+                }
+                // 로딩 중일 때 로딩 표시
+                item {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                        )
+                    }
                 }
             }
-            items(items = mockData) {
-                OpinionCard(
-                    heartCount = it.heartCount,
-                    buttonState = it.buttonState,
-                    feeling = it.feeling,
-                    description = it.description,
-                    onClick = {
-                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${it.id}")
-                    }
-                )
-            }
         }
+
+
     }
 }
 
@@ -148,44 +210,4 @@ data class OpinionItem(
     val buttonState: ButtonState,
     val feeling: String,
     val description: String
-)
-
-val mockData = listOf(
-    OpinionItem(
-        id = 1,
-        heartCount = 999,
-        buttonState = ButtonState.ENABLED,
-        feeling = "excited",
-        description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
-    ), OpinionItem(
-        id = 2,
-        heartCount = 100,
-        buttonState = ButtonState.SELECTED,
-        feeling = "happy",
-        description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
-    ), OpinionItem(
-        id = 3,
-        heartCount = 14,
-        buttonState = ButtonState.ENABLED,
-        feeling = "excited",
-        description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
-    ), OpinionItem(
-        id = 4,
-        heartCount = 15,
-        buttonState = ButtonState.DISABLED,
-        feeling = "happy",
-        description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
-    ), OpinionItem(
-        id = 5,
-        heartCount = 11,
-        buttonState = ButtonState.ENABLED,
-        feeling = "excited",
-        description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
-    ), OpinionItem(
-        id = 6,
-        heartCount = 87,
-        buttonState = ButtonState.DISABLED,
-        feeling = "happy",
-        description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
-    )
 )

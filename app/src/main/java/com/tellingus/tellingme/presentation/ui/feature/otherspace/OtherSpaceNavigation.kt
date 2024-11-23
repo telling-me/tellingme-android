@@ -27,8 +27,9 @@ fun NavGraphBuilder.otherSpaceGraph(
                     type = NavType.StringType
                 }
             )
-        ) {
-            OtherSpaceListScreen(navController = navController)
+        ) { navBackStackEntry ->
+            val date = navBackStackEntry.arguments?.getString(KEY_ID) ?: "Unknown"
+            OtherSpaceListScreen(navController = navController, date = date)
         }
         composable(route = "${OtherSpaceDestinations.OTHER_SPACE}/detail/{$KEY_ID}",
             arguments = listOf(

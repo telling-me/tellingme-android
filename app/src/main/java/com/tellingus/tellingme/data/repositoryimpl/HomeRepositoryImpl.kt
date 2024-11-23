@@ -24,7 +24,7 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getQuestion(today: String): ApiResult<QuestionResponse> {
-        return networkService.getQuestion(QuestionRequest(date = today))
+        return networkService.getQuestion(date = today)
 
 
     }

@@ -13,7 +13,7 @@ import com.tellingus.tellingme.data.network.adapter.ApiResult
 interface HomeRepository {
     //    suspend fun loadTodayQuestion() : ApiResult<TodayQuestion>
     suspend fun getNotice(): ApiResult<NoticeResponse>
-    suspend fun getQuestion(today: String): ApiResult<QuestionResponse>
+    suspend fun getQuestion(date: String): ApiResult<QuestionResponse>
     suspend fun writeAnswer(answer: AnswerRequest): ApiResult<BasicResponse>
     suspend fun getMain(req: HomeRequest): ApiResult<HomeResponse>
 }

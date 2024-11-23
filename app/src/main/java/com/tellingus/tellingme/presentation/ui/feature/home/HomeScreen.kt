@@ -43,6 +43,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileWi
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
@@ -137,7 +138,9 @@ fun HomeScreenContent(
         }
         Box(modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp)) {
             LevelSection(
-                level = userLevel, percent = userExp, levelDescription = "연속 ${daysToLevelUp}일만 작성하면 LV.${userLevel + 1} 달성!"
+                level = userLevel,
+                percent = userExp,
+                levelDescription = "연속 ${daysToLevelUp}일만 작성하면 LV.${userLevel + 1} 달성!"
             )
 
         }
@@ -210,7 +213,16 @@ fun HomeScreenContent(
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                ActionChip(text = "더보기", onClick = {})
+                ActionChip(text = "더보기", onClick = {
+                    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}") {
+                        navController.navigate(OtherSpaceDestinations.OTHER_SPACE) {
+                            launchSingleTop = true // 중복 방지
+                        }
+                        // 이후 otherSpaceListScreen으로 이동
+                        launchSingleTop = true
+                    }
+                })
             }
         }
 
