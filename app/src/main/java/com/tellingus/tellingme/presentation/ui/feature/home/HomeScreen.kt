@@ -1,6 +1,5 @@
 package com.tellingus.tellingme.presentation.ui.feature.home
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,21 +9,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
@@ -50,31 +54,24 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    viewModel: HomeViewModel = hiltViewModel()
+    navController: NavController, viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val TAG: String = "로그"
-    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val mainData = viewModel.currentState.mainData
 
-    mainData?.let {
-        MainLayout(
-            header = {
-                HomeScreenHeader(navController, viewModel = viewModel)
-            },
-            content = {
-                HomeScreenContent(
-                    navController = navController,
-                    viewModel = viewModel
-                )
-            }
+
+    MainLayout(header = {
+        HomeScreenHeader(navController, unreadNoticeStatus = uiState.unreadNoticeStatus)
+    }, content = {
+        HomeScreenContent(
+            navController = navController, uiState = uiState
         )
-    }
+    })
+
 }
 
 @Composable
-fun HomeScreenHeader(navController: NavController, viewModel: HomeViewModel) {
+fun HomeScreenHeader(navController: NavController, unreadNoticeStatus: Boolean) {
     BasicAppBar(
         modifier = Modifier
             .background(Background100)
@@ -89,137 +86,136 @@ fun HomeScreenHeader(navController: NavController, viewModel: HomeViewModel) {
             )
         },
         rightSlot = {
-            Icon(
-                painter = painterResource(R.drawable.icon_notice),
-                contentDescription = "icon_notice",
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(onClick = { navController.navigate(MyPageDestinations.ALARM) }),
-                tint = Gray200
-            )
+            Box {
+                Icon(
+                    painter = painterResource(R.drawable.icon_notice),
+                    contentDescription = "icon_notice",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable(onClick = { navController.navigate(MyPageDestinations.ALARM) }),
+                    tint = Gray200
+                )
+                if (unreadNoticeStatus) {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .background(Color.Red, shape = CircleShape)
+                            .align(Alignment.TopEnd) // 아이콘의 오른쪽 상단에 위치
+                            .offset(x = 2.dp, y = (-2).dp) // 약간 더 정확한 위치 조정
+                    )
+                }
+            }
         }
     )
 }
 
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreenContent(
-    navController: NavController,
-    viewModel: HomeViewModel,
+    navController: NavController, uiState: HomeContract.State
 ) {
-    val cardList = listOf(
-        "happy",
-        "excited",
-        "happy",
-        "excited",
-        "happy",
-        "excited",
-        "happy",
-        "excited",
-        "happy",
-        "excited",
-        "happy",
-        "excited",
-    )
+    val recordCount = uiState.recordCount
+    val todayAnswerCount = uiState.todayAnswerCount
+    val communicationList = uiState.communicationList
+    val unreadNoticeStatus = uiState.unreadNoticeStatus
+    val questionTitle = uiState.questionTitle
+    val questionPhrase = uiState.questionPhrase
+    val userNickname = uiState.userNickname
+    val userLevel = uiState.userLevel
+    val userExp = uiState.userExp
 
+    Column(
+    ) {
+        Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
 
-    val TAG: String = "로그"
-    Log.d(
-        TAG,
-        "HomeScreenContent viewModel.currentState.mainData: ${viewModel.currentState.mainData}"
-    )
+            ProfileWidget(nickname = userNickname,
+                description = "연속 ${recordCount} 일째 기록",
+                modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
 
-    val mainData = viewModel.currentState.mainData
+        }
+        Box(modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp)) {
+            LevelSection(
+                level = userLevel, percent = userExp
+            )
 
-    mainData?.let {
-        Column(
-        ) {
-            Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
-                ProfileWidget(
-                    nickname = mainData.userNickname,
-                    description = "연속 ${mainData.recordCount} 일째 기록",
-                    modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
-            }
-            Box(modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp)) {
-                mainData?.userLevel?.let {
-                    LevelSection(
-                        level = mainData.userLevel,
-                        percent = mainData.userExp
+        }
+        Column(modifier = Modifier.padding(top = 32.dp, start = 20.dp, end = 20.dp)) {
+            Text(text = "오늘의 질문", style = TellingmeTheme.typography.body1Bold)
+            Text(
+                modifier = Modifier.padding(top = 5.dp),
+                text = "${todayAnswerCount} 명이 대답했어요!",
+                style = TellingmeTheme.typography.caption1Regular
+            )
+
+            QuestionSection(modifier = Modifier.padding(top = 12.dp),
+                title = "${questionTitle}",
+                description = "${questionPhrase}",
+                onClickButton = {
+                    navController.navigate(
+                        ("${HomeDestinations.RECORD}/${questionTitle}/${questionPhrase}")
                     )
-                }
-            }
-            Column(modifier = Modifier.padding(top = 32.dp, start = 20.dp, end = 20.dp)) {
-                Text(text = "오늘의 질문", style = TellingmeTheme.typography.body1Bold)
-                Text(
-                    modifier = Modifier.padding(top = 5.dp),
-                    text = "${mainData?.todayAnswerCount} 명이 대답했어요!",
-                    style = TellingmeTheme.typography.caption1Regular
-                )
-                QuestionSection(
+                })
+
+        }
+
+        Column(modifier = Modifier.padding(start = 20.dp, top = 32.dp)) {
+            Text(text = "나와 비슷한 텔러들의 이야기", style = TellingmeTheme.typography.body1Bold)
+
+
+            if (communicationList.isNotEmpty()) {
+                val pagerState = rememberPagerState { communicationList.size }
+
+                HorizontalPager(
                     modifier = Modifier.padding(top = 12.dp),
-                    title = "${mainData.questionTitle}",
-                    description = "${mainData.questionPhrase}",
-                    onClickButton = {
-                        navController.navigate(
-                            ("${HomeDestinations.RECORD}/${mainData.questionTitle}/${mainData.questionPhrase}")
-                        )
-                    }
-                )
-            }
-
-            Column(modifier = Modifier.padding(start = 20.dp, top = 32.dp)) {
-                Text(text = "나와 비슷한 텔러들의 이야기", style = TellingmeTheme.typography.body1Bold)
-
-                if (mainData.communicationList.isNotEmpty()) {
-                    val pagerState = rememberPagerState { mainData.communicationList.size }
-
-                    HorizontalPager(
-                        modifier = Modifier.padding(top = 12.dp),
-                        state = pagerState,
-                        contentPadding = PaddingValues(end = 32.dp),
-                    ) { page ->
-                        val item = mainData.communicationList[page]
-                        OpinionCard(
-                            modifier = Modifier.padding(end = 12.dp),
-                            heartCount = item.likeCount,
-                            buttonState = if (item.isLiked) ButtonState.SELECTED else ButtonState.ENABLED,
-                            description = item.content,
-                            emotion = item.emotion,
-                        )
-                    }
-                } else {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painter = painterResource(id = R.drawable.empty_character),
-                            contentDescription = "empty_character"
-                        )
-                        Text(
-                            text = "나와 비슷한 텔러들의 이야기가 없어요",
-                            style = Typography.body2Bold,
-                            color = Gray600
-                        )
-                    }
-
-                }
-
-            }
-
-            if (mainData.communicationList.isNotEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .padding(top = 14.dp, bottom = 30.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    ActionChip(
-                        text = "더보기",
-                        onClick = {}
+                    state = pagerState,
+                    contentPadding = PaddingValues(end = 32.dp),
+                ) { page ->
+                    val item = communicationList[page]
+                    OpinionCard(
+                        modifier = Modifier.padding(end = 12.dp),
+                        heartCount = item.likeCount,
+                        buttonState = if (item.isLiked) ButtonState.SELECTED else ButtonState.ENABLED,
+                        description = item.content,
+                        emotion = item.emotion,
                     )
                 }
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = 20.dp, top = 20.dp)
+
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.empty_character),
+                        contentDescription = "empty_character"
+                    )
+                    Text(
+                        text = "나와 비슷한 텔러들의 이야기가 없어요",
+                        style = Typography.body2Bold,
+                        color = Gray600
+                    )
+                }
+
             }
 
-        } //    Column END
-    }
+        }
+        if (communicationList.isNotEmpty()) {
+            Column(
+                modifier = Modifier
+                    .padding(top = 14.dp, bottom = 30.dp)
+                    .fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ActionChip(text = "더보기", onClick = {})
+            }
+        }
+
+
+    } //    Column END
+
 
 }
 
