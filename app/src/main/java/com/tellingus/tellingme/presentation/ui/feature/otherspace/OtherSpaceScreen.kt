@@ -62,7 +62,8 @@ fun OtherSpaceScreenContent(navController: NavController) {
                     date = it.date,
                     commentCount = it.commentCount,
                     onClickCard = { id ->
-                        Log.d("로그", "CommunityCard id: $id")
+                        val TAG: String = "로그"
+                        Log.d(TAG, "id ${id}")
                         navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${id}")
                     }
                 )
@@ -87,7 +88,7 @@ data class CommunityItem(
 
 val dummyList = listOf(
     CommunityItem(
-        id = "1", title = "소속된 집단에서 내가 주로 맡는 역활은?",
+        id = "1", title = "소속된 집단에서 내가 주로 맡는 역활은1?",
         date = "오늘",
         commentCount = 1000
     ),

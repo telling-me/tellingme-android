@@ -16,7 +16,9 @@ data class HomeData(
     val userNickname: String,
     val userLevel: Int,
     val userExp: Int,
-    )
+    val requiredExp: Int,
+    val daysToLevelUp: Int,
+)
 
 data class CommunicationData(
     val answerId: Int,
