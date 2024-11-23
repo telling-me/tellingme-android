@@ -6,8 +6,10 @@ import com.tellingus.tellingme.data.model.home.AnswerResponse
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.HomeRepository
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class WriteAnswerUseCase(
+class WriteAnswerUseCase @Inject constructor(
     private val homeRepository: HomeRepository
 ) {
     suspend operator fun invoke(
