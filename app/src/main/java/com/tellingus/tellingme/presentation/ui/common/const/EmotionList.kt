@@ -158,7 +158,7 @@ fun getMediumEmotion(index: Int): Int {
             return it.emotionRes
         }
     }
-    return 0
+    return R.drawable.emotion_happy_medium
 }
 
 /** index는 1~12까지, 리소스를 반환 **/
@@ -168,7 +168,7 @@ fun getLargeEmotion(index: Int): Int {
             return it.emotionRes
         }
     }
-    return 0
+    return R.drawable.emotion_happy_large
 }
 
 /** 감정에 해당하는 텍스트 조회 ex. 행복해요, 설레요 **/

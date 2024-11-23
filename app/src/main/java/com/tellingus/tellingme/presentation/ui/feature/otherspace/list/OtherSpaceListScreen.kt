@@ -1,6 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.otherspace.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -49,15 +50,17 @@ fun OtherSpaceListScreen(
                 .fillMaxWidth()
                 .padding(start = 12.dp, top = 12.dp, bottom = 12.dp, end = 12.dp),
                 leftSlot = {
-                TellingmeIconButton(iconRes = R.drawable.icon_caret_left,
-                    size = ButtonSize.MEDIUM,
-                    color = Gray500,
-                    onClick = {
-                        navController.popBackStack()
-                    })
-            })
+                    TellingmeIconButton(iconRes = R.drawable.icon_caret_left,
+                        size = ButtonSize.MEDIUM,
+                        color = Gray500,
+                        onClick = {
+                            navController.popBackStack()
+                        })
+                })
         },
-        content = { OtherSpaceListScreenContent(navController = navController) },
+        content = {
+            OtherSpaceListScreenContent(navController = navController)
+        },
         isScrollable = false,
     )
 }
@@ -94,7 +97,12 @@ fun OtherSpaceListScreenContent(navController: NavController) {
                 )
             }
             stickyHeader {
-                Row(modifier = Modifier.padding(top = 0.dp, bottom = 16.dp)) {
+                Row(
+                    modifier = Modifier
+                        .padding(top = 0.dp, bottom = 16.dp)
+                        .background(Background100)
+                        .fillMaxWidth()
+                ) {
                     ChoiceChip(selected = isSelected == "recently", text = "최신순", onClick = {
                         isSelected = "recently"
                     })
@@ -121,7 +129,6 @@ fun OtherSpaceListScreenContent(navController: NavController) {
                     onClick = {
                         navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${it.id}")
                     }
-
                 )
             }
         }

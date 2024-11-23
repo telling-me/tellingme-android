@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
 import com.tellingus.tellingme.domain.usecase.SignOutUseCase
 import com.tellingus.tellingme.domain.usecase.mypage.GetMyPageUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
@@ -14,7 +15,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MyPageViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
-    private val getMyPageUseCase: GetMyPageUseCase
+    private val getMyPageUseCase: GetMyPageUseCase,
+    private val getAnswerListUseCase: GetAnswerListUseCase
 ) : BaseViewModel<MyPageContract.State, MyPageContract.Event, MyPageContract.Effect>(initialState = MyPageContract.State()) {
     val TAG: String = "로그"
 
@@ -42,14 +44,6 @@ class MyPageViewModel @Inject constructor(
                         val requiredExp = levelDto.required_exp
                         val daysToLevelUp = data.level.days_to_level_up
 
-                        // 디버깅용 로그
-                        Log.d(
-                            TAG, """
-                        nickname: $nickname, badgeCode: $badgeCode, cheeseBalance: $cheeseBalance
-                        badgeCount: $badgeCount, answerCount: $answerCount, premium: $premium
-                        level: $level, currentExp: $currentExp, requiredExp: $requiredExp, daysToLevelUp: $daysToLevelUp
-                    """.trimIndent()
-                        )
 
                         // 필요한 로직에 따라 상태 업데이트
                         updateState(

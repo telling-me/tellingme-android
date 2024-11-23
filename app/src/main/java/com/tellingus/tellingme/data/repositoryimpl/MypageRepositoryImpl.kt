@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.data.repositoryimpl
 
+import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.model.myspace.MyPageResponse
 import com.tellingus.tellingme.data.network.NetworkService
 import com.tellingus.tellingme.data.network.adapter.ApiResult
@@ -15,6 +16,10 @@ class MyPageRepositoryImpl @Inject constructor(
 
     override suspend fun getMyPage(): ApiResult<MyPageResponse> {
         return networkService.getMyPage()
+    }
+
+    override suspend fun getAnswerList(): ApiResult<AnswerListResponse> {
+        return networkService.getAnswerList()
     }
 
 }

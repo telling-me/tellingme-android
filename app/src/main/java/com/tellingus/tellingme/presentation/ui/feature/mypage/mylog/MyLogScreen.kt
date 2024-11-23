@@ -5,9 +5,11 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -27,12 +30,19 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.button.TellingmeIconButton
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
+import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
+import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageContract
+import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageViewModel
+import com.tellingus.tellingme.presentation.ui.feature.myspace.MySpaceContract
+import com.tellingus.tellingme.presentation.ui.feature.myspace.MySpaceViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Gray100
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
@@ -40,66 +50,88 @@ import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 
 @Composable
-fun MyLogScreen(navController: NavController) {
+fun MyLogScreen(navController: NavController, viewModel: MyLogViewModel = hiltViewModel()) {
+
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     MainLayout(
         header = { MyLogScreenHeader { navController.popBackStack() } },
-        content = { MyLogScreenContent() },
+        content = { MyLogScreenContent(uiState) },
         isScrollable = false,
         background = Color.White
     )
 }
 
 @Composable
-fun MyLogScreenContent() {
+fun MyLogScreenContent(uiState: MyLogContract.State) {
+
+    val answerList = uiState.answerList
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 20.dp, end = 20.dp)
     ) {
-        LazyColumn() {
-            items(items = dummyList) { it ->
-                MyLogCard(title = it.title, date = it.date)
+
+        if (answerList.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "나의 기록이 없어요", style = Typography.body2Bold)
+            }
+        } else {
+            LazyColumn() {
+                items(items = answerList) { it ->
+                    MyLogCard(
+                        spareTitle = it.spareTitle,
+                        date = "${it.date[0]}-${it.date[1]}-${it.date[2]}",
+                        emotion = it.emotion
+                    )
+                }
             }
         }
+
+
     }
 }
 
 @Composable
-fun MyLogCard(title: String, date: String) {
+fun MyLogCard(spareTitle: String, date: String, emotion: Int) {
     var isPressed by remember { mutableStateOf(false) }
     // 크기 애니메이션
     val scale by animateFloatAsState(if (isPressed) 0.96f else 1f, label = "scale")
     // 배경색 애니메이션
-    val backgroundColor by animateColorAsState(if (isPressed) Gray100 else Color.White, label = "backgroundColor")
+    val backgroundColor by animateColorAsState(
+        if (isPressed) Gray100 else Color.White, label = "backgroundColor"
+    )
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp)
-            .background(backgroundColor) // 배경색 적용
-            .graphicsLayer(scaleX = scale, scaleY = scale) // 스케일 적용
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onPress = {
-                        isPressed = true // 눌림 상태로 변경
-                        tryAwaitRelease() // 터치 해제될 때까지 대기
-                        isPressed = false // 터치 해제 후 원래 상태로 변경
-                    }
-                )
-            }
-    ) {
-        Image(painter = painterResource(R.drawable.emotion_happy_medium), contentDescription = "")
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(80.dp)
+        .background(backgroundColor) // 배경색 적용
+        .graphicsLayer(scaleX = scale, scaleY = scale) // 스케일 적용
+        .pointerInput(Unit) {
+            detectTapGestures(onPress = {
+                isPressed = true // 눌림 상태로 변경
+                tryAwaitRelease() // 터치 해제될 때까지 대기
+                isPressed = false // 터치 해제 후 원래 상태로 변경
+            })
+        }) {
+        Image(painter = painterResource(getMediumEmotion(emotion)), contentDescription = "")
         Spacer(modifier = Modifier.width(16.dp))
         Column() {
             Text(
-                text = "${title}",
+                text = "$spareTitle",
                 style = Typography.body2Bold,
                 color = Gray600,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )
             Spacer(modifier = Modifier.height(6.dp))
-            Text(text = "${date}", style = Typography.caption1Regular, color = Gray600)
+            Text(text = "$date", style = Typography.caption1Regular, color = Gray600)
         }
     }
 }
