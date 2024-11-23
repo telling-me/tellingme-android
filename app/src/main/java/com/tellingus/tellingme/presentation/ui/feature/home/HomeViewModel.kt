@@ -24,7 +24,7 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel<HomeContract.State, HomeContract.Event, HomeContract.Effect>(
     initialState = HomeContract.State()
 ) {
-    private val TAG = "HomeViewModel"
+    private val TAG = "로그"
 
     init {
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))

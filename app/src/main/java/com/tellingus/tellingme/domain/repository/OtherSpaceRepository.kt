@@ -9,5 +9,10 @@ import com.tellingus.tellingme.data.network.adapter.ApiResult
 interface OtherSpaceRepository {
     suspend fun getCommunication(date: String): ApiResult<CommunicationResponse>
 
-    suspend fun getCommunicationList(communicationListRequest: CommunicationListRequest): ApiResult<CommunicationListResponse>
+    suspend fun getCommunicationList(
+        date: String,
+        page: Int,
+        size: Int,
+        sort: Int
+    ): ApiResult<CommunicationListResponse>
 }
