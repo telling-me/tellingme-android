@@ -20,10 +20,13 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
@@ -36,36 +39,23 @@ import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 
 @Composable
-fun MyTellerBadgeScreen(navController: NavController) {
+fun MyTellerBadgeScreen(
+    navController: NavController,
+    myTellerBadgeViewModel: MyTellerBadgeViewModel = hiltViewModel()
+) {
+    val uiState by myTellerBadgeViewModel.uiState.collectAsStateWithLifecycle()
     MainLayout(
         isScrollable = false,
         header = { MyTellerBadgeScreenHeader(navController) },
-        content = { MyTellerBadgeScreenContent() })
+        content = { MyTellerBadgeScreenContent(uiState) })
 }
 
 @Composable
-fun MyTellerBadgeScreenContent() {
-    val dummyBadgeList = listOf(
-        "단골 텔러" to "또 오셨네요",
-        "열정 텔러" to "많은 이야기",
-        "초보 텔러" to "첫 경험",
-        "소통 텔러" to "함께 이야기",
-        "행복 텔러" to "웃음 가득",
-        "친절 텔러" to "친절한 응대",
-        "공감 텔러" to "따뜻한 공감",
-        "전문 텔러" to "풍부한 지식",
-        "단골 텔러" to "또 오셨네요",
-        "열정 텔러" to "많은 이야기",
-        "초보 텔러" to "첫 경험",
-        "소통 텔러" to "함께 이야기",
-        "행복 텔러" to "웃음 가득",
-        "친절 텔러" to "친절한 응대",
-        "공감 텔러" to "따뜻한 공감",
-        "전문 텔러" to "풍부한 지식"
-    )
+fun MyTellerBadgeScreenContent(uiState: MyTellerBadgeContract.State) {
+    val userBadgeList = uiState.userBadgeList
 
     Column(modifier = Modifier.fillMaxHeight()) {
-        if (dummyBadgeList.isEmpty()) {
+        if (userBadgeList.isEmpty()) {
             EmptyContent()
         } else {
             Row(modifier = Modifier.padding(top = 9.dp, start = 20.dp)) {
@@ -81,9 +71,9 @@ fun MyTellerBadgeScreenContent() {
                 verticalArrangement = Arrangement.spacedBy(14.dp), // 아이템 간의 세로 간격
                 horizontalArrangement = Arrangement.spacedBy(14.dp) // 아이템 간의 가로 간격
             ) {
-                items(dummyBadgeList) { badge ->
+                items(userBadgeList) { badge ->
                     TellerBadge(
-                        title = badge.first, content = badge.second
+                        title = badge.badgeName, content = badge.badgeMiddleName ,badgeCode = badge.badgeCode
                     )
                 }
             }

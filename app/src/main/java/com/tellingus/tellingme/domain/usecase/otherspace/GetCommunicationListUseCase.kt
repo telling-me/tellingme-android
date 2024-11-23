@@ -6,10 +6,20 @@ import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.OtherSpaceRepository
 import javax.inject.Inject
 
-class CommunicationListUseCase @Inject constructor(
+class GetCommunicationListUseCase @Inject constructor(
     private val otherSpaceRepository: OtherSpaceRepository
 ) {
-    suspend operator fun invoke(communicationListRequest: CommunicationListRequest): ApiResult<CommunicationListResponse> {
-        return otherSpaceRepository.getCommunicationList(communicationListRequest)
+    suspend operator fun invoke(
+        date: String,
+        page: Int,
+        size: Int,
+        sort: Int
+    ): ApiResult<CommunicationListResponse> {
+        return otherSpaceRepository.getCommunicationList(
+            date,
+            page,
+            size,
+            sort,
+            )
     }
 }

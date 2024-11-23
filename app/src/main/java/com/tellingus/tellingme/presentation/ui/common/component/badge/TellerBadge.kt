@@ -16,11 +16,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotionBadge
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 
 @Composable
-fun TellerBadge(modifier: Modifier = Modifier, title: String = "", content: String = "") {
+fun TellerBadge(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    content: String = "",
+    badgeCode: String = ""
+) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -32,11 +38,11 @@ fun TellerBadge(modifier: Modifier = Modifier, title: String = "", content: Stri
 
     ) {
         Image(
-            painter = painterResource(R.drawable.emotion_happy_medium),
+            painter = painterResource(getMediumEmotionBadge(badgeCode)),
             contentDescription = "",
             modifier = Modifier.size(100.dp),
         )
-        Text(text = "${title}", style = TellingmeTheme.typography.caption1Regular)
-        Text(text = "${content}", style = TellingmeTheme.typography.body2Bold)
+        Text(text = "$title", style = TellingmeTheme.typography.caption1Regular)
+        Text(text = "$content", style = TellingmeTheme.typography.body2Bold)
     }
 }

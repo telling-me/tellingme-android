@@ -15,11 +15,17 @@ class OtherSpaceRepositoryImpl @Inject constructor(
     private val service: NetworkService
 ) : OtherSpaceRepository {
     override suspend fun getCommunication(date: String): ApiResult<CommunicationResponse> {
-        return service.getCommunication(CommunicationRequest(date = date))
+        return service.getCommunication(date)
     }
 
-    override suspend fun getCommunicationList(communicationListRequest: CommunicationListRequest): ApiResult<CommunicationListResponse> {
-        return service.getCommunicationList(communicationListRequest)
+    override suspend fun getCommunicationList(
+        date: String,
+        page: Int,
+        size: Int,
+        sort: Int
+    ): ApiResult<CommunicationListResponse> {
+        return service.getCommunicationList(date, page, size, sort)
     }
+
 
 }

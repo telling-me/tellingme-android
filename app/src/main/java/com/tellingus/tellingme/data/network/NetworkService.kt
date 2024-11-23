@@ -22,6 +22,7 @@ import com.tellingus.tellingme.data.model.otherspace.CommunicationListRequest
 import com.tellingus.tellingme.data.model.otherspace.CommunicationListResponse
 import com.tellingus.tellingme.data.model.otherspace.CommunicationRequest
 import com.tellingus.tellingme.data.model.otherspace.CommunicationResponse
+import com.tellingus.tellingme.data.model.user.UserBadgeResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -29,6 +30,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 
 const val END_POINT: String = "/api"
@@ -118,15 +120,20 @@ interface NetworkService {
     // 모두의 공간 5일치 질문 리스트
     @GET("${END_POINT}/communication")
     suspend fun getCommunication(
-        @Body communicationRequest: CommunicationRequest
+        @Query("date") date: String
     ): ApiResult<CommunicationResponse>
 
     // 소통 공간 정렬 해서 보기
     @GET("${END_POINT}/communication/list")
     suspend fun getCommunicationList(
-        @Body communicationListRequest: CommunicationListRequest
-    ) : ApiResult<CommunicationListResponse>
+        @Query("date") date: String,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: Int
+    ): ApiResult<CommunicationListResponse>
 
-
+    // 유저 배지 목록
+    @GET("${END_POINT}/v2/user/badge")
+    suspend fun getUserBadge(): ApiResult<UserBadgeResponse>
 
 }

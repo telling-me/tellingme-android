@@ -2,17 +2,23 @@ package com.tellingus.tellingme.presentation.ui.feature.otherspace
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
@@ -20,20 +26,25 @@ import com.tellingus.tellingme.presentation.ui.common.component.card.CommunityCa
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import com.tellingus.tellingme.presentation.ui.theme.Typography
 
 @Composable
 fun OtherSpaceScreen(
-    navController: NavController
+    navController: NavController,
+    otherSpaceViewModel: OtherSpaceViewModel = hiltViewModel()
 ) {
+
+    val uiState by otherSpaceViewModel.uiState.collectAsStateWithLifecycle()
+
     MainLayout(
         header = { BasicAppBar() },
-        content = { OtherSpaceScreenContent(navController = navController) },
+        content = { OtherSpaceScreenContent(navController = navController, uiState) },
         isScrollable = false,
     )
 }
 
 @Composable
-fun OtherSpaceScreenContent(navController: NavController) {
+fun OtherSpaceScreenContent(navController: NavController, uiState: OtherSpaceContract.State) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -47,28 +58,40 @@ fun OtherSpaceScreenContent(navController: NavController) {
             style = TellingmeTheme.typography.body2Regular
         )
 
+        val communications = uiState.communication
 
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(
-                top = 24.dp,
-                bottom = 24.dp
-            )
-        ) {
-            items(items = dummyList) {
-                CommunityCard(
-                    id = it.id,
-                    title = it.title,
-                    date = it.date,
-                    commentCount = it.commentCount,
-                    onClickCard = { id ->
-                        val TAG: String = "로그"
-                        Log.d(TAG, "id ${id}")
-                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${id}")
-                    }
-                )
+        if (communications.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "내용이 없어요", style = Typography.body2Bold)
             }
+        } else {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                contentPadding = PaddingValues(
+                    top = 24.dp,
+                    bottom = 24.dp
+                )
+            ) {
+                items(items = communications) {
+                    CommunityCard(
+                        id = it.title,
+                        title = it.title,
+                        date = "${it.date[0]}- ${it.date[1]} - ${it.date[2]}",
+                        commentCount = it.answerCount,
+                        onClickCard = { id ->
+                            navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${id}")
+                        }
+                    )
+                }
+            }
+
         }
+
     }
 }
 
