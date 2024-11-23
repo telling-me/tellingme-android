@@ -77,11 +77,13 @@ fun DefaultCard(
             .background(Color.White, shape = RoundedCornerShape(20.dp))
             .padding(start = 22.dp, end = 22.dp, top = 20.dp, bottom = 20.dp)
     ) {
-        Row(modifier = Modifier.clickable {
-            if (onClick != {}) {
-                onClick()
-            }
-        }) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                if (onClick != {}) {
+                    onClick()
+                }
+            }) {
             Column(
                 modifier = Modifier
                     .height(98.dp)

@@ -124,19 +124,20 @@ fun HomeScreenContent(
     val userNickname = uiState.userNickname
     val userLevel = uiState.userLevel
     val userExp = uiState.userExp
+    val daysToLevelUp = uiState.daysToLevelUp
 
     Column(
     ) {
         Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
 
             ProfileWidget(nickname = userNickname,
-                description = "연속 ${recordCount} 일째 기록",
+                description = "연속 $recordCount 일째 기록",
                 modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
 
         }
         Box(modifier = Modifier.padding(top = 10.dp, start = 20.dp, end = 20.dp)) {
             LevelSection(
-                level = userLevel, percent = userExp
+                level = userLevel, percent = userExp, levelDescription = "연속 ${daysToLevelUp}일만 작성하면 LV.${userLevel + 1} 달성!"
             )
 
         }
@@ -175,7 +176,7 @@ fun HomeScreenContent(
                     OpinionCard(
                         modifier = Modifier.padding(end = 12.dp),
                         heartCount = item.likeCount,
-                        buttonState = if (item.isLiked) ButtonState.SELECTED else ButtonState.ENABLED,
+                        buttonState = if (item.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
                         description = item.content,
                         emotion = item.emotion,
                     )

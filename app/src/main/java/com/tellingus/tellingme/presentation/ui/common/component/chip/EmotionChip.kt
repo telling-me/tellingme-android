@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -20,8 +21,8 @@ fun EmotionChip(modifier: Modifier = Modifier, feeling: String = "happy", emotio
     Column(
         modifier = modifier
             .background(Background100, shape = RoundedCornerShape(4.dp))
-            .width(63.dp)
-            .height(24.dp),
+            .height(24.dp)
+            .padding(start = 6.dp, end = 6.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

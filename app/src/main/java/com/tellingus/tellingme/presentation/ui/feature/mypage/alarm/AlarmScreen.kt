@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -55,6 +56,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary100
 import com.tellingus.tellingme.presentation.ui.theme.Error600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import com.tellingus.tellingme.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -117,20 +119,34 @@ fun AlarmScreenContent(
                 }, text = "전체 읽음", hasArrow = false)
             }
         }
-        LazyColumn() {
-            items(items = list) {
-                it
-                AlarmCard(alarmType = "",
-                    title = it.title,
-                    content = it.content,
-                    date = it.date,
-                    isRead = it.isRead,
-                    onClick = {
-                        viewModel.processEvent(AlarmContract.Event.OnClickItemRead(it.noticeId))
-                    },
-                    onDelete = {
-                        viewModel.processEvent(AlarmContract.Event.OnClickItemDelete(it.noticeId))
-                    })
+        if (list.isEmpty()) {
+            // 알림이 없을 경우
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(20.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "알림이 없어요", style = Typography.body2Bold)
+            }
+        } else {
+            // 알림이 있을 경우
+            LazyColumn {
+                items(items = list) {
+                    AlarmCard(
+                        alarmType = "",
+                        title = it.title,
+                        content = it.content,
+                        date = it.date,
+                        isRead = it.isRead,
+                        onClick = {
+                            viewModel.processEvent(AlarmContract.Event.OnClickItemRead(it.noticeId))
+                        },
+                        onDelete = {
+                            viewModel.processEvent(AlarmContract.Event.OnClickItemDelete(it.noticeId))
+                        }
+                    )
+                }
             }
         }
     }

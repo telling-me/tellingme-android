@@ -18,6 +18,10 @@ import com.tellingus.tellingme.data.model.oauth.signup.SignUpRequest
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameRequest
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameResponse
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpResponse
+import com.tellingus.tellingme.data.model.otherspace.CommunicationListRequest
+import com.tellingus.tellingme.data.model.otherspace.CommunicationListResponse
+import com.tellingus.tellingme.data.model.otherspace.CommunicationRequest
+import com.tellingus.tellingme.data.model.otherspace.CommunicationResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -25,7 +29,6 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
-import retrofit2.http.Query
 
 
 const val END_POINT: String = "/api"
@@ -108,9 +111,22 @@ interface NetworkService {
     @DELETE("${END_POINT}/notice/{noticeId}")
     suspend fun deleteNoticeByNoticeId(@Path("noticeId") noticeId: Int): ApiResult<BasicResponse>
 
-    // 모바일 마이페이지
+    // 모바일 마이 페이지
     @GET("${END_POINT}/v2/mobile/mypage")
     suspend fun getMyPage(): ApiResult<MyPageResponse>
+
+    // 모두의 공간 5일치 질문 리스트
+    @GET("${END_POINT}/communication")
+    suspend fun getCommunication(
+        @Body communicationRequest: CommunicationRequest
+    ): ApiResult<CommunicationResponse>
+
+    // 소통 공간 정렬 해서 보기
+    @GET("${END_POINT}/communication/list")
+    suspend fun getCommunicationList(
+        @Body communicationListRequest: CommunicationListRequest
+    ) : ApiResult<CommunicationListResponse>
+
 
 
 }
