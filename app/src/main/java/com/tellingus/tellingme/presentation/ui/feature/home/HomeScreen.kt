@@ -1,5 +1,11 @@
 package com.tellingus.tellingme.presentation.ui.feature.home
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,15 +36,22 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.card.OpinionCard
 import com.tellingus.tellingme.presentation.ui.common.component.chip.ActionChip
+import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushAlertDialog
+import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushDenyDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.section.QuestionSection
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
@@ -44,6 +60,7 @@ import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
+import com.tellingus.tellingme.presentation.ui.feature.MainActivity
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
@@ -53,13 +70,19 @@ import com.tellingus.tellingme.presentation.ui.theme.Typography
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController, viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    val permissionState = rememberPermissionState(
+        Manifest.permission.POST_NOTIFICATIONS
+    )
 
+    var isShowPushDenyDialog by remember { mutableStateOf(false) }
+    var isShowPushAlertDialog by remember { mutableStateOf(false) }
 
     MainLayout(header = {
         HomeScreenHeader(navController, unreadNoticeStatus = uiState.unreadNoticeStatus)
@@ -69,6 +92,45 @@ fun HomeScreen(
         )
     })
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d("taag", "승인")
+        } else {
+            if (permissionState.status.shouldShowRationale) {
+                // 이전에 거부한 경우가 있는 경우
+                isShowPushAlertDialog = true
+                Log.d("taag", "이전 거부 ㅇ")
+            } else {
+                // 최초 거부
+                isShowPushDenyDialog = true
+                Log.d("taag", "최초 거부")
+            }
+        }
+    }
+
+    if (isShowPushDenyDialog) {
+        PushDenyDialog(
+            onClickPositive = {},
+            onClickNegative = {}
+        )
+    }
+
+    if (isShowPushAlertDialog) {
+        PushAlertDialog(
+            onClickPositive = {},
+            onClickNegative = {}
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        }
+    }
 }
 
 @Composable
