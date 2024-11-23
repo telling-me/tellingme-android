@@ -2,6 +2,7 @@ package com.tellingus.tellingme.presentation.ui.feature.home
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.tellingus.tellingme.data.model.home.CommunicationData
 import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
@@ -43,14 +44,23 @@ class HomeViewModel @Inject constructor(
     fun getMain(req: HomeRequest) {
         viewModelScope.launch {
             homeUseCase(req).onSuccess {
-                Log.d(TAG, "HomeViewModel - it: $it")
                 if (it.code == 200) {
-                    Log.d(TAG, "if문")
-                    updateState(currentState.copy(mainData = it.data))
-                } else {
-                    Log.d(TAG, "else문")
+                    it.data.apply {
+                        updateState(
+                            currentState.copy(
+                                recordCount = recordCount,
+                                todayAnswerCount = todayAnswerCount,
+                                communicationList = communicationList,
+                                unreadNoticeStatus = unreadNoticeStatus,
+                                questionTitle = questionTitle,
+                                questionPhrase = questionPhrase,
+                                userNickname = userNickname,
+                                userLevel = userLevel,
+                                userExp = userExp,
+                            )
+                        )
+                    }
                 }
-
             }.onFailure { s, i ->
                 Log.d(TAG, "HomeViewModel - getMain() called failure: $s - $i")
             }
