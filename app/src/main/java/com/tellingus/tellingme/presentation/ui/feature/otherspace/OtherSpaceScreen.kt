@@ -78,10 +78,11 @@ fun OtherSpaceScreenContent(navController: NavController, uiState: OtherSpaceCon
                 )
             ) {
                 items(items = communications) {
+                    val date = "${it.date[0]}-${it.date[1]}-${it.date[2]}";
                     CommunityCard(
-                        id = it.title,
+                        id = date,
                         title = it.title,
-                        date = "${it.date[0]}- ${it.date[1]} - ${it.date[2]}",
+                        date = date,
                         commentCount = it.answerCount,
                         onClickCard = { id ->
                             navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${id}")

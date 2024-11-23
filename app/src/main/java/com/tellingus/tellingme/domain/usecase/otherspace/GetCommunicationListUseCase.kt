@@ -13,7 +13,7 @@ class GetCommunicationListUseCase @Inject constructor(
         date: String,
         page: Int,
         size: Int,
-        sort: Int
+        sort: String
     ): ApiResult<CommunicationListResponse> {
         return otherSpaceRepository.getCommunicationList(
             date,

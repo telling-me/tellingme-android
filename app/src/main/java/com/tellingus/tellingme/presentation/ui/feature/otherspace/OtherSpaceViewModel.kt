@@ -20,7 +20,7 @@ class OtherSpaceViewModel @Inject constructor(
 
     init {
         val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        getCommunication(date = "2024-10-01")
+        getCommunication(date)
     }
 
     fun getCommunication(date: String) {

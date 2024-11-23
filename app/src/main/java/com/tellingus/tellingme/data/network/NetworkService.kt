@@ -62,9 +62,9 @@ interface NetworkService {
     suspend fun loadNotice(): ApiResult<LoadNoticeResponse>
 
     // 오늘의 질문 조회 API
-    @POST("${END_POINT}/question")
+    @GET("${END_POINT}/question")
     suspend fun getQuestion(
-        @Body questionRequest: QuestionRequest
+        @Query("date") date: String
     ): ApiResult<QuestionResponse>
 
     // 답변 작성 API
@@ -129,7 +129,7 @@ interface NetworkService {
         @Query("date") date: String,
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("sort") sort: Int
+        @Query("sort") sort: String
     ): ApiResult<CommunicationListResponse>
 
     // 유저 배지 목록

@@ -13,6 +13,6 @@ interface OtherSpaceRepository {
         date: String,
         page: Int,
         size: Int,
-        sort: Int
+        sort: String
     ): ApiResult<CommunicationListResponse>
 }
