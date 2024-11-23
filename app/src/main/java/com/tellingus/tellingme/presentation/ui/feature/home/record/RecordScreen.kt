@@ -1,7 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
 import android.widget.Toast
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -26,8 +24,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -43,10 +39,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -89,6 +83,8 @@ fun RecordScreen(
     modifier: Modifier = Modifier,
     viewModel: RecordViewModel = hiltViewModel(),
     navController: NavController,
+    title: String,
+    phrase: String,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -113,26 +109,21 @@ fun RecordScreen(
                     )
                 },
                 rightSlot = {
-                    Row {
-                        SingleButton(
-                            size = ButtonSize.LARGE,
-                            text = "질문바꾸기",
-                            onClick = { showTodayQuestionChangeBottomSheet = true }
-                        )
-                        SingleButton(
-                            size = ButtonSize.LARGE,
-                            text = "완료",
-                            onClick = {
-                                viewModel.processEvent(RecordContract.Event.OnClickRecordButton)
-                            }
-                        )
-                    }
+                    SingleButton(
+                        size = ButtonSize.LARGE,
+                        text = "완료",
+                        onClick = {
+                            viewModel.processEvent(RecordContract.Event.OnClickRecordButton)
+                        }
+                    )
                 }
             )
         },
         content = {
             RecordScreenContent(
-                viewModel = viewModel
+                viewModel = viewModel,
+                title = title,
+                phrase = phrase
             )
         },
         isScrollable = false
@@ -157,11 +148,15 @@ fun RecordScreen(
                     size = ButtonSize.LARGE,
                     text = "완료",
                     onClick = {
-                        Toast.makeText(context, "완료 후 홈으로 이동", Toast.LENGTH_SHORT).show()
+                        viewModel.processEvent(RecordContract.Event.RecordAnswer)
                     }
                 )
             }
         )
+    }
+
+    if (uiState.isCompleteWriteAnswer) {
+        navController.popBackStack()
     }
 
     if (showTodayQuestionChangeBottomSheet) {
@@ -199,7 +194,9 @@ fun RecordScreen(
 @Composable
 fun RecordScreenContent(
     modifier: Modifier = Modifier,
-    viewModel: RecordViewModel
+    viewModel: RecordViewModel,
+    title: String,
+    phrase: String,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isEmotionBottomSheetOpen by remember { mutableStateOf(false) }
@@ -214,14 +211,14 @@ fun RecordScreenContent(
                 .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 31.dp)
         ) {
             Text(
-                text = "지금까지 나의 인생을 두 단계로\n나눈다면 어느 시점에 구분선을 둘 건가요?",
+                text = title,
                 style = TellingmeTheme.typography.body1Regular.copy(
                     color = Gray700,
                 ),
             )
             Spacer(modifier = modifier.size(8.dp))
             Text(
-                text = "스스로 크게 변화한 시점을 떠올려봐요.",
+                text = phrase,
                 style = TellingmeTheme.typography.body2Regular,
                 color = Gray500
             )
@@ -333,7 +330,7 @@ fun RecordScreenContent(
             Spacer(modifier = modifier.size(10.dp))
             Switch(
                 modifier = modifier.scale(0.8f),
-                checked = uiState.isOpen,
+                checked = uiState.isPublic,
                 onCheckedChange = {
                     viewModel.processEvent(RecordContract.Event.OnClickOpenSwitch)
                 },

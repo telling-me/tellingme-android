@@ -3,6 +3,8 @@ package com.tellingus.tellingme.data.network
 import com.tellingus.tellingme.data.model.common.BasicResponse
 import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.HomeResponse
+import com.tellingus.tellingme.data.model.home.AnswerRequest
+import com.tellingus.tellingme.data.model.home.AnswerResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
@@ -59,6 +61,13 @@ interface NetworkService {
     suspend fun getQuestion(
         @Body questionRequest: QuestionRequest
     ): ApiResult<QuestionResponse>
+
+    // 답변 작성 API
+    @POST("${END_POINT}/answer")
+    suspend fun writeAnswer(
+        @Body answerRequest: AnswerRequest
+    ): ApiResult<AnswerResponse>
+
 
     // 알림 조회 API
     @GET("${END_POINT}/notice")

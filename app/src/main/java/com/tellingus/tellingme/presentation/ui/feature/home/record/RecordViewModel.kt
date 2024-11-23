@@ -1,17 +1,19 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
+import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.R
-import com.tellingus.tellingme.data.repositoryimpl.HomeRepositoryImpl
+import com.tellingus.tellingme.data.model.home.AnswerRequest
+import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.usecase.WriteAnswerUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import com.tellingus.tellingme.util.getToday
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RecordViewModel @Inject constructor(
-    private val homeRepositoryImpl: HomeRepositoryImpl
+    private val writeAnswerUseCase: WriteAnswerUseCase
 ) : BaseViewModel<RecordContract.State, RecordContract.Event, RecordContract.Effect>(
     initialState = RecordContract.State()
 ) {
@@ -39,7 +41,23 @@ class RecordViewModel @Inject constructor(
             }
 
             is RecordContract.Event.OnClickOpenSwitch -> {
-                updateState(currentState.copy(isOpen = !currentState.isOpen))
+                updateState(currentState.copy(isPublic = !currentState.isPublic))
+            }
+
+            is RecordContract.Event.RecordAnswer -> {
+                viewModelScope.launch {
+                    writeAnswerUseCase(
+                        answerRequest = AnswerRequest(
+                            content = currentState.answer,
+                            emotion = currentState.selectedEmotion,
+                            date = currentState.today.replace(".", "-"),
+                            isPublic = currentState.isPublic,
+                            isSpare = false
+                        )
+                    ).onSuccess {
+                        updateState(currentState.copy(isCompleteWriteAnswer = true))
+                    }
+                }
             }
 
             else -> {}
