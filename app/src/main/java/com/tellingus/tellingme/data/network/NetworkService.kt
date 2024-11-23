@@ -7,6 +7,7 @@ import com.tellingus.tellingme.data.model.home.NoticeResponse
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
+import com.tellingus.tellingme.data.model.myspace.MypageResponse
 import com.tellingus.tellingme.data.model.notice.LoadNoticeResponse
 import com.tellingus.tellingme.data.model.oauth.login.OauthRequest
 import com.tellingus.tellingme.data.model.oauth.login.TokenResponse
@@ -85,7 +86,6 @@ interface NetworkService {
         @Body homeRequest: HomeRequest
     ): ApiResult<HomeResponse>
 
-
     // 알림 전체 읽음
     @POST("${END_POINT}/notice/readAll")
     suspend fun noticeReadAll(): ApiResult<BasicResponse>
@@ -98,5 +98,10 @@ interface NetworkService {
 
     @DELETE("${END_POINT}/notice/{noticeId}")
     suspend fun deleteNoticeByNoticeId(@Path("noticeId") noticeId: Int): ApiResult<BasicResponse>
+
+    // 모바일 마이페이지
+    @GET("${END_POINT}/v2/mobile/mypage")
+    suspend fun getMypage(): ApiResult<MypageResponse>
+
 
 }

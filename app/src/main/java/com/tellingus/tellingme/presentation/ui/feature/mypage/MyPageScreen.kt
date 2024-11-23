@@ -68,15 +68,7 @@ fun MyPageScreen(
     MainLayout(header = {
         MyPageScreenHeader(navController = navController)
     }, content = {
-        MyPageScreenContent(navController)/*
-            Button(
-                onClick = {
-                    viewModel.signOutUser()
-                }
-            ) {
-                Text(text = "유저 탈퇴하기")
-            }
-             */
+        MyPageScreenContent(navController)
     })
 }
 

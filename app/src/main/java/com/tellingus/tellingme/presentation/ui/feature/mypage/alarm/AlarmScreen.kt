@@ -210,7 +210,7 @@ fun AlarmCard(
                     )
             ) {
                 Text(
-                    text = getAlarmCardTypeText(alarmType),
+                    text = getAlarmCardTypeText("alarm"),
                     color = Primary100,
                     style = TellingmeTheme.typography.caption1Bold,
                 )
