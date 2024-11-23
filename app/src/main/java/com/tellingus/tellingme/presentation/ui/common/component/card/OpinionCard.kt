@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.button.HeartButton
 import com.tellingus.tellingme.presentation.ui.common.component.chip.EmotionChip
+import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 
@@ -88,7 +89,7 @@ fun DefaultCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Image(
-                    painter = painterResource(R.drawable.emotion_happy_medium),
+                    painter = painterResource(getMediumEmotion(emotion)),
                     contentDescription = "",
                     modifier = Modifier.size(52.dp),
                 )
@@ -135,7 +136,7 @@ fun FullCard(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(R.drawable.emotion_happy_medium),
+                    painter = painterResource(getMediumEmotion(emotion)),
                     contentDescription = "",
                     modifier = Modifier.size(52.dp),
                 )
