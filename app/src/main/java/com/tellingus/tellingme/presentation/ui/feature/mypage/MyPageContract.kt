@@ -7,6 +7,18 @@ import com.tellingus.tellingme.presentation.ui.common.base.UiState
 class MyPageContract {
     data class State(
         val isLoading: Boolean = false,
+
+        val nickname: String = "",
+        val badgeCode: String = "",
+        val cheeseBalance: Int = 0,
+        val badgeCount: Int = 0,
+        val answerCount: Int = 0,
+        val premium: Boolean = false,
+        val days_to_level_up: Int = 0,
+        val level: Int = 0,
+        val current_exp: Int = 0,
+        val required_exp: Int = 0
+
     ) : UiState
 
     sealed class Event : UiEvent {

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,6 +39,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
@@ -48,6 +50,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowDoubl
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
+import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotionBadge
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.model.ToolTipType
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
@@ -65,10 +68,13 @@ import com.tellingus.tellingme.util.AppUtils
 fun MyPageScreen(
     navController: NavController, viewModel: MyPageViewModel = hiltViewModel()
 ) {
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     MainLayout(header = {
         MyPageScreenHeader(navController = navController)
     }, content = {
-        MyPageScreenContent(navController)
+        MyPageScreenContent(navController, uiState)
     })
 }
 
@@ -95,7 +101,7 @@ fun MyPageScreenHeader(
 }
 
 @Composable
-fun MyPageScreenContent(navController: NavController) {
+fun MyPageScreenContent(navController: NavController, uiState: MyPageContract.State) {
     val context = LocalContext.current
     val appVersion = AppUtils.getAppVersion(context)
     var isTooltipVisible by remember { mutableStateOf(false) }
@@ -149,8 +155,10 @@ fun MyPageScreenContent(navController: NavController) {
         modifier = Modifier.padding(start = 20.dp, end = 20.dp)
     ) {
         Row {
+            val TAG: String = "로그"
+            Log.d(TAG, " - MyPageScreenContent() called ${uiState.badgeCode}")
             Image(
-                painter = painterResource(R.drawable.icon_connexion),
+                painter = painterResource(getMediumEmotionBadge(uiState.badgeCode)),
                 contentDescription = "",
                 modifier = Modifier.size(68.dp)
             )
@@ -162,14 +170,18 @@ fun MyPageScreenContent(navController: NavController) {
 
                     )
                 Text(
-                    text = "듀이듀이",
+                    text = uiState.nickname,
                     modifier = Modifier.padding(top = 4.dp),
                     style = TellingmeTheme.typography.head3Bold
                 )
             }
         }
         Box(modifier = Modifier.padding(top = 10.dp)) {
-            LevelSection(level = 1, percent = 50)
+            LevelSection(
+                level = uiState.level,
+                percent = uiState.current_exp,
+                levelDescription = "연속 ${uiState.days_to_level_up}일만 작성하면 LV.${uiState.level + 1} 달성!"
+            )
         }
 
         Card(
@@ -204,7 +216,9 @@ fun MyPageScreenContent(navController: NavController) {
                         style = TellingmeTheme.typography.caption2Regular
                     )
                     Text(
-                        text = "378", color = Gray600, style = TellingmeTheme.typography.body2Bold
+                        text = "${uiState.cheeseBalance}",
+                        color = Gray600,
+                        style = TellingmeTheme.typography.body2Bold
                     )
                 }
 
@@ -227,7 +241,9 @@ fun MyPageScreenContent(navController: NavController) {
                         style = TellingmeTheme.typography.caption2Regular
                     )
                     Text(
-                        text = "24", color = Gray600, style = TellingmeTheme.typography.body2Bold
+                        text = "${uiState.badgeCount}",
+                        color = Gray600,
+                        style = TellingmeTheme.typography.body2Bold
                     )
                 }
 
@@ -250,7 +266,9 @@ fun MyPageScreenContent(navController: NavController) {
                         style = TellingmeTheme.typography.caption2Regular
                     )
                     Text(
-                        text = "346", color = Gray600, style = TellingmeTheme.typography.body2Bold
+                        text = "${uiState.answerCount}",
+                        color = Gray600,
+                        style = TellingmeTheme.typography.body2Bold
                     )
                 }
             }
@@ -259,7 +277,7 @@ fun MyPageScreenContent(navController: NavController) {
         if (isTooltipVisible) {
             ToolTip(
                 type = ToolTipType.HELP,
-                text = "현재 보유 중인 치즈는 총 19,403개예요!",
+                text = "현재 보유 중인 치즈는 총 ${uiState.cheeseBalance}개예요!",
                 hasTriangle = true,
             )
         }
@@ -343,7 +361,7 @@ fun MyPageScreenContent(navController: NavController) {
                         val intent =
                             Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://doana.notion.site/f7a045872c3b4b02bce5e9f6d6cfc2d8?pvs=4")
+                                Uri.parse("https://walla.my/v/7XwE0CxFffPanoQ7TneT")
                             )
                         context.startActivity(intent)
 

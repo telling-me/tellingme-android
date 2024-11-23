@@ -1,12 +1,12 @@
 package com.tellingus.tellingme.data.model.myspace
 
-data class MypageResponse(
+data class MyPageResponse(
     val code: Int,
     val message: String,
-    val data: List<MypageData>
+    val data: MyPageData
 )
 
-data class MypageData(
+data class MyPageData(
     val userProfile: UserProfile,
     val level: LevelData
 )
@@ -21,12 +21,8 @@ data class UserProfile(
 )
 
 data class LevelData(
-    val level: Level,
+    val level_dto: LevelDto,
     val days_to_level_up: Int,
-)
-
-data class Level(
-    val level_dto: LevelDto
 )
 
 data class LevelDto(

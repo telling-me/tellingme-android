@@ -57,6 +57,8 @@ class HomeViewModel @Inject constructor(
                                 userNickname = userNickname,
                                 userLevel = userLevel,
                                 userExp = userExp,
+                                requiredExp = requiredExp,
+                                daysToLevelUp = daysToLevelUp
                             )
                         )
                     }
