@@ -126,10 +126,10 @@ fun AlarmScreenContent(
                     date = it.date,
                     isRead = it.isRead,
                     onClick = {
-                        viewModel.processEvent(AlarmContract.Event.OnClickItemRead(it.id))
+                        viewModel.processEvent(AlarmContract.Event.OnClickItemRead(it.noticeId))
                     },
                     onDelete = {
-                        viewModel.processEvent(AlarmContract.Event.OnClickItemDelete(it.id))
+                        viewModel.processEvent(AlarmContract.Event.OnClickItemDelete(it.noticeId))
                     })
             }
         }
