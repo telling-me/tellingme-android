@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
@@ -62,9 +63,11 @@ fun AlarmScreen(
     navController: NavController,
     viewModel: AlarmViewModel = hiltViewModel(),
 ) {
-    MainLayout(
-        header = { AlarmScreenHeader { navController.popBackStack() } },
-        content = { AlarmScreenContent(viewModel = viewModel) },
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    MainLayout(header = { AlarmScreenHeader { navController.popBackStack() } },
+        content = { AlarmScreenContent(uiState = uiState, viewModel = viewModel) },
         isScrollable = false,
         background = Color.White
     )
@@ -87,10 +90,10 @@ fun AlarmScreenHeader(navigateToPreviousScreen: () -> Unit) {
 
 @Composable
 fun AlarmScreenContent(
-    viewModel: AlarmViewModel = hiltViewModel(),
+    uiState: AlarmContract.State, viewModel: AlarmViewModel
 ) {
-    val isLoading = viewModel.currentState.isLoading
-    val list = viewModel.currentState.list;
+    val isLoading = uiState.isLoading
+    val list = uiState.list;
 
     val TAG: String = "로그"
     Log.d(TAG, " - AlarmScreenContent() called $list")
@@ -115,10 +118,9 @@ fun AlarmScreenContent(
             }
         }
         LazyColumn() {
-            items(items = dummyList) {
+            items(items = list) {
                 it
-                AlarmCard(
-                    alarmType = "",
+                AlarmCard(alarmType = "",
                     title = it.title,
                     content = it.content,
                     date = it.date,
@@ -127,9 +129,8 @@ fun AlarmScreenContent(
                         viewModel.processEvent(AlarmContract.Event.OnClickItemRead(it.id))
                     },
                     onDelete = {
-                        // TODO: delete
-                    }
-                )
+                        viewModel.processEvent(AlarmContract.Event.OnClickItemDelete(it.id))
+                    })
             }
         }
     }
@@ -205,9 +206,7 @@ fun AlarmCard(
                     .padding(top = 12.dp, bottom = 12.dp, start = 20.dp, end = 20.dp)
                     .alpha(if (isRead === true || isPressed === true) 0.5f else 1f)
                     .clickable(
-                        interactionSource = interactionSource,
-                        indication = null,
-                        onClick = onClick
+                        interactionSource = interactionSource, indication = null, onClick = onClick
                     )
             ) {
                 Text(

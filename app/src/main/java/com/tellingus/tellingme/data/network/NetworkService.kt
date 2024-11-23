@@ -17,6 +17,7 @@ import com.tellingus.tellingme.data.model.oauth.signup.NicknameResponse
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -65,8 +66,7 @@ interface NetworkService {
     // 토큰 갱신 API
     @POST("${END_POINT}/token")
     suspend fun refreshAccessToken(
-        @Header("accessToken") accessToken: String,
-        @Header("refreshToken") refreshToken: String
+        @Header("accessToken") accessToken: String, @Header("refreshToken") refreshToken: String
     ): ApiResult<TokenResponse>
 
     // 회원 탈퇴 API
@@ -95,5 +95,8 @@ interface NetworkService {
     suspend fun noticeReadByNoticeId(
         @Path("noticeId") noticeId: Int,
     ): ApiResult<BasicResponse>
+
+    @DELETE("${END_POINT}/notice/{noticeId}")
+    suspend fun deleteNoticeByNoticeId(@Path("noticeId") noticeId: Int): ApiResult<BasicResponse>
 
 }

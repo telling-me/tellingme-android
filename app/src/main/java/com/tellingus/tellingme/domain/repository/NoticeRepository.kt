@@ -8,4 +8,6 @@ interface NoticeRepository {
     suspend fun loadNotice(): ApiResult<LoadNoticeResponse>
     suspend fun noticeReadAll(): ApiResult<BasicResponse>
     suspend fun noticeReadByNoticeId(noticeId: Int): ApiResult<BasicResponse>
+
+    suspend fun deleteNoticeByNoticeId(noticeId: Int): ApiResult<BasicResponse>
 }

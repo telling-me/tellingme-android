@@ -4,9 +4,10 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.usecase.notice.DeleteNoticeByNoticeIdUseCase
 import com.tellingus.tellingme.domain.usecase.notice.LoadNoticeUseCase
-import com.tellingus.tellingme.domain.usecase.notice.NoticeRadByNoticeIdUseCase
 import com.tellingus.tellingme.domain.usecase.notice.NoticeReadAllUseCase
+import com.tellingus.tellingme.domain.usecase.notice.NoticeReadByNoticeIdUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class AlarmViewModel @Inject constructor(
     private val loadNoticeUseCase: LoadNoticeUseCase,
     private val noticeReadAllUseCase: NoticeReadAllUseCase,
-    private val noticeRadByNoticeIdUseCase: NoticeRadByNoticeIdUseCase
+    private val noticeReadByNoticeIdUseCase: NoticeReadByNoticeIdUseCase,
+    private val deleteNoticeByNoticeIdUseCase: DeleteNoticeByNoticeIdUseCase,
 ) : BaseViewModel<AlarmContract.State, AlarmContract.Event, AlarmContract.Effect>(
     initialState = AlarmContract.State()
 ) {
@@ -37,30 +39,49 @@ class AlarmViewModel @Inject constructor(
             }
 
             is AlarmContract.Event.OnClickItemDelete -> {
-
+                deleteNotice(event.noticeId)
             }
         }
     }
 
-
     fun deleteNotice(noticeId: Int) {
-        // TODO: networkService api 정의
+        viewModelScope.launch {
+            deleteNoticeByNoticeIdUseCase(noticeId).onSuccess {
+                Log.d(TAG, "AlarmViewModel - deleteNotice() called")
+                loadAlarmList()
+            }.onFailure { message, code ->
+                Log.d(
+                    TAG,
+                    "AlarmViewModel - deleteNotice() called Error message: $message, code: $code"
+                )
+            }
+        }
     }
 
     fun postReadNotice(noticeId: Int) {
         viewModelScope.launch {
-            noticeRadByNoticeIdUseCase(noticeId).onSuccess {
-
-            }.onFailure { message, code -> }
+            noticeReadByNoticeIdUseCase(noticeId).onSuccess {
+                Log.d(TAG, "AlarmViewModel - postReadNotice() called")
+                loadAlarmList()
+            }.onFailure { message, code ->
+                Log.d(
+                    TAG,
+                    "AlarmViewModel - postReadNotice() called Error message: $message, code: $code"
+                )
+            }
         }
     }
 
     fun postReadAll() {
         viewModelScope.launch {
             noticeReadAllUseCase().onSuccess {
-                // TODO: invalidate api
+                loadAlarmList()
+                Log.d(TAG, "AlarmViewModel - postReadAll() called")
             }.onFailure { message, code ->
-
+                Log.d(
+                    TAG,
+                    "AlarmViewModel - postReadAll() called Error message: $message, code: $code"
+                )
             }
         }
     }
@@ -68,10 +89,10 @@ class AlarmViewModel @Inject constructor(
     fun loadAlarmList() {
         viewModelScope.launch {
             loadNoticeUseCase().onSuccess { it ->
+                Log.d(TAG, "AlarmViewModel - loadAlarmList() called")
                 currentState.copy(isLoading = true, list = it.data)
             }.onFailure { message, code ->
                 currentState.copy(isLoading = false)
-                val TAG: String = "로그"
                 Log.d(
                     TAG,
                     "AlarmViewModel - loadAlarmList() called Error message: $message, code: $code"

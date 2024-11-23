@@ -5,11 +5,11 @@ import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.NoticeRepository
 import javax.inject.Inject
 
-class NoticeRadByNoticeIdUseCase @Inject constructor(
+class DeleteNoticeByNoticeIdUseCase @Inject constructor(
     private val noticeRepository: NoticeRepository
 ) {
 
     suspend operator fun invoke(noticeId: Int): ApiResult<BasicResponse> {
-        return noticeRepository.noticeReadByNoticeId(noticeId)
+        return noticeRepository.deleteNoticeByNoticeId(noticeId)
     }
 }

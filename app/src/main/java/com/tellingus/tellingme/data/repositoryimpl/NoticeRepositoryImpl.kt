@@ -24,4 +24,9 @@ class NoticeRepositoryImpl @Inject constructor(
     override suspend fun noticeReadByNoticeId(noticeId: Int): ApiResult<BasicResponse> {
         return service.noticeReadByNoticeId(noticeId)
     }
+
+    override suspend fun deleteNoticeByNoticeId(noticeId: Int): ApiResult<BasicResponse> {
+        return service.deleteNoticeByNoticeId(noticeId)
+    }
+
 }
