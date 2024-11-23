@@ -31,18 +31,21 @@ fun EmotionChip(modifier: Modifier = Modifier, feeling: String = "happy", emotio
     }
 }
 
-fun getFeeling(data: String): String {
-    return when (data.lowercase()) {
-        "happy" -> "행복해요"
-        "excited" -> "신나요"
-        else -> "기본값"
-    }
-}
 
 fun getEmotion(data: Int): String {
     return when (data) {
         0 -> "행복해요"
-        1 -> "신나요"
+        1 -> "뿌듯해요"
+        2 -> "그저 그래요"
+        3 -> "피곤해요"
+        4 -> "슬퍼요"
+        5 -> "화나요"
+        6 -> "설레요"
+        7 -> "신나요"
+        8 -> "편안해요"
+        9 -> "무기력해요"
+        10 -> "외로워요"
+        11 -> "복잡해요"
         else -> ""
     }
 }
