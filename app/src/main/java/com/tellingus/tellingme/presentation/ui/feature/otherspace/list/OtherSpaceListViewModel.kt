@@ -5,11 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.model.home.QuestionData
 import com.tellingus.tellingme.data.model.otherspace.CommunicationListData
 import com.tellingus.tellingme.data.model.otherspace.Pageable
+import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.model.otherspace.Sort
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.usecase.GetQuestionUseCase
 import com.tellingus.tellingme.domain.usecase.otherspace.GetCommunicationListUseCase
+import com.tellingus.tellingme.domain.usecase.otherspace.PostLikesUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import com.tellingus.tellingme.presentation.ui.feature.otherspace.KEY_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class OtherSpaceListViewModel @Inject constructor(
     private val getCommunicationListUseCase: GetCommunicationListUseCase,
     private val getQuestionUseCase: GetQuestionUseCase,
+    private val postLikesUseCase: PostLikesUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<OtherSpaceListContract.State, OtherSpaceListContract.Event, OtherSpaceListContract.Effect>(
     initialState = OtherSpaceListContract.State(
@@ -94,6 +97,13 @@ class OtherSpaceListViewModel @Inject constructor(
         }
     }
 
+    fun postLikes(answerId: Int, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            postLikesUseCase(PostLikesRequest((answerId))).onSuccess {
+                onSuccess()
+            }.onFailure { s, i -> }
+        }
+    }
 
     fun loadMoreDataIfNeeded() {
         if (!currentState.isLastPage) {
@@ -107,28 +117,58 @@ class OtherSpaceListViewModel @Inject constructor(
         }
     }
 
+    private var lastExecutedTime: Long = 0L
+    private val THROTTLE_INTERVAL = 500L // 0.5초 (밀리초 단위)
+    fun isThrottled(): Boolean {
+        val currentTime = System.currentTimeMillis()
+        return if (currentTime - lastExecutedTime < THROTTLE_INTERVAL) {
+            true // Throttle 중
+        } else {
+            lastExecutedTime = currentTime
+            false // 실행 가능
+        }
+    }
+
     override fun reduceState(event: OtherSpaceListContract.Event) {
         when (event) {
             is OtherSpaceListContract.Event.OnClickRecently -> {
-                // 최신순 클릭 시 페이지를 1로 초기화하고 데이터 로드
                 updateState(currentState.copy(currentPage = 0, isLastPage = false))
                 getCommunicationList(date = event.date, page = 0, sort = "최신순")
             }
 
             is OtherSpaceListContract.Event.OnClickRelative -> {
-                // 관련순 클릭 시 페이지를 1로 초기화하고 데이터 로드
                 updateState(currentState.copy(currentPage = 0, isLastPage = false))
                 getCommunicationList(date = event.date, page = 0, sort = "관련순")
             }
 
             is OtherSpaceListContract.Event.OnClickEmpathy -> {
-                // 공감순 클릭 시 페이지를 1로 초기화하고 데이터 로드
                 updateState(currentState.copy(currentPage = 0, isLastPage = false))
                 getCommunicationList(date = event.date, page = 0, sort = "공감순")
             }
 
             is OtherSpaceListContract.Event.OnClickHeart -> {
-                // 하트 클릭 시 필요한 작업 추가
+                if (isThrottled()) return // Throttle 적용: 실행 제한
+
+                postLikes(event.answerId) {
+                    val updatedContent = currentState.communicationListData.content.map { item ->
+                        if (item.answerId == event.answerId) {
+                            item.copy(
+                                isLiked = !item.isLiked,
+                                likeCount = item.likeCount + if (item.isLiked) -1 else 1
+                            )
+                        } else {
+                            item
+                        }
+                    }
+
+                    updateState(
+                        currentState.copy(
+                            communicationListData = currentState.communicationListData.copy(
+                                content = updatedContent
+                            )
+                        )
+                    )
+                }
             }
         }
     }

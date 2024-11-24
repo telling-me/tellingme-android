@@ -22,6 +22,9 @@ import com.tellingus.tellingme.data.model.otherspace.CommunicationListRequest
 import com.tellingus.tellingme.data.model.otherspace.CommunicationListResponse
 import com.tellingus.tellingme.data.model.otherspace.CommunicationRequest
 import com.tellingus.tellingme.data.model.otherspace.CommunicationResponse
+import com.tellingus.tellingme.data.model.otherspace.GetAnswerByIdResponse
+import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
+import com.tellingus.tellingme.data.model.otherspace.PostLikesResponse
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
@@ -135,5 +138,17 @@ interface NetworkService {
     // 유저 배지 목록
     @GET("${END_POINT}/v2/user/badge")
     suspend fun getUserBadge(): ApiResult<UserBadgeResponse>
+
+    // 좋아요 누르기/취소하기
+    @POST("${END_POINT}/likes")
+    suspend fun postLikes(
+        @Body postLikesRequest: PostLikesRequest
+    ): ApiResult<PostLikesResponse>
+
+    // 고유 id로 답변 조회 API
+    @GET("${END_POINT}/answer/id")
+    suspend fun getAnswerById(
+        @Query("answerId") answerId: Int,
+    ) : ApiResult<GetAnswerByIdResponse>
 
 }

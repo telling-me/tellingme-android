@@ -1,6 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.common.component.button
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
@@ -26,14 +27,16 @@ fun HeartButton(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.clickable {
+            onClick()
+        },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(
             painter = painterResource(R.drawable.icon_heart),
             contentDescription = "",
             colorFilter = ColorFilter.tint(
-                when(buttonState) {
+                when (buttonState) {
                     ButtonState.ENABLED, ButtonState.SELECTED -> Error500
                     ButtonState.DISABLED -> Gray200
                 }
@@ -42,7 +45,7 @@ fun HeartButton(
         Text(
             text = if (heartCount < 1000) heartCount.toString() else "999+",
             style = TellingmeTheme.typography.caption1Bold,
-            color = when(buttonState) {
+            color = when (buttonState) {
                 ButtonState.ENABLED, ButtonState.SELECTED -> Gray600
                 ButtonState.DISABLED -> Gray300
             }

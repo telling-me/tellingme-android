@@ -1,6 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.otherspace.detail
 
 import android.text.style.AlignmentSpan
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,6 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.holix.android.bottomsheetdialog.compose.BottomSheetBehaviorProperties
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
@@ -62,11 +65,19 @@ import kotlinx.coroutines.launch
 fun OtherSpaceDetailScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
+    answerId: Int? = 0,
+    date: String? = "",
+    viewModel: OtherSpaceDetailViewModel = hiltViewModel()
 ) {
     var isComplaintBottomSheetOpen by remember { mutableStateOf(false) }
     var isComplainReasonBottomSheetOpen by remember { mutableStateOf(false) }
     var selectedComplainReason by remember { mutableStateOf("") }
     var isComplainConfirmModalOpen by remember { mutableStateOf(false) }
+
+    val TAG: String = "로그"
+    Log.d(TAG, "OtherSpaceDetailScreen: $answerId, $date")
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MainLayout(header = {
         BasicAppBar(modifier = modifier
@@ -88,7 +99,7 @@ fun OtherSpaceDetailScreen(
         })
     },
         content = {
-            OtherSpaceDetailScreenContent()
+            OtherSpaceDetailScreenContent(uiState, viewModel)
             if (isComplaintBottomSheetOpen) {
                 ComplaintBottomSheet(
                     onDismiss = { isComplaintBottomSheetOpen = false },
@@ -229,24 +240,34 @@ fun ComplaintBottomSheet(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
 }
 
 @Composable
-fun OtherSpaceDetailScreenContent() {
+fun OtherSpaceDetailScreenContent(
+    uiState: OtherSpaceDetailContract.State,
+    viewModel: OtherSpaceDetailViewModel
+) {
+    val questionData = uiState.questionData
+    val answerData = uiState.answerData
+
     Column(
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 20.dp)
             .fillMaxHeight()
     ) {
         QuestionSection(
-            title = "지금까지의 나의 인생을 두 단계로\n" + "나눈다면 어느 시점에 구분선을 둘 건가요?",
-            description = "스스로 크게 변화한 시점을 떠올려봐요.",
+            title = "${questionData.title}",
+            description = "${questionData.phrase}",
             isButtonVisible = false,
             bgColor = Background100
         )
         OpinionCard(
-            heartCount = mockData.heartCount,
-            buttonState = mockData.buttonState,
-            feeling = mockData.feeling,
-            description = mockData.description,
-            type = "full"
+            heartCount = answerData.likeCount,
+            buttonState = if (answerData.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
+            emotion = answerData.emotion,
+            description = answerData.content,
+            type = "full",
+            onClickHeart = {
+                viewModel.processEvent(OtherSpaceDetailContract.Event.OnClickHeart(answerData.answerId))
+            }
+
         )
     }
 }
