@@ -40,6 +40,7 @@ fun OpinionCard(
     onClick: () -> Unit = {},
     type: String = "default",
     emotion: Int = 0,
+    onClickHeart: () -> Unit = {}
 ) {
 
     if (type === "default") {
@@ -51,11 +52,12 @@ fun OpinionCard(
             description,
             onClick,
             emotion,
+            onClickHeart
         )
     } else if (type === "full") {
         FullCard(
             modifier, heartCount, buttonState,
-            feeling, description, onClick, emotion
+            feeling, description, onClick, emotion, onClickHeart
         )
     }
 }
@@ -69,21 +71,22 @@ fun DefaultCard(
     description: String,
     onClick: () -> Unit = {},
     emotion: Int,
+    onClickHeart: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 130.dp)
+            .heightIn(min = 148.dp)
             .background(Color.White, shape = RoundedCornerShape(20.dp))
             .padding(start = 22.dp, end = 22.dp, top = 20.dp, bottom = 20.dp)
-    ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
             .clickable {
-                if (onClick != {}) {
-                    onClick()
-                }
-            }) {
+                onClick()
+            }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
             Column(
                 modifier = Modifier
                     .height(98.dp)
@@ -111,7 +114,9 @@ fun DefaultCard(
                 .align(Alignment.TopEnd)
                 .offset(y = (-12).dp)
         ) {
-            HeartButton(heartCount = heartCount, buttonState = buttonState, onClick = {})
+            HeartButton(heartCount = heartCount, buttonState = buttonState, onClick = {
+                onClickHeart()
+            })
         }
     }
 }
@@ -125,6 +130,7 @@ fun FullCard(
     description: String,
     onClick: () -> Unit = {},
     emotion: Int,
+    onClickHeart: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
@@ -153,7 +159,7 @@ fun FullCard(
                         top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp
                     )
                 ) {
-                    Text(text = "첫 직장에 입사했을 때인 것 같아. 대학 다니면서는 알지 못했던 새로운 분야도 많이 알게 되고 시야도 그 시점에 많이 넓어졌어. 동료들과 어울리고 조직 문화에 적응하면서 업무에 대해 이해하는 시간을 갖느라 긴장하면서 열심히 다녔어. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 첫 직장에 입사했을 때인 것 같아. 대학 다니면서는 알지 못했던 새로운 분야도 많이 알게 되고 시야도 그 시점에 많이 넓어졌어. 동료들과 어울리고 조직 문화에 적응하면서 업무에 대해 이해하는 시간을 갖느라 긴장하면서 열심히 다녔어. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 대학 다니면서는 알지 못했던 새로운 분야도 많이 알게 되고 시야도 그 시점에 많이 넓어졌어. 동료들과 어울리고 조직 문화에 적응하면서 업무에 대해 이해하는 시간을 갖느라 긴장하면서 열심히 다녔어. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 그시기가 내 인생의 터닝 포인트라 생각해. 이 전엔 배움의 시기였다면 그 때 이후로 성장과 실전의 시기로 들어섰단 느낌이 들었거든. 하하하")
+                    Text(text = description)
                 }
             }
         }
@@ -163,7 +169,9 @@ fun FullCard(
                 .align(Alignment.TopEnd)
                 .padding(top = 10.dp, end = 10.dp)
         ) {
-            HeartButton(heartCount = heartCount, buttonState = buttonState, onClick = {})
+            HeartButton(heartCount = heartCount, buttonState = buttonState, onClick = {
+                onClickHeart()
+            })
         }
     }
 }

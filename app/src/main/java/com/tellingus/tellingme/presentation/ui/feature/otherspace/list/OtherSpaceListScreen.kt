@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.otherspace.list
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,10 +20,12 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -85,6 +88,8 @@ fun OtherSpaceListScreen(
     )
 }
 
+private val buffer = 1
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OtherSpaceListScreenContent(
@@ -93,16 +98,24 @@ fun OtherSpaceListScreenContent(
     viewModel: OtherSpaceListViewModel,
     date: String,
 ) {
+    val communicationListData = uiState.communicationListData
+    val questionData = uiState.questionData
     var isSelected by remember { mutableStateOf("recently") }
 
-    val lazyListState = rememberLazyListState() // LazyListState를 사용하여 스크롤 상태를 관리
-    val communicationListData =
-        uiState.communicationListData // ViewModel에서 communicationListData를 관찰
-    var isLoading by remember { mutableStateOf(false) } // 로딩 상태 관리
-    var isLastPage by remember { mutableStateOf(false) } // 마지막 페이지 상태 관리
-    val questionData = uiState.questionData
 
+    val lazyListState = rememberLazyListState()
+    // observe list scrolling
+    val reachedBottom: Boolean by remember {
+        derivedStateOf {
+            val lastVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()
+            lastVisibleItem?.index != 0 && lastVisibleItem?.index == lazyListState.layoutInfo.totalItemsCount - buffer
+        }
+    }
 
+    // load more if scrolled to bottom
+    LaunchedEffect(reachedBottom) {
+        if (reachedBottom) viewModel.loadMoreDataIfNeeded()
+    }
 
     Box(
         modifier = Modifier
@@ -115,7 +128,6 @@ fun OtherSpaceListScreenContent(
                 .padding(end = 0.dp, bottom = 20.dp)
                 .zIndex(1f)
         ) {}
-
 
         if (communicationListData.content.isEmpty()) {
             Box(
@@ -130,18 +142,17 @@ fun OtherSpaceListScreenContent(
             LazyColumn(
                 state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(
-                    top = 0.dp, bottom = 24.dp
-                )
+                contentPadding = PaddingValues(top = 0.dp, bottom = 24.dp)
             ) {
                 item {
                     QuestionSection(
-                        title = "${questionData.title}",
-                        description = "${questionData.phrase}",
+                        title = questionData.title,
+                        description = questionData.phrase,
                         isButtonVisible = false,
                         bgColor = Background100
                     )
                 }
+
                 stickyHeader {
                     Row(
                         modifier = Modifier
@@ -149,51 +160,69 @@ fun OtherSpaceListScreenContent(
                             .background(Background100)
                             .fillMaxWidth()
                     ) {
-                        ChoiceChip(selected = isSelected == "recently", text = "최신순", onClick = {
-                            isSelected = "recently"
-                            viewModel.processEvent(OtherSpaceListContract.Event.OnClickRecently(date))
-                        })
+                        ChoiceChip(
+                            selected = isSelected == "recently",
+                            text = "최신순",
+                            onClick = {
+                                isSelected = "recently"
+                                viewModel.processEvent(OtherSpaceListContract.Event.OnClickRecently(date))
+                            }
+                        )
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        ChoiceChip(selected = isSelected == "related", text = "관련순", onClick = {
-                            isSelected = "related"
-                            viewModel.processEvent(OtherSpaceListContract.Event.OnClickRelative(date))
-                        })
+                        ChoiceChip(
+                            selected = isSelected == "related",
+                            text = "관련순",
+                            onClick = {
+                                isSelected = "related"
+                                viewModel.processEvent(OtherSpaceListContract.Event.OnClickRelative(date))
+                            }
+                        )
 
                         Spacer(modifier = Modifier.width(8.dp))
 
-                        ChoiceChip(selected = isSelected == "sympathy", text = "공감순", onClick = {
-                            isSelected = "sympathy"
-                            viewModel.processEvent(OtherSpaceListContract.Event.OnClickEmpathy(date))
-                        })
+                        ChoiceChip(
+                            selected = isSelected == "sympathy",
+                            text = "공감순",
+                            onClick = {
+                                isSelected = "sympathy"
+                                viewModel.processEvent(OtherSpaceListContract.Event.OnClickEmpathy(date))
+                            }
+                        )
                     }
                 }
-                items(items = communicationListData.content) {
+
+                items(items = communicationListData.content) { item ->
                     OpinionCard(
-                        heartCount = it.likeCount,
-                        buttonState = if (it.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
-                        emotion = it.emotion,
-                        description = it.content,
+                        heartCount = item.likeCount,
+                        buttonState = if (item.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
+                        emotion = item.emotion,
+                        description = item.content,
                         onClick = {
-                            navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${it.answerId}")
+                            navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${item.answerId}?date=${date}")
+                        },
+                        onClickHeart = {
+                            viewModel.processEvent(OtherSpaceListContract.Event.OnClickHeart(item.answerId))
                         }
                     )
                 }
-                // 로딩 중일 때 로딩 표시
+
+                // 로딩 중일 때 표시할 로딩 인디케이터
                 item {
-                    if (isLoading) {
-                        CircularProgressIndicator(
+                    if (!uiState.isLastPage) {
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
-                        )
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }
         }
-
-
     }
 }
 
@@ -203,11 +232,3 @@ fun OtherSpaceListScreenContent(
 fun OtherSpaceDetailScreenPreview() {
     OtherSpaceListScreen(navController = rememberNavController())
 }
-
-data class OpinionItem(
-    val id: Int,
-    val heartCount: Int,
-    val buttonState: ButtonState,
-    val feeling: String,
-    val description: String
-)

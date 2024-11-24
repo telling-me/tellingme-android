@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.otherspace
 
+import android.util.Log
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -31,14 +32,21 @@ fun NavGraphBuilder.otherSpaceGraph(
             val date = navBackStackEntry.arguments?.getString(KEY_ID) ?: "Unknown"
             OtherSpaceListScreen(navController = navController, date = date)
         }
-        composable(route = "${OtherSpaceDestinations.OTHER_SPACE}/detail/{$KEY_ID}",
+        composable(route = "${OtherSpaceDestinations.OTHER_SPACE}/detail/{$KEY_ID}?date={date}",
             arguments = listOf(
                 navArgument(KEY_ID) {
+                    type = NavType.IntType
+                },
+                navArgument("date") {
                     type = NavType.StringType
+                    nullable = true // query-parameter는 nullable을 명시해야함
+                    defaultValue = null
                 }
             )
-        ) {
-            OtherSpaceDetailScreen(navController = navController)
+        ) { navBackStackEntry ->
+            val answerId = navBackStackEntry.arguments?.getInt(KEY_ID)
+            val date = navBackStackEntry.arguments?.getString("date")
+            OtherSpaceDetailScreen(navController = navController, answerId = answerId, date = date)
         }
     }
 }
