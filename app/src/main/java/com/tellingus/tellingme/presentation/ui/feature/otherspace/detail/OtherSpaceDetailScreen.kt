@@ -97,43 +97,42 @@ fun OtherSpaceDetailScreen(
                     isComplaintBottomSheetOpen = true
                 })
         })
-    },
-        content = {
-            OtherSpaceDetailScreenContent(uiState, viewModel)
-            if (isComplaintBottomSheetOpen) {
-                ComplaintBottomSheet(
-                    onDismiss = { isComplaintBottomSheetOpen = false },
-                    onClick = { isComplainReasonBottomSheetOpen = true })
-            }
-            if (isComplainReasonBottomSheetOpen) {
-                ComplainReasonBottomSheet(
-                    onDismiss = {
-                        isComplaintBottomSheetOpen = false
-                        isComplainReasonBottomSheetOpen = false
-                    },
-                    onConfirm = {
-                        isComplaintBottomSheetOpen = false
-                        selectedComplainReason = it
-                        isComplainConfirmModalOpen = true
-                    }
-                )
-            }
-            if (isComplainConfirmModalOpen) {
-                ShowSingleButtonDialog(title = "신고가 접수되었습니다.",
-                    contents = "",
-                    completeButton = {
-                        PrimaryButton(
-                            modifier = Modifier.fillMaxWidth(),
-                            size = ButtonSize.LARGE,
-                            text = "확인",
-                            onClick = {
-                                isComplainConfirmModalOpen = false
-                            }
-                        )
-                    }
-                )
-            }
-        })
+    }, content = {
+        OtherSpaceDetailScreenContent(uiState, viewModel)
+        if (isComplaintBottomSheetOpen) {
+            ComplaintBottomSheet(onDismiss = { isComplaintBottomSheetOpen = false },
+                onClick = { isComplainReasonBottomSheetOpen = true })
+        }
+        if (isComplainReasonBottomSheetOpen) {
+            ComplainReasonBottomSheet(onDismiss = {
+                isComplaintBottomSheetOpen = false
+                isComplainReasonBottomSheetOpen = false
+            }, onConfirm = {
+                isComplaintBottomSheetOpen = false
+                selectedComplainReason = it
+                isComplainConfirmModalOpen = true
+            })
+        }
+        if (isComplainConfirmModalOpen) {
+            ShowSingleButtonDialog(title = "신고가 접수되었습니다.", contents = "", completeButton = {
+                PrimaryButton(modifier = Modifier.fillMaxWidth(),
+                    size = ButtonSize.LARGE,
+                    text = "확인",
+                    onClick = {
+                        answerId?.let {
+                            OtherSpaceDetailContract.Event.OnClickReport(
+                                answerId = it, reason = selectedComplainReason.toInt()
+                            )
+                        }?.let {
+                            viewModel.processEvent(
+                                it
+                            )
+                        }
+                        isComplainConfirmModalOpen = false
+                    })
+            })
+        }
+    })
 }
 
 
@@ -171,8 +170,8 @@ fun ComplainReasonBottomSheet(onConfirm: (String) -> Unit = {}, onDismiss: () ->
                         ) {
                             CheckBox(
                                 text = it.label,
-                                onClick = { checkedValue = it.value },
-                                isSelected = checkedValue == it.value,
+                                onClick = { checkedValue = it.reason.toString() },
+                                isSelected = checkedValue == it.reason.toString(),
                                 isIconCircle = true
                             )
                         }
@@ -184,15 +183,15 @@ fun ComplainReasonBottomSheet(onConfirm: (String) -> Unit = {}, onDismiss: () ->
                         .padding(horizontal = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    PrimaryLightButton(
-                        modifier = Modifier.weight(1f),
+                    PrimaryLightButton(modifier = Modifier.weight(1f),
                         size = ButtonSize.LARGE,
                         text = "취소",
                         onClick = { onDismiss() })
                     Spacer(modifier = Modifier.width(4.dp))
-                    PrimaryButton(
-                        modifier = Modifier.weight(1f),
-                        size = ButtonSize.LARGE, text = "확인", onClick = {
+                    PrimaryButton(modifier = Modifier.weight(1f),
+                        size = ButtonSize.LARGE,
+                        text = "확인",
+                        onClick = {
                             onConfirm(checkedValue)
                             onDismiss()
                         })
@@ -221,8 +220,7 @@ fun ComplaintBottomSheet(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
                     .clickable(enabled = true,
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null,
-                        onClick = { onClick() }
-                    ),
+                        onClick = { onClick() }),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
@@ -241,8 +239,7 @@ fun ComplaintBottomSheet(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
 
 @Composable
 fun OtherSpaceDetailScreenContent(
-    uiState: OtherSpaceDetailContract.State,
-    viewModel: OtherSpaceDetailViewModel
+    uiState: OtherSpaceDetailContract.State, viewModel: OtherSpaceDetailViewModel
 ) {
     val questionData = uiState.questionData
     val answerData = uiState.answerData
@@ -258,8 +255,7 @@ fun OtherSpaceDetailScreenContent(
             isButtonVisible = false,
             bgColor = Background100
         )
-        OpinionCard(
-            heartCount = answerData.likeCount,
+        OpinionCard(heartCount = answerData.likeCount,
             buttonState = if (answerData.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
             emotion = answerData.emotion,
             description = answerData.content,
@@ -284,28 +280,13 @@ fun ComplaintBottomSheetPreview() {
     ComplaintBottomSheet(onDismiss = {})
 }
 
+sealed class ComplainReasonType(val label: String, val value: String, val reason: Int) {
+    object Abuse : ComplainReasonType(label = "욕설", value = "abuse", reason = 1)
+    object Pornography : ComplainReasonType(label = "음란물", value = "pornography", reason = 2)
+    object Advertising : ComplainReasonType(label = "광고", value = "advertising", reason = 3)
+    object PersonalInfoInfringement :
+        ComplainReasonType(label = "개인정보 침해", value = "personalInfo", reason = 4)
 
-data class OpinionItem(
-    val id: Int,
-    val heartCount: Int,
-    val buttonState: ButtonState,
-    val feeling: String,
-    val description: String
-)
-
-val mockData = OpinionItem(
-    id = 1,
-    heartCount = 999,
-    buttonState = ButtonState.ENABLED,
-    feeling = "excited",
-    description = "나는 보통 집단 안에서 이야기 나온 내용에서 핵심을 뽑아내 정리하는 것을 잘하는 것 같다. 예를 들면 학교 팀플을 진행할 때 빛을 보인다. 팀원들의 의견을 수용하여 핵심만을 요약한다."
-)
-
-sealed class ComplainReasonType(val label: String, val value: String) {
-    object Abuse : ComplainReasonType(label = "욕설", value = "abuse")
-    object Pornography : ComplainReasonType(label = "음란물", value = "pornography")
-    object Advertising : ComplainReasonType(label = "광고", value = "advertising")
-    object PersonalInfoInfringement : ComplainReasonType(label = "개인정보 침해", value = "personalInfo")
-    object Fishing : ComplainReasonType(label = "낚시성 콘텐츠", value = "fishing")
-    object Others : ComplainReasonType(label = "기타", value = "others")
+    object Fishing : ComplainReasonType(label = "낚시성 콘텐츠", value = "fishing", reason = 5)
+    object Others : ComplainReasonType(label = "기타", value = "others", reason = 6)
 }

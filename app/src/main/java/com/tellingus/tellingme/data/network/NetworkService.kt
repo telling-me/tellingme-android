@@ -25,6 +25,7 @@ import com.tellingus.tellingme.data.model.otherspace.CommunicationResponse
 import com.tellingus.tellingme.data.model.otherspace.GetAnswerByIdResponse
 import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.model.otherspace.PostLikesResponse
+import com.tellingus.tellingme.data.model.otherspace.PostReportRequest
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
@@ -150,5 +151,11 @@ interface NetworkService {
     suspend fun getAnswerById(
         @Query("answerId") answerId: Int,
     ) : ApiResult<GetAnswerByIdResponse>
+
+    // 신고 등록, reason : 1~6
+    @POST("${END_POINT}/report")
+    suspend fun postReport(
+        @Body postReportRequest: PostReportRequest
+    ) : ApiResult<Unit>
 
 }

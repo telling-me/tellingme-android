@@ -7,6 +7,7 @@ import com.tellingus.tellingme.data.model.otherspace.CommunicationResponse
 import com.tellingus.tellingme.data.model.otherspace.GetAnswerByIdResponse
 import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.model.otherspace.PostLikesResponse
+import com.tellingus.tellingme.data.model.otherspace.PostReportRequest
 import com.tellingus.tellingme.data.network.NetworkService
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.OtherSpaceRepository
@@ -36,6 +37,10 @@ class OtherSpaceRepositoryImpl @Inject constructor(
 
     override suspend fun getAnswerById(answerId: Int): ApiResult<GetAnswerByIdResponse> {
         return service.getAnswerById(answerId)
+    }
+
+    override suspend fun postReport(postReportRequest: PostReportRequest): ApiResult<Unit> {
+        return service.postReport(postReportRequest)
     }
 
 
