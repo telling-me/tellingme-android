@@ -40,19 +40,19 @@ import com.tellingus.tellingme.presentation.ui.theme.Typography
 
 @Composable
 fun MyTellerBadgeScreen(
-    navController: NavController,
-    myTellerBadgeViewModel: MyTellerBadgeViewModel = hiltViewModel()
+    navController: NavController, myTellerBadgeViewModel: MyTellerBadgeViewModel = hiltViewModel()
 ) {
     val uiState by myTellerBadgeViewModel.uiState.collectAsStateWithLifecycle()
-    MainLayout(
-        isScrollable = false,
-        header = { MyTellerBadgeScreenHeader(navController) },
+    val cheeseBalance = uiState.cheeseBalance
+    MainLayout(isScrollable = false,
+        header = { MyTellerBadgeScreenHeader(navController, cheeseBalance = cheeseBalance) },
         content = { MyTellerBadgeScreenContent(uiState) })
 }
 
 @Composable
 fun MyTellerBadgeScreenContent(uiState: MyTellerBadgeContract.State) {
     val userBadgeList = uiState.userBadgeList
+
 
     Column(modifier = Modifier.fillMaxHeight()) {
         if (userBadgeList.isEmpty()) {
@@ -73,7 +73,9 @@ fun MyTellerBadgeScreenContent(uiState: MyTellerBadgeContract.State) {
             ) {
                 items(userBadgeList) { badge ->
                     TellerBadge(
-                        title = badge.badgeName, content = badge.badgeMiddleName ,badgeCode = badge.badgeCode
+                        title = badge.badgeName,
+                        content = badge.badgeMiddleName,
+                        badgeCode = badge.badgeCode
                     )
                 }
             }
@@ -95,7 +97,7 @@ fun EmptyContent() {
 }
 
 @Composable
-fun MyTellerBadgeScreenHeader(navController: NavController) {
+fun MyTellerBadgeScreenHeader(navController: NavController, cheeseBalance: Int = 0) {
     BasicAppBar(modifier = Modifier
         .background(Background100)
         .height(48.dp)
@@ -106,5 +108,5 @@ fun MyTellerBadgeScreenHeader(navController: NavController) {
             contentDescription = "tellingme_logo",
             modifier = Modifier.clickable(onClick = { navController.popBackStack() })
         )
-    }, rightSlot = { CheeseBadge() })
+    }, rightSlot = { CheeseBadge(cheeseBalance = cheeseBalance) })
 }

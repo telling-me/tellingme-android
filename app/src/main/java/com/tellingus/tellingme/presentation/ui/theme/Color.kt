@@ -45,6 +45,8 @@ val Profile700_Bottom = Color(0xFFFFB442)
 val Profile800 = Color(0xFF8C56FF)
 val Profile800_Bottom = Color(0xFFA276FF)
 
+val RED_001 = Color(0xFFED3639)
+
 val Sub100 = Color(0xFFFFE373)
 
 val Error50 = Color(0xFFFFF5F4)

@@ -8,7 +8,8 @@ import com.tellingus.tellingme.presentation.ui.common.base.UiState
 class MyTellerBadgeContract {
 
     data class State(
-        val userBadgeList: List<UserBadgeData> = emptyList()
+        val userBadgeList: List<UserBadgeData> = emptyList(),
+        val cheeseBalance: Int = 0,
     ) : UiState
 
     sealed class Event : UiEvent {
