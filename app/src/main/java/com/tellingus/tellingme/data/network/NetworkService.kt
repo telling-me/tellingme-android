@@ -5,6 +5,7 @@ import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.AnswerResponse
+import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
@@ -26,6 +27,7 @@ import com.tellingus.tellingme.data.model.otherspace.GetAnswerByIdResponse
 import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.model.otherspace.PostLikesResponse
 import com.tellingus.tellingme.data.model.otherspace.PostReportRequest
+import com.tellingus.tellingme.data.model.user.GetCheeseResponse
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
@@ -150,12 +152,20 @@ interface NetworkService {
     @GET("${END_POINT}/answer/id")
     suspend fun getAnswerById(
         @Query("answerId") answerId: Int,
-    ) : ApiResult<GetAnswerByIdResponse>
+    ): ApiResult<GetAnswerByIdResponse>
 
     // 신고 등록, reason : 1~6
     @POST("${END_POINT}/report")
     suspend fun postReport(
         @Body postReportRequest: PostReportRequest
-    ) : ApiResult<Unit>
+    ): ApiResult<Unit>
+
+    // 치즈 개수 조회
+    @GET("${END_POINT}/v2/cheese")
+    suspend fun getCheese(): ApiResult<GetCheeseResponse>
+
+    // 모바일 텔러카드
+    @GET("${END_POINT}/v2/mobile/tellercard")
+    suspend fun getMobileTellerCard(): ApiResult<MobileTellerCardResponse>
 
 }

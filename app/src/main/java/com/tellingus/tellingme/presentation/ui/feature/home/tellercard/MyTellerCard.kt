@@ -18,21 +18,26 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCard
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCardResponse
+import com.tellingus.tellingme.presentation.ui.common.const.getColorByColorCode
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
-import com.tellingus.tellingme.presentation.ui.theme.Profile100
 import com.tellingus.tellingme.presentation.ui.theme.Profile200
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 
 @Composable
-fun MyTellerCard(navController: NavController, modifier: Modifier = Modifier) {
-    val response = ProfileCardResponse(
-        nickname = "nickname test",
-        description = "아파트아파트",
-        level = "LV.2",
-        consecutiveWritingDate = "2일째",
-        profileIcon = "R.drawable.icon_profile_sample",
+fun MyTellerCard(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    profileCardResponse: ProfileCardResponse = ProfileCardResponse(
+        nickname = "",
+        description = "",
+        level = "",
+        consecutiveWritingDate = "",
+        profileIcon = "",
+        badgeCode = "",
+        colorCode = "",
     )
+) {
 
     Column {
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
@@ -47,7 +52,10 @@ fun MyTellerCard(navController: NavController, modifier: Modifier = Modifier) {
             )
         }
         Box(modifier = Modifier.padding(top = 16.dp)) {
-            ProfileCard(response = response, backgroundColor = Profile200)
+            ProfileCard(
+                response = profileCardResponse,
+                backgroundColor = getColorByColorCode(profileCardResponse.colorCode)
+            )
         }
     }
 }

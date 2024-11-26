@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.presentation.ui.common.const.getLargeEmotionBadge
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray50
 import com.tellingus.tellingme.presentation.ui.theme.Profile100
@@ -107,7 +108,7 @@ fun ProfileCard(
             }
 
             Image(
-                painter = painterResource(R.drawable.type_badge_sample),
+                painter = painterResource(getLargeEmotionBadge(response.badgeCode)),
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = modifier
@@ -179,6 +180,8 @@ data class ProfileCardResponse(
     val level: String = "", // 레벨
     val consecutiveWritingDate: String = "", // 연속작성일
     val profileIcon: String = "",
+    val badgeCode: String = "",
+    val colorCode: String = "",
 )
 
 @Preview(showBackground = true)

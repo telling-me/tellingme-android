@@ -4,6 +4,7 @@ import com.tellingus.tellingme.data.model.common.BasicResponse
 import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.HomeResponse
+import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
@@ -32,6 +33,10 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun getMain(req: HomeRequest): ApiResult<HomeResponse> {
         return networkService.getMain(req)
 
+    }
+
+    override suspend fun getMobileTellerCard(): ApiResult<MobileTellerCardResponse> {
+        return networkService.getMobileTellerCard()
     }
 
     override suspend fun writeAnswer(answer: AnswerRequest): ApiResult<BasicResponse> {

@@ -21,7 +21,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 
 @Composable
-fun CheeseBadge(modifier: Modifier = Modifier) {
+fun CheeseBadge(modifier: Modifier = Modifier, cheeseBalance: Int = 0) {
 
 
     Row(
@@ -38,6 +38,6 @@ fun CheeseBadge(modifier: Modifier = Modifier) {
             modifier = Modifier.size(26.dp)
         )
         Spacer(modifier = Modifier.size(8.dp))
-        Text(text = "111개", color = Gray600, style = TellingmeTheme.typography.body2Bold)
+        Text(text = "${cheeseBalance}개", color = Gray600, style = TellingmeTheme.typography.body2Bold)
     }
 }
