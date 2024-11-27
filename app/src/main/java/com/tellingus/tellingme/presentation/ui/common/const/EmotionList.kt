@@ -111,42 +111,42 @@ val LargeEmotionBadgeList = listOf<EmotionBadge>(
         R.drawable.teller_emotion_badge_christmas_large,
         "화이트 크리스마스",
         "BG_CHRISTMAS_2024",
-        "흰 눈 사이에서,",
+        "흰 눈 사이에서",
         "12월 23일 오전 6:00 ~ 12월 28일 오전 5:59 접속 시"
     ),
     EmotionBadge(
         R.drawable.teller_emotion_badge_traveler_large,
         "탐험가 텔러",
         "BG_FIRST",
-        "낯선 길에 첫 발자국,",
+        "낯선 길에 첫 발자국",
         "첫 답변 작성 시"
     ),
     EmotionBadge(
         R.drawable.teller_emotion_badge_toomuch_large,
         "투처미 토커",
         "BG_MUCH_001",
-        "내 이야길 들어봐,",
+        "내 이야길 들어봐",
         "280자 이상 답변 1회 작성 시"
     ),
     EmotionBadge(
         R.drawable.teller_emotion_badge_mystery_large,
         "미스터리 방문객",
         "BG_NEW",
-        "아직은 낯설어요,",
+        "아직은 낯설어요",
         "회원가입 시 기본 제공"
     ),
     EmotionBadge(
         R.drawable.teller_emotion_badge_owl_large,
         "올빼미 텔러",
         "BG_NIGHT_001",
-        "다들 꿈꿀 때 글을 썼지,",
+        "다들 꿈꿀 때 난 글썼지",
         "오전 12시 ~ 6시 사이 답변 3개 작성 시"
     ),
     EmotionBadge(
         R.drawable.teller_emotion_badge_savings_large,
         "나는야 저축왕",
         "BG_SAVE_001",
-        "치즈를 모아모아,",
+        "치즈를 모아모아",
         "치즈 총 50개 달성 시"
     ),
 )

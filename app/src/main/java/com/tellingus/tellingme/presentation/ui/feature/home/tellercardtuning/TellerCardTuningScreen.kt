@@ -37,8 +37,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.presentation.ui.common.base.UiState
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
 import com.tellingus.tellingme.presentation.ui.common.component.badge.DiagonalHalfCircleBadge
@@ -46,6 +49,12 @@ import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryBu
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLightButton
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCard
+import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCardResponse
+import com.tellingus.tellingme.presentation.ui.common.const.EmotionBadge
+import com.tellingus.tellingme.presentation.ui.common.const.LargeEmotionBadgeList
+import com.tellingus.tellingme.presentation.ui.common.const.getColorByColorCode
+import com.tellingus.tellingme.presentation.ui.common.const.getLargeEmotionBadge
+import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotionBadge
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
@@ -69,19 +78,45 @@ import com.tellingus.tellingme.presentation.ui.theme.Profile700
 import com.tellingus.tellingme.presentation.ui.theme.Profile700_Bottom
 import com.tellingus.tellingme.presentation.ui.theme.Profile800
 import com.tellingus.tellingme.presentation.ui.theme.Profile800_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.Profile900
+import com.tellingus.tellingme.presentation.ui.theme.Profile900_Bottom
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Icon as Icon1
 
 
 @Composable
-fun TellerCardTuningScreen(navController: NavController) {
-    MainLayout(header = { TellerCardTuningScreenHeader(navController = navController) },
-        content = { TellerCardTuningScreenContent() })
+fun TellerCardTuningScreen(
+    navController: NavController,
+    viewModel: TellerCardTuningViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val cheeseBalance = uiState.cheeseBalance
+    MainLayout(header = {
+        TellerCardTuningScreenHeader(
+            navController = navController,
+            cheeseBalance
+        )
+    },
+        content = { TellerCardTuningScreenContent(uiState) })
 }
 
 @Composable
-fun TellerCardTuningScreenContent() {
+fun TellerCardTuningScreenContent(uiState: TellerCardTuningContract.State) {
+
+    val userInfo = uiState.userInfo
+    val levelInfo = uiState.levelInfo
+
+    val profileCardResponse: ProfileCardResponse = ProfileCardResponse(
+        nickname = userInfo.nickname,
+        description = userInfo.tellerCard.badgeName,
+        level = "LV. ${levelInfo.level_dto.level}",
+        consecutiveWritingDate = "${levelInfo.days_to_level_up}일째",
+        profileIcon = "R.drawable.icon_profile_sample",
+        badgeCode = userInfo.tellerCard.badgeCode,
+        colorCode = userInfo.tellerCard.colorCode,
+    )
+
     Column(modifier = Modifier.padding(top = 22.dp)) {
         Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
             Text(text = "내 마음대로", style = Typography.head2Regular, color = Gray600)
@@ -92,7 +127,10 @@ fun TellerCardTuningScreenContent() {
         }
 
         Box(modifier = Modifier.padding(top = 26.dp, start = 20.dp, end = 20.dp)) {
-            ProfileCard(backgroundColor = Profile100)
+            ProfileCard(
+                response = profileCardResponse,
+                backgroundColor = getColorByColorCode(profileCardResponse.colorCode)
+            )
         }
 
         Box(modifier = Modifier.padding(top = 40.dp)) {
@@ -181,7 +219,8 @@ fun BadgeChangeSheet() {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BadgeContent() {
-    val cardList = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
+//    val cardList = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
+    val cardList = LargeEmotionBadgeList
     val pagerState = rememberPagerState(pageCount = {
         cardList.size
     })
@@ -197,7 +236,15 @@ fun BadgeContent() {
                 isChecked = selectedCardIndex == page,
                 onCheckChange = { index ->
                     selectedCardIndex = index
-                })
+                },
+                emotionBadge = EmotionBadge(
+                    badgeName = cardList[page].badgeName,
+                    badgeCode = cardList[page].badgeCode,
+                    badgeMiddleName = cardList[page].badgeMiddleName,
+                    badgeCondition = cardList[page].badgeCondition,
+                    emotionRes = cardList[page].emotionRes
+                )
+            )
         }
 
         Row(
@@ -232,11 +279,10 @@ fun BadgeContent() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgeCard(
-    index: Int, isChecked: Boolean, onCheckChange: (index: Int) -> Unit
+    index: Int, isChecked: Boolean, onCheckChange: (index: Int) -> Unit,
+    emotionBadge: EmotionBadge
 ) {
-    Card(modifier = Modifier
-        .width(106.dp)
-        .height(124.dp),
+    Card(modifier = Modifier.height(124.dp),
         colors = CardDefaults.cardColors(Base0),
         onClick = { onCheckChange(index) }) {
         Box(
@@ -247,14 +293,18 @@ fun BadgeCard(
                 verticalArrangement = Arrangement.Center // 세로 방향 중앙 정렬
             ) {
                 Image(
-                    painter = painterResource(R.drawable.teller_emotion_badge_connexion_medium),
+                    painter = painterResource(getMediumEmotionBadge(emotionBadge.badgeCode)),
                     contentDescription = "",
                 )
                 Text(
-                    text = "또 오셨네요", style = Typography.caption1Regular, color = Gray600
+                    text = "${emotionBadge.badgeMiddleName}",
+                    style = Typography.caption2Regular,
+                    color = Gray600
                 )
                 Text(
-                    text = "단골 텔러", style = Typography.caption1Bold, color = Gray600
+                    text = "${emotionBadge.badgeName}",
+                    style = Typography.caption1Bold,
+                    color = Gray600
                 )
             }
             Image(
@@ -274,7 +324,7 @@ fun BadgeCard(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BgColorContent() {
-    val items = List(12) { "Item $it" } // 예시로 12개의 아이템 생성
+    val items = List(9) { "Item $it" } // 9개의 아이템 생성
     val pagerState = rememberPagerState(pageCount = { (items.size + 7) / 8 }) // 각 페이지당 8개 아이템
     val coroutineScope = rememberCoroutineScope()
     var selectedCardIndex by remember { mutableStateOf(-1) } // 선택된 카드의 인덱스
@@ -287,7 +337,8 @@ fun BgColorContent() {
         Pair(Profile500, Profile500_Bottom),
         Pair(Profile600, Profile600_Bottom),
         Pair(Profile700, Profile700_Bottom),
-        Pair(Profile800, Profile800_Bottom)
+        Pair(Profile800, Profile800_Bottom),
+        Pair(Profile900, Profile900_Bottom),
     )
 
     Box(
@@ -295,16 +346,21 @@ fun BgColorContent() {
             .fillMaxSize()
             .padding(start = 22.dp, end = 22.dp)
     ) {
-        HorizontalPager(state = pagerState, modifier = Modifier.heightIn(138.dp)) { page ->
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.heightIn(138.dp),
+            verticalAlignment = Alignment.Top
+        ) { page ->
             // 각 페이지의 아이템 표시
             val startIndex = page * 8
             val endIndex = minOf(startIndex + 8, items.size)
 
-            Column {
+            Column() {
                 for (i in startIndex until endIndex step 4) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .fillMaxHeight()
                             .then(if (i + 4 >= endIndex) Modifier else Modifier.padding(bottom = 20.dp)),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -329,6 +385,9 @@ fun BgColorContent() {
                 }
             }
         }
+
+
+
 
         Box {
             Row(
@@ -414,7 +473,7 @@ fun BadgeToggle(selectedOption: String = "badge", onOptionSelected: (String) -> 
 }
 
 @Composable
-fun TellerCardTuningScreenHeader(navController: NavController) {
+fun TellerCardTuningScreenHeader(navController: NavController, cheeseBalance: Int = 0) {
     BasicAppBar(modifier = Modifier
         .background(Background100)
         .height(48.dp)
@@ -425,5 +484,5 @@ fun TellerCardTuningScreenHeader(navController: NavController) {
             contentDescription = "caret_left",
             modifier = Modifier.clickable(onClick = { navController.popBackStack() })
         )
-    }, rightSlot = { CheeseBadge() })
+    }, rightSlot = { CheeseBadge(cheeseBalance = cheeseBalance) })
 }

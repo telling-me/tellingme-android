@@ -7,6 +7,8 @@ import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.AnswerResponse
 import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
+import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
+import com.tellingus.tellingme.data.model.home.PatchTellerCardResponse
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
@@ -34,6 +36,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -167,5 +170,9 @@ interface NetworkService {
     // 모바일 텔러카드
     @GET("${END_POINT}/v2/mobile/tellercard")
     suspend fun getMobileTellerCard(): ApiResult<MobileTellerCardResponse>
+
+    // 텔러카드 colorCode / badgeCode 수정
+    @PATCH("${END_POINT}/v2/tellercard")
+    suspend fun patchTellerCard(@Body patchTellerCardRequest: PatchTellerCardRequest): ApiResult<PatchTellerCardResponse>
 
 }

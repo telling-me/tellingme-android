@@ -7,6 +7,8 @@ import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
+import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
+import com.tellingus.tellingme.data.model.home.PatchTellerCardResponse
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.home.TodayQuestion
 import com.tellingus.tellingme.data.network.adapter.ApiResult
@@ -19,4 +21,6 @@ interface HomeRepository {
     suspend fun getMain(req: HomeRequest): ApiResult<HomeResponse>
 
     suspend fun getMobileTellerCard(): ApiResult<MobileTellerCardResponse>
+
+    suspend fun patchTellerCard(patchTellerCardRequest: PatchTellerCardRequest): ApiResult<PatchTellerCardResponse>
 }

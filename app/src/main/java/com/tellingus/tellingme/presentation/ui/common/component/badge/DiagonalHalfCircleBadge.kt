@@ -87,9 +87,9 @@ fun DiagonalHalfCircleBadge(
             contentDescription = if (isChecked) "Checked" else "Unchecked",
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(top = 6.dp, end = 8.dp) // Same padding as in BadgeCard
-                .zIndex(1f) // Make sure the icon appears above other elements
-                .size(16.dp) // Icon size
+                .padding(top = 0.dp, end = 0.dp) // Same padding as in BadgeCard
+                .zIndex(1f)
+                .size(24.dp)
         )
     }
 }
