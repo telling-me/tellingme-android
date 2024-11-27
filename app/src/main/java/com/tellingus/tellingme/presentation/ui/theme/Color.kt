@@ -44,6 +44,8 @@ val Profile700 = Color(0xFFFFA216)
 val Profile700_Bottom = Color(0xFFFFB442)
 val Profile800 = Color(0xFF8C56FF)
 val Profile800_Bottom = Color(0xFFA276FF)
+val Profile900 = Color(0xFFFFF3134)
+val Profile900_Bottom = Color(0xFFFF595A)
 
 val RED_001 = Color(0xFFED3639)
 
