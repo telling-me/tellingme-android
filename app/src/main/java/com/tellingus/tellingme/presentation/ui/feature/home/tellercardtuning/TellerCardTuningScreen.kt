@@ -26,6 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +42,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.tellingus.tellingme.R
-import com.tellingus.tellingme.presentation.ui.common.base.UiState
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
 import com.tellingus.tellingme.presentation.ui.common.component.badge.DiagonalHalfCircleBadge
@@ -53,7 +53,6 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCa
 import com.tellingus.tellingme.presentation.ui.common.const.EmotionBadge
 import com.tellingus.tellingme.presentation.ui.common.const.LargeEmotionBadgeList
 import com.tellingus.tellingme.presentation.ui.common.const.getColorByColorCode
-import com.tellingus.tellingme.presentation.ui.common.const.getLargeEmotionBadge
 import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotionBadge
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.theme.Background100
@@ -87,35 +86,51 @@ import androidx.compose.material3.Icon as Icon1
 
 @Composable
 fun TellerCardTuningScreen(
-    navController: NavController,
-    viewModel: TellerCardTuningViewModel = hiltViewModel()
+    navController: NavController, viewModel: TellerCardTuningViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cheeseBalance = uiState.cheeseBalance
     MainLayout(header = {
         TellerCardTuningScreenHeader(
-            navController = navController,
-            cheeseBalance
+            navController = navController, cheeseBalance
         )
-    },
-        content = { TellerCardTuningScreenContent(uiState) })
+    }, content = { TellerCardTuningScreenContent(uiState) })
 }
 
 @Composable
 fun TellerCardTuningScreenContent(uiState: TellerCardTuningContract.State) {
-
     val userInfo = uiState.userInfo
     val levelInfo = uiState.levelInfo
 
-    val profileCardResponse: ProfileCardResponse = ProfileCardResponse(
-        nickname = userInfo.nickname,
-        description = userInfo.tellerCard.badgeName,
-        level = "LV. ${levelInfo.level_dto.level}",
-        consecutiveWritingDate = "${levelInfo.days_to_level_up}일째",
-        profileIcon = "R.drawable.icon_profile_sample",
-        badgeCode = userInfo.tellerCard.badgeCode,
-        colorCode = userInfo.tellerCard.colorCode,
-    )
+    var selectedBadgeCode by remember { mutableStateOf(userInfo.tellerCard.badgeCode) }
+    var selectedColorCode by remember { mutableStateOf(userInfo.tellerCard.colorCode) }
+
+    var profileCardResponse by remember {
+        mutableStateOf(
+            ProfileCardResponse(
+                nickname = userInfo.nickname,
+                description = userInfo.tellerCard.badgeName,
+                level = "LV. ${levelInfo.level_dto.level}",
+                consecutiveWritingDate = "${levelInfo.days_to_level_up}일째",
+                profileIcon = "R.drawable.icon_profile_sample",
+                badgeCode = selectedBadgeCode,
+                colorCode = selectedColorCode,
+            )
+        )
+    }
+    LaunchedEffect(userInfo.tellerCard.badgeCode) {
+        selectedBadgeCode = userInfo.tellerCard.badgeCode
+    }
+    LaunchedEffect(userInfo.tellerCard.colorCode) {
+        selectedColorCode = userInfo.tellerCard.colorCode
+    }
+
+    LaunchedEffect(selectedBadgeCode, selectedColorCode) {
+        profileCardResponse = profileCardResponse.copy(
+            badgeCode = selectedBadgeCode,
+            colorCode = selectedColorCode
+        )
+    }
 
     Column(modifier = Modifier.padding(top = 22.dp)) {
         Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
@@ -134,14 +149,27 @@ fun TellerCardTuningScreenContent(uiState: TellerCardTuningContract.State) {
         }
 
         Box(modifier = Modifier.padding(top = 40.dp)) {
-            BadgeChangeSheet()
+            BadgeChangeSheet(selectedBadgeCode,
+                selectedColorCode,
+                onBadgeCodeSelected = { badgeCode ->
+                    selectedBadgeCode = badgeCode;
+                },
+                onColorCodeSelected = { colorCode ->
+                    selectedColorCode = colorCode;
+                })
         }
     }
 }
 
 @Composable
-fun BadgeChangeSheet() {
+fun BadgeChangeSheet(
+    selectedBadgeCode: String,
+    selectedColorCode: String,
+    onBadgeCodeSelected: (badgeCode: String) -> Unit,
+    onColorCodeSelected: (colorCode: String) -> Unit
+) {
     var selectedOption by remember { mutableStateOf("badge") }
+
 
     Column(
         modifier = Modifier
@@ -160,7 +188,9 @@ fun BadgeChangeSheet() {
         when (selectedOption) {
             "badge" -> {
                 Column(modifier = Modifier.padding(top = 40.dp)) {
-                    BadgeContent()
+                    BadgeContent(selectedBadgeCode, onBadgeCodeSelected = { badgeCode ->
+                        onBadgeCodeSelected(badgeCode)
+                    })
 
                     Row(
                         modifier = Modifier
@@ -218,13 +248,11 @@ fun BadgeChangeSheet() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BadgeContent() {
-//    val cardList = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9")
+fun BadgeContent(selectedBadgeCode: String, onBadgeCodeSelected: (badgeCode: String) -> Unit) {
     val cardList = LargeEmotionBadgeList
     val pagerState = rememberPagerState(pageCount = {
         cardList.size
     })
-    var selectedCardIndex by remember { mutableStateOf(-1) } // 선택된 카드의 인덱스
     val coroutineScope = rememberCoroutineScope()
 
     Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
@@ -233,9 +261,9 @@ fun BadgeContent() {
         ) { page ->
             BadgeCard(
                 index = page,
-                isChecked = selectedCardIndex == page,
-                onCheckChange = { index ->
-                    selectedCardIndex = index
+                isChecked = selectedBadgeCode == cardList[page].badgeCode,
+                onCheckChange = { index, badgeCode ->
+                    onBadgeCodeSelected(badgeCode)
                 },
                 emotionBadge = EmotionBadge(
                     badgeName = cardList[page].badgeName,
@@ -279,12 +307,14 @@ fun BadgeContent() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BadgeCard(
-    index: Int, isChecked: Boolean, onCheckChange: (index: Int) -> Unit,
+    index: Int,
+    isChecked: Boolean,
+    onCheckChange: (index: Int, badgeCode: String) -> Unit,
     emotionBadge: EmotionBadge
 ) {
     Card(modifier = Modifier.height(124.dp),
         colors = CardDefaults.cardColors(Base0),
-        onClick = { onCheckChange(index) }) {
+        onClick = { onCheckChange(index, emotionBadge.badgeCode) }) {
         Box(
             modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
         ) {
