@@ -25,18 +25,17 @@ import com.tellingus.tellingme.R
 fun DiagonalHalfCircleBadge(
     index: Int,
     isChecked: Boolean,
-    onCheckChange: (index: Int) -> Unit,
+    onCheckChange: (index: Int, colorCode: String) -> Unit,
     bottomColor: Color,
     topColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    colorCode: String = "",
 ) {
-    val TAG: String = "로그"
-    Log.d(TAG, " - DiagonalHalfCircleBadge() called index: ${index}")
     Box(
         modifier = modifier
             .size(54.dp)
             .background(Color.White)
-            .clickable { onCheckChange(index) } // Click event to toggle checked state
+            .clickable { onCheckChange(index, colorCode) } // Click event to toggle checked state
     ) {
         Canvas(
             modifier = Modifier.matchParentSize()
