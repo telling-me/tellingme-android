@@ -72,15 +72,20 @@ fun TellerScreenContent(navController: NavController, uiState: TellerCardContrac
         }
         Column(modifier = Modifier.padding(top = 40.dp)) {
             TellerBadgeList(badges = badges)
-            Column(
-                modifier = Modifier
-                    .padding(top = 14.dp, bottom = 30.dp)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                ActionChip(text = "더보기",
-                    onClick = { navController.navigate(HomeDestinations.MY_TELLER_BADGE) })
+
+
+            if(badges.isNotEmpty()) {
+                Column(
+                    modifier = Modifier
+                        .padding(top = 14.dp, bottom = 30.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    ActionChip(text = "더보기",
+                        onClick = { navController.navigate(HomeDestinations.MY_TELLER_BADGE) })
+                }
             }
+
         }
     }
 }

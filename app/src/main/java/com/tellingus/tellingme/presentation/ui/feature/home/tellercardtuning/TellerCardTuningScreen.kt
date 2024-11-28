@@ -52,6 +52,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCa
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileCardResponse
 import com.tellingus.tellingme.presentation.ui.common.const.EmotionBadge
 import com.tellingus.tellingme.presentation.ui.common.const.LargeEmotionBadgeList
+import com.tellingus.tellingme.presentation.ui.common.const.colorCodeList
 import com.tellingus.tellingme.presentation.ui.common.const.getColorByColorCode
 import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotionBadge
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
@@ -217,7 +218,7 @@ fun BadgeChangeSheet(
 
             "bgColor" -> {
                 Column(modifier = Modifier.padding(top = 40.dp)) {
-                    BgColorContent()
+                    BgColorContent(selectedColorCode, onColorCodeSelected)
 
                     Row(
                         modifier = Modifier
@@ -353,28 +354,18 @@ fun BadgeCard(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BgColorContent() {
-    val items = List(9) { "Item $it" } // 9개의 아이템 생성
+fun BgColorContent(
+    selectedColorCode: String,
+    onColorCodeSelected: (colorCode: String) -> Unit
+) {
+    val items = List(colorCodeList.size) { "Item $it" } // 9개의 아이템 생성
     val pagerState = rememberPagerState(pageCount = { (items.size + 7) / 8 }) // 각 페이지당 8개 아이템
     val coroutineScope = rememberCoroutineScope()
-    var selectedCardIndex by remember { mutableStateOf(-1) } // 선택된 카드의 인덱스
-
-    val profileColors = listOf(
-        Pair(Profile100, Profile100_Bottom),
-        Pair(Profile200, Profile200_Bottom),
-        Pair(Profile300, Profile300_Bottom),
-        Pair(Profile400, Profile400_Bottom),
-        Pair(Profile500, Profile500_Bottom),
-        Pair(Profile600, Profile600_Bottom),
-        Pair(Profile700, Profile700_Bottom),
-        Pair(Profile800, Profile800_Bottom),
-        Pair(Profile900, Profile900_Bottom),
-    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(start = 22.dp, end = 22.dp)
+            .padding(start = 16.dp, end = 16.dp)
     ) {
         HorizontalPager(
             state = pagerState,
@@ -398,26 +389,27 @@ fun BgColorContent() {
                             val currentIndex = i + j
                             if (currentIndex < endIndex) {
 
-                                val colorPair = profileColors[currentIndex % profileColors.size]
-                                val topColor = colorPair.first
-                                val bottomColor = colorPair.second
+                                val colorItem = colorCodeList[currentIndex % colorCodeList.size]
+                                val topColor = colorItem.topColor
+                                val bottomColor = colorItem.bottomColor
 
-                                DiagonalHalfCircleBadge(bottomColor = bottomColor,
+                                DiagonalHalfCircleBadge(
+                                    colorCode = colorItem.colorCode,
+                                    bottomColor = bottomColor,
                                     topColor = topColor,
                                     index = currentIndex,
-                                    isChecked = selectedCardIndex == currentIndex,
-                                    onCheckChange = { index ->
-                                        selectedCardIndex = index
-                                    })
+                                    isChecked = selectedColorCode == colorItem.colorCode,
+                                    onCheckChange = { index, colorCode ->
+//                                        selectedCardIndex = index
+                                        onColorCodeSelected(colorCode)
+                                    },
+                                )
                             }
                         }
                     }
                 }
             }
         }
-
-
-
 
         Box {
             Row(
