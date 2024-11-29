@@ -74,9 +74,6 @@ fun OtherSpaceDetailScreen(
     var selectedComplainReason by remember { mutableStateOf("") }
     var isComplainConfirmModalOpen by remember { mutableStateOf(false) }
 
-    val TAG: String = "로그"
-    Log.d(TAG, "OtherSpaceDetailScreen: $answerId, $date")
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     MainLayout(header = {

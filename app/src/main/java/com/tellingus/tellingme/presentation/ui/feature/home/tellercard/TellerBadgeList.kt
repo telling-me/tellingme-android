@@ -29,7 +29,11 @@ fun TellerBadgeList(modifier: Modifier = Modifier, badges: List<Badge> = emptyLi
     val pagerState = rememberPagerState(pageCount = { badges.size })
 
     if (badges.isEmpty()) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 20.dp, top = 20.dp)
+        ) {
             Image(
                 painter = painterResource(id = R.drawable.empty_character),
                 contentDescription = "empty_character"

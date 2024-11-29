@@ -2,11 +2,14 @@ package com.tellingus.tellingme.presentation.ui.feature.mypage
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
 import com.tellingus.tellingme.domain.usecase.SignOutUseCase
 import com.tellingus.tellingme.domain.usecase.mypage.GetMyPageUseCase
+import com.tellingus.tellingme.domain.usecase.user.GetNotificationUseCase
+import com.tellingus.tellingme.domain.usecase.user.UpdateNotificationUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,12 +19,15 @@ import javax.inject.Inject
 class MyPageViewModel @Inject constructor(
     private val signOutUseCase: SignOutUseCase,
     private val getMyPageUseCase: GetMyPageUseCase,
-    private val getAnswerListUseCase: GetAnswerListUseCase
+    private val getAnswerListUseCase: GetAnswerListUseCase,
+    private val getNotificationUseCase: GetNotificationUseCase,
+    private val updateNotificationUseCase: UpdateNotificationUseCase
 ) : BaseViewModel<MyPageContract.State, MyPageContract.Event, MyPageContract.Effect>(initialState = MyPageContract.State()) {
     val TAG: String = "로그"
 
     init {
         getMypage()
+        getNotification()
     }
 
     fun getMypage() {
@@ -79,7 +85,34 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    override fun reduceState(event: MyPageContract.Event) {
 
+    fun getNotification() {
+        viewModelScope.launch {
+            getNotificationUseCase().onSuccess {
+                updateState(currentState.copy(allowNotification = it.data.allowNotification))
+            }.onFailure { s, i -> }
+        }
+    }
+
+    fun updateNotification(notificationStatus: Boolean) {
+        viewModelScope.launch {
+            updateNotificationUseCase(
+                updateNotificationRequest = UpdateNotificationRequest(notificationStatus)
+            )
+                .onSuccess {
+                    updateState(currentState.copy(allowNotification = it.data.allowNotification))
+                }
+                .onFailure { s, i -> }
+        }
+    }
+
+    override fun reduceState(event: MyPageContract.Event) {
+        when (event) {
+            is MyPageContract.Event.OnToggleNotificationSwitch -> {
+                updateNotification(event.notificationStatus)
+            }
+            is MyPageContract.Event.OnClickSignOutButton -> {
+            }
+        }
     }
 }

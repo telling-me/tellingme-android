@@ -1,7 +1,10 @@
 package com.tellingus.tellingme.presentation.ui.feature.mypage
 
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
@@ -27,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -74,7 +79,7 @@ fun MyPageScreen(
     MainLayout(header = {
         MyPageScreenHeader(navController = navController)
     }, content = {
-        MyPageScreenContent(navController, uiState)
+        MyPageScreenContent(navController, uiState, viewModel = viewModel)
     })
 }
 
@@ -100,11 +105,46 @@ fun MyPageScreenHeader(
     })
 }
 
+// 권한 확인 함수
+fun isNotificationPermissionGranted(context: Context): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    } else {
+        true // Android 13 미만에서는 권한이 항상 허용됨
+    }
+}
+
+// 알림 설정 화면 열기
+fun openNotificationSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+    }
+    context.startActivity(intent)
+}
+
 @Composable
-fun MyPageScreenContent(navController: NavController, uiState: MyPageContract.State) {
+fun MyPageScreenContent(
+    navController: NavController,
+    uiState: MyPageContract.State,
+    viewModel: MyPageViewModel
+) {
     val context = LocalContext.current
     val appVersion = AppUtils.getAppVersion(context)
     var isTooltipVisible by remember { mutableStateOf(false) }
+
+
+    var allowNotification = uiState.allowNotification;
+
+    var isAlarmChecked by remember { mutableStateOf(allowNotification) }
+    var isShowPermissionDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(allowNotification) {
+        isAlarmChecked = allowNotification
+    }
+
 
     val items = remember {
         mutableStateOf(
@@ -148,8 +188,7 @@ fun MyPageScreenContent(navController: NavController, uiState: MyPageContract.St
         )
     }
 
-    var isAlarmChecked by remember { mutableStateOf(false) }
-    var isShowAlarmAllow by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier.padding(start = 20.dp, end = 20.dp)
@@ -384,7 +423,7 @@ fun MyPageScreenContent(navController: NavController, uiState: MyPageContract.St
             }
         }
 
-        if (isShowAlarmAllow) {
+        if (isShowPermissionDialog) {
             ShowDoubleButtonDialog(
                 title = "알림을 허용하기 위해 설정으로 이동해요.",
                 contents = "",
@@ -394,7 +433,7 @@ fun MyPageScreenContent(navController: NavController, uiState: MyPageContract.St
                         size = ButtonSize.LARGE,
                         text = "나중에",
                         onClick = {
-                            isShowAlarmAllow = false
+                            isShowPermissionDialog = false
                         }
                     )
                 },
@@ -404,12 +443,8 @@ fun MyPageScreenContent(navController: NavController, uiState: MyPageContract.St
                         size = ButtonSize.LARGE,
                         text = "이동하기",
                         onClick = {
-                            isShowAlarmAllow = false
-                            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-                                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-                            }
-                            context.startActivity(intent)
-
+                            isShowPermissionDialog = false
+                            openNotificationSettings(context)
                         }
                     )
                 }
@@ -444,9 +479,27 @@ fun MyPageScreenContent(navController: NavController, uiState: MyPageContract.St
                         Text(text = "푸시 알림 받기")
                     }
 
-                    Switch(checked = isAlarmChecked, onCheckedChange = {
-//                        isAlarmChecked = it
-                        isShowAlarmAllow = true
+                    Switch(checked = isAlarmChecked, onCheckedChange = { checked ->
+                        if (checked) {
+                            if (isNotificationPermissionGranted(context)) {
+                                isAlarmChecked = true // 이미 권한이 있는 경우
+                                viewModel.processEvent(
+                                    MyPageContract.Event.OnToggleNotificationSwitch(
+                                        true
+                                    )
+                                )
+                            } else {
+                                isShowPermissionDialog = true // 권한 요청 필요
+
+                            }
+                        } else {
+                            isAlarmChecked = false
+                            viewModel.processEvent(
+                                MyPageContract.Event.OnToggleNotificationSwitch(
+                                    false
+                                )
+                            )
+                        }
                     })
                 }
 

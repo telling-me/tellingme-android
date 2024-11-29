@@ -182,12 +182,8 @@ fun getEmotionText(index: Int): String {
 }
 
 fun getMediumEmotionBadge(badgeCode: String): Int {
-    val TAG: String = "로그"
     MediumEmotionBadgeList.forEach {
-        Log.d(TAG, "badgeCode ${badgeCode}")
-        Log.d(TAG, "it.badgeCode ${it.badgeCode}")
         if (it.badgeCode == badgeCode) {
-            Log.d(TAG, "it.emotionRes ${it.emotionRes}")
             return it.emotionRes
         }
     }
