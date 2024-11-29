@@ -30,6 +30,9 @@ import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.model.otherspace.PostLikesResponse
 import com.tellingus.tellingme.data.model.otherspace.PostReportRequest
 import com.tellingus.tellingme.data.model.user.GetCheeseResponse
+import com.tellingus.tellingme.data.model.user.GetNotificationResponse
+import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
+import com.tellingus.tellingme.data.model.user.UpdateNotificationResponse
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
@@ -174,5 +177,13 @@ interface NetworkService {
     // 텔러카드 colorCode / badgeCode 수정
     @PATCH("${END_POINT}/v2/tellercard")
     suspend fun patchTellerCard(@Body patchTellerCardRequest: PatchTellerCardRequest): ApiResult<PatchTellerCardResponse>
+
+    // 알림 상태 반환
+    @GET("${END_POINT}/user/notification")
+    suspend fun getNotification(): ApiResult<GetNotificationResponse>
+
+    // 알림 상태 변경
+    @POST("${END_POINT}/update/notification")
+    suspend fun updateNotification(@Body updateNotificationRequest: UpdateNotificationRequest): ApiResult<UpdateNotificationResponse>
 
 }

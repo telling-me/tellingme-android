@@ -20,13 +20,18 @@ class MyPageContract {
         val current_exp: Int = 0,
         val required_exp: Int = 0,
         val answerList: List<Answer> = emptyList(),
-        ) : UiState
+
+        val allowNotification: Boolean = false,
+    ) : UiState
 
     sealed class Event : UiEvent {
-        object OnClickSignOutButton: Event()
+        object OnClickSignOutButton : Event()
+        data class OnToggleNotificationSwitch(
+            val notificationStatus: Boolean
+        ) : Event()
     }
 
     sealed class Effect : UiEffect {
-        object MoveToLoginScreen: Effect()
+        object MoveToLoginScreen : Effect()
     }
 }

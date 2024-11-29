@@ -1,6 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.tellercardtuning
 
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -95,11 +96,14 @@ fun TellerCardTuningScreen(
         TellerCardTuningScreenHeader(
             navController = navController, cheeseBalance
         )
-    }, content = { TellerCardTuningScreenContent(uiState) })
+    }, content = { TellerCardTuningScreenContent(uiState, viewModel = viewModel) })
 }
 
 @Composable
-fun TellerCardTuningScreenContent(uiState: TellerCardTuningContract.State) {
+fun TellerCardTuningScreenContent(
+    uiState: TellerCardTuningContract.State,
+    viewModel: TellerCardTuningViewModel
+) {
     val userInfo = uiState.userInfo
     val levelInfo = uiState.levelInfo
 
@@ -126,6 +130,10 @@ fun TellerCardTuningScreenContent(uiState: TellerCardTuningContract.State) {
         selectedColorCode = userInfo.tellerCard.colorCode
     }
 
+    LaunchedEffect(profileCardResponse) {
+
+    }
+
     LaunchedEffect(selectedBadgeCode, selectedColorCode) {
         profileCardResponse = profileCardResponse.copy(
             badgeCode = selectedBadgeCode,
@@ -150,14 +158,38 @@ fun TellerCardTuningScreenContent(uiState: TellerCardTuningContract.State) {
         }
 
         Box(modifier = Modifier.padding(top = 40.dp)) {
-            BadgeChangeSheet(selectedBadgeCode,
+            BadgeChangeSheet(
+                selectedBadgeCode,
                 selectedColorCode,
                 onBadgeCodeSelected = { badgeCode ->
                     selectedBadgeCode = badgeCode;
                 },
                 onColorCodeSelected = { colorCode ->
                     selectedColorCode = colorCode;
-                })
+                },
+                onReset = {
+                    selectedBadgeCode = userInfo.tellerCard.badgeCode
+                    selectedColorCode = userInfo.tellerCard.colorCode
+                    profileCardResponse = ProfileCardResponse(
+                        nickname = userInfo.nickname,
+                        description = userInfo.tellerCard.badgeName,
+                        level = "LV. ${levelInfo.level_dto.level}",
+                        consecutiveWritingDate = "${levelInfo.days_to_level_up}일째",
+                        profileIcon = "R.drawable.icon_profile_sample",
+                        badgeCode = selectedBadgeCode,
+                        colorCode = selectedColorCode,
+                    )
+                },
+                onConfirm = {
+                    if (selectedBadgeCode.isEmpty() || selectedColorCode.isEmpty()) return@BadgeChangeSheet
+                    viewModel.processEvent(
+                        TellerCardTuningContract.Event.OnClickPatchTellerCard(
+                            colorCode = selectedColorCode,
+                            badgeCode = selectedBadgeCode
+                        )
+                    )
+                }
+            )
         }
     }
 }
@@ -167,7 +199,9 @@ fun BadgeChangeSheet(
     selectedBadgeCode: String,
     selectedColorCode: String,
     onBadgeCodeSelected: (badgeCode: String) -> Unit,
-    onColorCodeSelected: (colorCode: String) -> Unit
+    onColorCodeSelected: (colorCode: String) -> Unit,
+    onReset: () -> Unit,
+    onConfirm: () -> Unit
 ) {
     var selectedOption by remember { mutableStateOf("badge") }
 
@@ -204,14 +238,20 @@ fun BadgeChangeSheet(
                             .height(50.dp),
                             size = ButtonSize.LARGE,
                             text = "되돌리기",
-                            onClick = { /*TODO*/ })
+                            onClick = {
+                                onReset()
+                            }
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         PrimaryButton(modifier = Modifier
                             .width(163.dp)
                             .height(50.dp),
                             size = ButtonSize.LARGE,
                             text = "완료",
-                            onClick = { /*TODO*/ })
+                            onClick = {
+                                onConfirm()
+                            }
+                        )
                     }
                 }
             }
@@ -231,14 +271,20 @@ fun BadgeChangeSheet(
                             .height(50.dp),
                             size = ButtonSize.LARGE,
                             text = "되돌리기",
-                            onClick = { /*TODO*/ })
+                            onClick = {
+                                onReset()
+                            }
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         PrimaryButton(modifier = Modifier
                             .width(163.dp)
                             .height(50.dp),
                             size = ButtonSize.LARGE,
                             text = "완료",
-                            onClick = { /*TODO*/ })
+                            onClick = {
+                                onConfirm()
+                            }
+                        )
                     }
                 }
             }
@@ -400,7 +446,6 @@ fun BgColorContent(
                                     index = currentIndex,
                                     isChecked = selectedColorCode == colorItem.colorCode,
                                     onCheckChange = { index, colorCode ->
-//                                        selectedCardIndex = index
                                         onColorCodeSelected(colorCode)
                                     },
                                 )
