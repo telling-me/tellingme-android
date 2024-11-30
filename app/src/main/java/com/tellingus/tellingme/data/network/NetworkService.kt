@@ -9,7 +9,6 @@ import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
 import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
 import com.tellingus.tellingme.data.model.home.PatchTellerCardResponse
-import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.model.myspace.MyPageResponse
@@ -21,9 +20,7 @@ import com.tellingus.tellingme.data.model.oauth.signup.SignUpRequest
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameRequest
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameResponse
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpResponse
-import com.tellingus.tellingme.data.model.otherspace.CommunicationListRequest
 import com.tellingus.tellingme.data.model.otherspace.CommunicationListResponse
-import com.tellingus.tellingme.data.model.otherspace.CommunicationRequest
 import com.tellingus.tellingme.data.model.otherspace.CommunicationResponse
 import com.tellingus.tellingme.data.model.otherspace.GetAnswerByIdResponse
 import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest

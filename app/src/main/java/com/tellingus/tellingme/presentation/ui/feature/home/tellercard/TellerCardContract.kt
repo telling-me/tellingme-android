@@ -26,13 +26,15 @@ class TellerCardContract {
             )
         ),
         val levelInfo: LevelInfo = LevelInfo(
-            level_dto = LevelDto(
+            levelDto = LevelDto(
                 level = 0,
-                current_exp = 0,
-                required_exp = 0
+                currentExp = 0,
+                requiredExp = 0
             ),
-            days_to_level_up = 0
+            daysToLevelUp = 0
         ),
+
+        val recordCount : Int = 0,
 
         val cheeseBalance: Int = 0,
     ) : UiState

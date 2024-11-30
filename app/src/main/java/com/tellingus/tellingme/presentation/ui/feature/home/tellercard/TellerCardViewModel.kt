@@ -21,7 +21,6 @@ class TellerCardViewModel @Inject constructor(
         getMobileTellerCard()
         getCheese()
     }
-
     fun getMobileTellerCard() {
         viewModelScope.launch {
             getMobileTellerCardUseCase().onSuccess {
@@ -30,7 +29,8 @@ class TellerCardViewModel @Inject constructor(
                         badges = it.data.badges,
                         colors = it.data.colors,
                         userInfo = it.data.userInfo,
-                        levelInfo = it.data.levelInfo
+                        levelInfo = it.data.levelInfo,
+                        recordCount = it.data.recordCount
                     )
                 )
             }.onFailure { s, i -> }
