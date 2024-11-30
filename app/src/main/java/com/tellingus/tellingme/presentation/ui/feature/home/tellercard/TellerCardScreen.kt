@@ -1,6 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.tellercard
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,16 +10,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
@@ -37,10 +36,19 @@ fun TellerCardScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit)
+    {
+        viewModel.getMobileTellerCard()
+    }
+
     MainLayout(header = { TellerScreenHeader(navController, uiState) },
         content = { TellerScreenContent(navController, uiState) })
 }
 
+fun calculatePercentage(currentExp: Int, requiredExp: Int): Int {
+    if (requiredExp == 0) return 0
+    return (currentExp * 100 / requiredExp)
+}
 
 @Composable
 fun TellerScreenContent(navController: NavController, uiState: TellerCardContract.State) {
@@ -48,6 +56,12 @@ fun TellerScreenContent(navController: NavController, uiState: TellerCardContrac
     val colors = uiState.colors
     val levelInfo = uiState.levelInfo
     val userInfo = uiState.userInfo
+    val recordCount = uiState.recordCount
+
+    val currentExp = levelInfo.levelDto.currentExp;
+    val requiredExp = levelInfo.levelDto.requiredExp;
+
+    val percentage = calculatePercentage(currentExp, requiredExp)
 
     Column {
         Box(modifier = Modifier.padding(20.dp)) {
@@ -56,8 +70,8 @@ fun TellerScreenContent(navController: NavController, uiState: TellerCardContrac
                 profileCardResponse = ProfileCardResponse(
                     nickname = userInfo.nickname,
                     description = userInfo.tellerCard.badgeName,
-                    level = "LV. ${levelInfo.level_dto.level}",
-                    consecutiveWritingDate = "${levelInfo.days_to_level_up}일째",
+                    level = "LV. ${levelInfo.levelDto.level}",
+                    consecutiveWritingDate = "${recordCount}일째",
                     profileIcon = "R.drawable.icon_profile_sample",
                     badgeCode = userInfo.tellerCard.badgeCode,
                     colorCode = userInfo.tellerCard.colorCode,
@@ -66,15 +80,17 @@ fun TellerScreenContent(navController: NavController, uiState: TellerCardContrac
         }
         Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp)) {
             LevelSection(
-                level = levelInfo.level_dto.level, percent = levelInfo.level_dto.required_exp,
-                levelDescription = "연속 ${levelInfo.days_to_level_up}일만 작성하면 LV.${levelInfo.level_dto.level + 1} 달성!",
-            )
+                level = levelInfo.levelDto.level,
+                percent = percentage,
+                levelDescription = "연속 ${levelInfo.daysToLevelUp}일만 작성하면 LV.${levelInfo.levelDto.level + 1} 달성!",
+
+                )
         }
         Column(modifier = Modifier.padding(top = 40.dp)) {
             TellerBadgeList(badges = badges)
 
 
-            if(badges.isNotEmpty()) {
+            if (badges.isNotEmpty()) {
                 Column(
                     modifier = Modifier
                         .padding(top = 14.dp, bottom = 30.dp)

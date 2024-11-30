@@ -106,6 +106,7 @@ fun TellerCardTuningScreenContent(
 ) {
     val userInfo = uiState.userInfo
     val levelInfo = uiState.levelInfo
+    val recordCount = uiState.recordCount
 
     var selectedBadgeCode by remember { mutableStateOf(userInfo.tellerCard.badgeCode) }
     var selectedColorCode by remember { mutableStateOf(userInfo.tellerCard.colorCode) }
@@ -115,8 +116,8 @@ fun TellerCardTuningScreenContent(
             ProfileCardResponse(
                 nickname = userInfo.nickname,
                 description = userInfo.tellerCard.badgeName,
-                level = "LV. ${levelInfo.level_dto.level}",
-                consecutiveWritingDate = "${levelInfo.days_to_level_up}일째",
+                level = "LV. ${levelInfo.levelDto.level}",
+                consecutiveWritingDate = "${recordCount}일째",
                 profileIcon = "R.drawable.icon_profile_sample",
                 badgeCode = selectedBadgeCode,
                 colorCode = selectedColorCode,
@@ -131,7 +132,15 @@ fun TellerCardTuningScreenContent(
     }
 
     LaunchedEffect(profileCardResponse) {
-
+        profileCardResponse = ProfileCardResponse(
+            nickname = userInfo.nickname,
+            description = userInfo.tellerCard.badgeName,
+            level = "LV. ${levelInfo.levelDto.level}",
+            consecutiveWritingDate = "${recordCount}일째",
+            profileIcon = "R.drawable.icon_profile_sample",
+            badgeCode = selectedBadgeCode,
+            colorCode = selectedColorCode,
+        )
     }
 
     LaunchedEffect(selectedBadgeCode, selectedColorCode) {
@@ -173,8 +182,8 @@ fun TellerCardTuningScreenContent(
                     profileCardResponse = ProfileCardResponse(
                         nickname = userInfo.nickname,
                         description = userInfo.tellerCard.badgeName,
-                        level = "LV. ${levelInfo.level_dto.level}",
-                        consecutiveWritingDate = "${levelInfo.days_to_level_up}일째",
+                        level = "LV. ${levelInfo.levelDto.level}",
+                        consecutiveWritingDate = "${recordCount}일째",
                         profileIcon = "R.drawable.icon_profile_sample",
                         badgeCode = selectedBadgeCode,
                         colorCode = selectedColorCode,

@@ -11,7 +11,8 @@ data class MobileTellerCardData(
     val badges: List<Badge>,
     val colors: List<Color>,
     val userInfo: UserInfo,
-    val levelInfo: LevelInfo
+    val levelInfo: LevelInfo,
+    val recordCount: Int,
 )
 
 data class Badge(
@@ -39,12 +40,12 @@ data class TellerCard(
 )
 
 data class LevelInfo(
-    val level_dto: LevelDto,
-    val days_to_level_up: Int
+    val levelDto: LevelDto,
+    val daysToLevelUp: Int
 )
 
 data class LevelDto(
     val level: Int,
-    val current_exp: Int,
-    val required_exp: Int
+    val currentExp: Int,
+    val requiredExp: Int
 )

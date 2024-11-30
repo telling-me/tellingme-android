@@ -94,7 +94,6 @@ fun ProfileCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-//                    text = "나도 날 잘 몰라요, 슈퍼 루키(예시)",
                     text = "${response.description}",
                     style = TellingmeTheme.typography.body1Bold,
                     color = Base0
@@ -121,7 +120,6 @@ fun ProfileCard(
             )
 
             Text(
-//                text = "듀이듀이",
                 text = "${response.nickname}",
                 style = TellingmeTheme.typography.body1Bold,
                 color = Base0,
