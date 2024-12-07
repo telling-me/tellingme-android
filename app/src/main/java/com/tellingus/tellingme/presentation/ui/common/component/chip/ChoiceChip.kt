@@ -31,8 +31,9 @@ fun ChoiceChip(
     modifier: Modifier = Modifier,
     text: String,
     selected: Boolean = false,
+    index: Int = 0,
     enable: Boolean = true,
-    onClick: (Boolean) -> Unit
+    onClick: (Int) -> Unit
 ) {
     Card(
         modifier = modifier.clickable(
@@ -40,7 +41,7 @@ fun ChoiceChip(
             interactionSource = remember { MutableInteractionSource() },
             enabled = enable,
             onClick = {
-                onClick(selected)
+                onClick(index)
             }
         ),
         shape = RoundedCornerShape(12.dp),
@@ -61,28 +62,28 @@ fun ChoiceChip(
     }
 }
 
-@Composable
-fun ChoiceChips(
-    modifier: Modifier = Modifier,
-    elements: List<ChipState>,
-    onClick: (Int, Boolean) -> Unit
-) {
-    LazyRow(
-        modifier = modifier
-    ) {
-        items(elements.size) {position ->
-            ChoiceChip(
-                text = elements[position].text,
-                selected = elements[position].isSelected.value,
-                enable = elements[position].enable.value,
-                onClick = { isSelected ->
-                    onClick(position, isSelected)
-                }
-            ) 
-            Spacer(modifier = modifier.size(8.dp))
-        }
-    }
-}
+//@Composable
+//fun ChoiceChips(
+//    modifier: Modifier = Modifier,
+//    elements: List<ChipState>,
+//    onClick: (Int, Boolean) -> Unit
+//) {
+//    LazyRow(
+//        modifier = modifier
+//    ) {
+//        items(elements.size) {position ->
+//            ChoiceChip(
+//                text = elements[position].text,
+//                selected = elements[position].isSelected.value,
+//                enable = elements[position].enable.value,
+//                onClick = { isSelected ->
+//                    onClick(position, isSelected)
+//                }
+//            )
+//            Spacer(modifier = modifier.size(8.dp))
+//        }
+//    }
+//}
 
 data class ChipState(
     val text: String,
@@ -103,14 +104,14 @@ fun ChoiceChipsPreview() {
         )
     }
 
-    ChoiceChips(
-        elements = elements,
-        onClick = { position, isSelected ->
-            // 칩을 단일/다중 선택할 수 있도록 (일단은 단일 선택 칩)
-            elements.map { it.isSelected.value = false }
-            elements[position].isSelected.value = !isSelected
-        }
-    )
+//    ChoiceChips(
+//        elements = elements,
+//        onClick = { position, isSelected ->
+//            // 칩을 단일/다중 선택할 수 있도록 (일단은 단일 선택 칩)
+//            elements.map { it.isSelected.value = false }
+//            elements[position].isSelected.value = !isSelected
+//        }
+//    )
 }
 
 @Preview
