@@ -15,6 +15,8 @@ import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.model.myspace.MyPageResponse
 import com.tellingus.tellingme.data.model.notice.LoadNoticeResponse
+import com.tellingus.tellingme.data.model.oauth.UserRequest
+import com.tellingus.tellingme.data.model.oauth.UserResponse
 import com.tellingus.tellingme.data.model.oauth.login.OauthRequest
 import com.tellingus.tellingme.data.model.oauth.login.TokenResponse
 import com.tellingus.tellingme.data.model.oauth.signout.SignOutRequest
@@ -103,6 +105,16 @@ interface NetworkService {
     // 내 답변 리스트 조회 API
     @GET("${END_POINT}/answer/list/all")
     suspend fun getAnswerList(): ApiResult<AnswerListResponse>
+
+    // 유저정보 조회 API
+    @GET("${END_POINT}/user")
+    suspend fun getUserInfo(): ApiResult<UserResponse>
+
+    // 유저정보 업데이트 API
+    @PATCH("${END_POINT}/user/update")
+    suspend fun updateUserInfo(
+        @Body userRequest: UserRequest
+    ): ApiResult<BasicResponse>
 
     // 메인화면용 API
     @POST("${END_POINT}/v2/mobile/main")

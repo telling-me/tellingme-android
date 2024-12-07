@@ -44,8 +44,7 @@ class MySpaceViewModel @Inject constructor(
                 .onNetworkError {}
 
             getQuestionUseCase(
-//                today = formattedDate
-                today = "2024-11-11"
+                today = formattedDate
             ).onSuccess {
                 updateState(
                     currentState.copy(
