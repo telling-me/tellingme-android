@@ -9,6 +9,8 @@ import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
 import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
 import com.tellingus.tellingme.data.model.home.PatchTellerCardResponse
+import com.tellingus.tellingme.data.model.home.PushTokenRequest
+import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.model.myspace.MyPageResponse
@@ -162,6 +164,9 @@ interface NetworkService {
         @Body postReportRequest: PostReportRequest
     ): ApiResult<Unit>
 
+    // 로그아웃
+    @POST("${END_POINT}/oauth/logout")
+    suspend fun logout(): ApiResult<BasicResponse>
     // 치즈 개수 조회
     @GET("${END_POINT}/v2/cheese")
     suspend fun getCheese(): ApiResult<GetCheeseResponse>
@@ -182,4 +187,9 @@ interface NetworkService {
     @POST("${END_POINT}/update/notification")
     suspend fun updateNotification(@Body updateNotificationRequest: UpdateNotificationRequest): ApiResult<UpdateNotificationResponse>
 
+    // 푸시토큰 업데이트
+    @POST("${END_POINT}/user/update/pushToken")
+    suspend fun updatePushToken(
+        @Body pushTokenRequest: PushTokenRequest
+    ): ApiResult<BasicResponse>
 }

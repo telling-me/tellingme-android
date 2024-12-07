@@ -40,6 +40,7 @@ object MySpaceDestinations {
     const val ROUTE = "mySpaceRoute"
 
     const val MY_SPACE = "mySpace"
+    const val RECORD = "record"
 }
 
 object OtherSpaceDestinations {

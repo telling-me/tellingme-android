@@ -11,6 +11,7 @@ import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -91,6 +92,14 @@ class DataStoreRepositoryImpl @Inject constructor(
             .map {
                 it[REFRESH_TOKEN] ?: ""
             }
+    }
+
+    override suspend fun deleteAll() {
+        runBlocking {
+            dataStore.edit { preferences ->
+                preferences.clear()
+            }
+        }
     }
 
     override suspend fun deleteTokens() {

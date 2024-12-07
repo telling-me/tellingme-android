@@ -1,6 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.myspace
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -24,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +63,7 @@ import com.tellingus.tellingme.presentation.ui.common.const.getEmotionText
 import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.MySpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background200
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Error400
@@ -307,8 +310,12 @@ fun MySpaceScreen(
                 .padding(bottom = 16.dp, end = 20.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
+            Log.d("taag", uiState.todayTitle)
+            Log.d("taag", uiState.todayPhrase)
             FloatingButton {
-                navController.navigate(HomeDestinations.RECORD)
+                navController.navigate(
+                    ("${MySpaceDestinations.RECORD}/${uiState.todayTitle}/${uiState.todayPhrase}")
+                )
             }
         }
     }
@@ -533,35 +540,33 @@ fun MySpaceScreen(
                 usePlatformDefaultWidth = false
             )
         ) {
-            Column(
+            Surface(
                 modifier = modifier
-                    .fillMaxSize()
-                    .padding(top = 130.dp, bottom = 144.dp, start = 26.dp, end = 26.dp)
-                    .background(
-                        shape = RoundedCornerShape(12.dp),
-                        color = Color.White
-                    )
-                    .clickable(
-                        onClick = { isShowEmptyDialog = false },
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .fillMaxWidth()
+                    .padding(horizontal = 26.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = Color.White
             ) {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.image_answer_empty),
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.size(24.dp))
-                Text(
-                    modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                    text = "이 날 작성한 답변이 없어요!",
-                    style = TellingmeTheme.typography.body2Regular.copy(
-                        color = Gray500,
-                        fontSize = 14.sp
+                Column(
+                    modifier = modifier
+                        .padding(top = 130.dp, bottom = 144.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        imageVector = ImageVector.vectorResource(R.drawable.image_answer_empty),
+                        contentDescription = null
                     )
-                )
+                    Spacer(modifier = Modifier.size(24.dp))
+                    Text(
+                        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
+                        text = "이 날 작성한 답변이 없어요!",
+                        style = TellingmeTheme.typography.body2Regular.copy(
+                            color = Gray500,
+                            fontSize = 14.sp
+                        )
+                    )
+                }
             }
         }
     }
@@ -589,6 +594,7 @@ fun MySpaceScreen(
             is MySpaceContract.Effect.ShowAnswerEmptyDialog -> {
                 isShowEmptyDialog = true
             }
+
         }
     }
 }
