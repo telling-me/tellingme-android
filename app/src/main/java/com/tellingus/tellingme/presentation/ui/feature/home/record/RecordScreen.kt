@@ -351,6 +351,7 @@ fun RecordScreenContent(
 
     if (isEmotionBottomSheetOpen) {
         EmotionBottomSheet(
+            selectedEmotion = uiState.selectedEmotion,
             onDismiss = { isEmotionBottomSheetOpen = false },
             onClickCancel = { isEmotionBottomSheetOpen = false },
             onClickConfirm = {
@@ -363,12 +364,13 @@ fun RecordScreenContent(
 
 @Composable
 fun EmotionBottomSheet(
+    selectedEmotion: Int = -1,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onClickCancel: () -> Unit,
     onClickConfirm: (Int) -> Unit,
 ) {
-    var selectedEmotion by remember { mutableStateOf(-1) }
+    var selectedEmotion by remember { mutableStateOf(selectedEmotion) }
     var showBuyEmotionDialog by remember { mutableStateOf(false) }
 
     BottomSheetDialog(
