@@ -20,6 +20,8 @@ class HomeContract {
         val userNickname: String = "",
         val userLevel: Int = 0,
         val userExp: Int = 0,
+
+        val denyPushNoti: Boolean = true,
     ) : UiState
     {
         data class TodayQuestionCardInfo(val title: String = "", val content: String = "")

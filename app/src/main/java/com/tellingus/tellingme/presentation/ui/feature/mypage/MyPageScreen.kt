@@ -5,6 +5,8 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.util.Log
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,8 +52,11 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSect
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.model.ToolTipType
+import com.tellingus.tellingme.presentation.ui.common.navigation.AuthDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
+import com.tellingus.tellingme.presentation.ui.feature.myspace.CALENDAR_RANGE
+import com.tellingus.tellingme.presentation.ui.feature.myspace.MySpaceContract
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
@@ -59,17 +64,34 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.util.AppUtils
+import com.tellingus.tellingme.util.collectWithLifecycle
 
 
 @Composable
 fun MyPageScreen(
-    navController: NavController, viewModel: MyPageViewModel = hiltViewModel()
+    navController: NavController,
+    viewModel: MyPageViewModel = hiltViewModel()
 ) {
     MainLayout(header = {
-        MyPageScreenHeader(navController = navController)
+        MyPageScreenHeader(navController)
     }, content = {
         MyPageScreenContent(navController)
     })
+
+//    viewModel.effect.collectWithLifecycle { effect ->
+//        when(effect) {
+//            is MyPageContract.Effect.MoveToLoginScreen -> {
+//                // 홈화면으로 이동
+//                Log.d("taag", "1")
+//                navController.navigate(AuthDestinations.Login.LOGIN)
+////                navController.navigate(AuthDestinations.Login.LOGIN) {
+////                    popUpTo(AuthDestinations.ROUTE) {
+////                        inclusive = true
+////                    }
+////                }
+//            }
+//        }
+//    }
 }
 
 @Composable

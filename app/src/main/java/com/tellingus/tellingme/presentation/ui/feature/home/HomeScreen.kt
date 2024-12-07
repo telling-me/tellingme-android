@@ -1,8 +1,10 @@
 package com.tellingus.tellingme.presentation.ui.feature.home
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.tellingus.tellingme.R
@@ -75,6 +78,7 @@ fun HomeScreen(
     navController: NavController, viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     val permissionState = rememberPermissionState(
         Manifest.permission.POST_NOTIFICATIONS
@@ -94,42 +98,74 @@ fun HomeScreen(
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        if (isGranted) {
-            Log.d("taag", "승인")
-        } else {
+        if (!isGranted) {
             if (permissionState.status.shouldShowRationale) {
-                // 이전에 거부한 경우가 있는 경우
-                isShowPushAlertDialog = true
-                Log.d("taag", "이전 거부 ㅇ")
+                // 이전에 거부한 경우가 있는 경우 == 영구거부
+                Log.d("taag", "shouldShowRationale")
+                if (uiState.denyPushNoti) {
+                    isShowPushAlertDialog = true
+                }
+                viewModel.denyPushNoti(true)
             } else {
                 // 최초 거부
+                Log.d("taag", "!shouldShowRationale")
                 isShowPushDenyDialog = true
-                Log.d("taag", "최초 거부")
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (!permissionState.status.isGranted) {
+            if (uiState.denyPushNoti) {
+                isShowPushAlertDialog = true
+            } else {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
 
     if (isShowPushDenyDialog) {
         PushDenyDialog(
-            onClickPositive = {},
-            onClickNegative = {}
+            onClickPositive = {
+                isShowPushDenyDialog = false
+                if (uiState.denyPushNoti) {
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            },
+            onClickNegative = {
+                isShowPushDenyDialog = false
+            }
         )
     }
 
     if (isShowPushAlertDialog) {
         PushAlertDialog(
-            onClickPositive = {},
-            onClickNegative = {}
+            onClickPositive = {
+                isShowPushAlertDialog = false
+                if (uiState.denyPushNoti) {
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            },
+            onClickNegative = {
+                isShowPushAlertDialog = false
+            }
         )
     }
 
-    LaunchedEffect(Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionLauncher.launch(
-                Manifest.permission.POST_NOTIFICATIONS
-            )
-        }
-    }
 }
 
 @Composable

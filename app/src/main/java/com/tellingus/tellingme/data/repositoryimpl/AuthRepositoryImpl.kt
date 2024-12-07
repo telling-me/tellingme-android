@@ -1,6 +1,7 @@
 package com.tellingus.tellingme.data.repositoryimpl
 
 import com.tellingus.tellingme.data.model.common.BasicResponse
+import com.tellingus.tellingme.data.model.home.PushTokenRequest
 import com.tellingus.tellingme.data.model.oauth.login.OauthRequest
 import com.tellingus.tellingme.data.model.oauth.login.TokenResponse
 import com.tellingus.tellingme.data.model.oauth.signout.SignOutRequest
@@ -27,6 +28,10 @@ class AuthRepositoryImpl @Inject constructor(
         return service.loginFromKakao(oauthToken, loginType, isAuto, oauthRequest)
     }
 
+    override suspend fun logout(): ApiResult<BasicResponse> {
+        return service.logout()
+    }
+
     override suspend fun verifyNickname(nickname: String): ApiResult<NicknameResponse> {
         return service.verifyNickname(NicknameRequest(nickname = nickname))
     }
@@ -44,6 +49,10 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun signOutUser(): ApiResult<BasicResponse> {
         return service.signOutUser(signoutRequest = SignOutRequest())
+    }
+
+    override suspend fun updatePushToken(pushToken: String): ApiResult<BasicResponse> {
+        return service.updatePushToken(PushTokenRequest(pushToken))
     }
 
 }

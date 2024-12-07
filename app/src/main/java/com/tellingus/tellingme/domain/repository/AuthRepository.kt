@@ -16,6 +16,8 @@ interface AuthRepository {
         oauthRequest: OauthRequest
     ): ApiResult<TokenResponse>
 
+    suspend fun logout(): ApiResult<BasicResponse>
+
     suspend fun verifyNickname(
         nickname: String
     ): ApiResult<NicknameResponse>
@@ -30,4 +32,5 @@ interface AuthRepository {
     ): ApiResult<TokenResponse>
 
     suspend fun signOutUser(): ApiResult<BasicResponse>
+    suspend fun updatePushToken(pushToken: String): ApiResult<BasicResponse>
 }

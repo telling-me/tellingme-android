@@ -3,6 +3,7 @@ package com.tellingus.tellingme.presentation.ui.common.component.dialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -53,36 +55,35 @@ fun PushDenyDialog(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                modifier = modifier.padding(bottom = 4.dp),
-                text = "푸시알림 거부",
+                modifier = modifier.padding(bottom = 20.dp),
+                textAlign = TextAlign.Center,
+                text = "혜택이나 이벤트 알림을\n" +
+                        "받지 못할 수도 있어요.\n" +
+                        "그래도 괜찮으시겠어요?",
                 style = TellingmeTheme.typography.body1Bold.copy(
                     color = Gray600,
                     fontSize = 16.sp
                 )
             )
-            Image(
-                modifier = modifier.padding(bottom = 12.dp),
-                imageVector = ImageVector.vectorResource(R.drawable.image_push_alert),
-                contentDescription = null
-            )
-
-            PrimaryButton(
-                modifier = modifier.fillMaxWidth(),
-                size = ButtonSize.LARGE,
-                text = "좋아요",
-                onClick = {
-                    onClickPositive()
-                }
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-            SingleButton(
-                modifier = modifier.fillMaxWidth(),
-                size = ButtonSize.LARGE,
-                text = "괜찮아요",
-                onClick = {
-                    onClickNegative()
-                }
-            )
+            Row {
+                SingleButton(
+                    modifier = modifier.fillMaxWidth().weight(1f),
+                    size = ButtonSize.LARGE,
+                    text = "취소",
+                    onClick = {
+                        onClickNegative()
+                    }
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                PrimaryButton(
+                    modifier = modifier.fillMaxWidth().weight(1f),
+                    size = ButtonSize.LARGE,
+                    text = "알림 받기",
+                    onClick = {
+                        onClickPositive()
+                    }
+                )
+            }
         }
     }
 }

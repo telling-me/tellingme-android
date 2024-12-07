@@ -6,6 +6,7 @@ import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.AnswerResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
+import com.tellingus.tellingme.data.model.home.PushTokenRequest
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
@@ -57,9 +58,9 @@ interface NetworkService {
     suspend fun loadNotice(): ApiResult<LoadNoticeResponse>
 
     // 오늘의 질문 조회 API
-    @POST("${END_POINT}/question")
+    @GET("${END_POINT}/question")
     suspend fun getQuestion(
-        @Body questionRequest: QuestionRequest
+        @Query("date") date: String
     ): ApiResult<QuestionResponse>
 
     // 답변 작성 API
@@ -111,5 +112,13 @@ interface NetworkService {
     @GET("${END_POINT}/v2/mobile/mypage")
     suspend fun getMypage(): ApiResult<MypageResponse>
 
+    // 로그아웃
+    @POST("${END_POINT}/oauth/logout")
+    suspend fun logout(): ApiResult<BasicResponse>
 
+    // 푸시토큰 업데이트
+    @POST("${END_POINT}/user/update/pushToken")
+    suspend fun updatePushToken(
+        @Body pushTokenRequest: PushTokenRequest
+    ): ApiResult<BasicResponse>
 }
