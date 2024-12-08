@@ -14,6 +14,7 @@ import com.tellingus.tellingme.domain.usecase.GetQuestionUseCase
 import com.tellingus.tellingme.domain.usecase.otherspace.GetCommunicationListUseCase
 import com.tellingus.tellingme.domain.usecase.otherspace.PostLikesUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
+import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageContract
 import com.tellingus.tellingme.presentation.ui.feature.otherspace.KEY_ID
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -85,6 +86,9 @@ class OtherSpaceListViewModel @Inject constructor(
     fun getCommunicationListBySort(date: String, page: Int, sort: String) {
         viewModelScope.launch {
             getCommunicationListUseCase(date, page = 0, size = 20, sort).onSuccess {
+
+                postEffect(OtherSpaceListContract.Effect.ScrollToTop)
+
                 val communicationData = it.data
                 val isLastPage =
                     communicationData.pageable.pageNumber == communicationData.totalPages - 1
