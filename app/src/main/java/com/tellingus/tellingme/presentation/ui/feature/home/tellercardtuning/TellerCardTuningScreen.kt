@@ -1,7 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.tellercardtuning
 
 
-import android.util.Log
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
@@ -36,8 +38,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -63,24 +69,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray300
 import com.tellingus.tellingme.presentation.ui.theme.Gray50
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
-import com.tellingus.tellingme.presentation.ui.theme.Profile100
-import com.tellingus.tellingme.presentation.ui.theme.Profile100_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile200
-import com.tellingus.tellingme.presentation.ui.theme.Profile200_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile300
-import com.tellingus.tellingme.presentation.ui.theme.Profile300_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile400
-import com.tellingus.tellingme.presentation.ui.theme.Profile400_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile500
-import com.tellingus.tellingme.presentation.ui.theme.Profile500_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile600
-import com.tellingus.tellingme.presentation.ui.theme.Profile600_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile700
-import com.tellingus.tellingme.presentation.ui.theme.Profile700_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile800
-import com.tellingus.tellingme.presentation.ui.theme.Profile800_Bottom
-import com.tellingus.tellingme.presentation.ui.theme.Profile900
-import com.tellingus.tellingme.presentation.ui.theme.Profile900_Bottom
+import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
 import androidx.compose.material3.Icon as Icon1
@@ -92,11 +81,16 @@ fun TellerCardTuningScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cheeseBalance = uiState.cheeseBalance
+
     MainLayout(header = {
         TellerCardTuningScreenHeader(
             navController = navController, cheeseBalance
         )
-    }, content = { TellerCardTuningScreenContent(navController= navController, uiState, viewModel = viewModel) })
+    }, content = {
+        TellerCardTuningScreenContent(
+            navController = navController, uiState = uiState, viewModel = viewModel
+        )
+    })
 }
 
 @Composable
@@ -108,6 +102,10 @@ fun TellerCardTuningScreenContent(
     val userInfo = uiState.userInfo
     val levelInfo = uiState.levelInfo
     val recordCount = uiState.recordCount
+    val cheeseBalance = uiState.cheeseBalance
+    val myColors = uiState.colors;
+
+
 
     var selectedBadgeCode by remember { mutableStateOf(userInfo.tellerCard.badgeCode) }
     var selectedColorCode by remember { mutableStateOf(userInfo.tellerCard.colorCode) }
@@ -146,8 +144,7 @@ fun TellerCardTuningScreenContent(
 
     LaunchedEffect(selectedBadgeCode, selectedColorCode) {
         profileCardResponse = profileCardResponse.copy(
-            badgeCode = selectedBadgeCode,
-            colorCode = selectedColorCode
+            badgeCode = selectedBadgeCode, colorCode = selectedColorCode
         )
     }
 
@@ -169,6 +166,8 @@ fun TellerCardTuningScreenContent(
 
         Box(modifier = Modifier.padding(top = 40.dp)) {
             BadgeChangeSheet(
+                myColors = myColors,
+                cheeseBalance = cheeseBalance,
                 selectedBadgeCode,
                 selectedColorCode,
                 onBadgeCodeSelected = { badgeCode ->
@@ -194,19 +193,19 @@ fun TellerCardTuningScreenContent(
                     if (selectedBadgeCode.isEmpty() || selectedColorCode.isEmpty()) return@BadgeChangeSheet
                     viewModel.processEvent(
                         TellerCardTuningContract.Event.OnClickPatchTellerCard(
-                            colorCode = selectedColorCode,
-                            badgeCode = selectedBadgeCode
+                            colorCode = selectedColorCode, badgeCode = selectedBadgeCode
                         )
                     )
                     navController.popBackStack()
-                }
-            )
+                })
         }
     }
 }
 
 @Composable
 fun BadgeChangeSheet(
+    myColors: List<com.tellingus.tellingme.data.model.home.Color>,
+    cheeseBalance: Int,
     selectedBadgeCode: String,
     selectedColorCode: String,
     onBadgeCodeSelected: (badgeCode: String) -> Unit,
@@ -215,7 +214,7 @@ fun BadgeChangeSheet(
     onConfirm: () -> Unit
 ) {
     var selectedOption by remember { mutableStateOf("badge") }
-
+    var showBuyColorCodeDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -251,8 +250,7 @@ fun BadgeChangeSheet(
                             text = "되돌리기",
                             onClick = {
                                 onReset()
-                            }
-                        )
+                            })
                         Spacer(modifier = Modifier.width(8.dp))
                         PrimaryButton(modifier = Modifier
                             .width(163.dp)
@@ -261,15 +259,14 @@ fun BadgeChangeSheet(
                             text = "완료",
                             onClick = {
                                 onConfirm()
-                            }
-                        )
+                            })
                     }
                 }
             }
 
             "bgColor" -> {
                 Column(modifier = Modifier.padding(top = 40.dp)) {
-                    BgColorContent(selectedColorCode, onColorCodeSelected)
+                    BgColorContent(myColors, selectedColorCode, onColorCodeSelected)
 
                     Row(
                         modifier = Modifier
@@ -284,8 +281,7 @@ fun BadgeChangeSheet(
                             text = "되돌리기",
                             onClick = {
                                 onReset()
-                            }
-                        )
+                            })
                         Spacer(modifier = Modifier.width(8.dp))
                         PrimaryButton(modifier = Modifier
                             .width(163.dp)
@@ -293,14 +289,81 @@ fun BadgeChangeSheet(
                             size = ButtonSize.LARGE,
                             text = "완료",
                             onClick = {
-                                onConfirm()
-                            }
-                        )
+                                if (isCheeseNeeded(myColors, selectedColorCode)) {
+                                    if (cheeseBalance < 20) {
+
+                                    } else {
+                                        showBuyColorCodeDialog = true
+                                    }
+                                } else {
+                                    onConfirm()
+                                }
+                            })
                     }
                 }
             }
         }
+    }
 
+
+    if (showBuyColorCodeDialog) {
+        Dialog(
+            onDismissRequest = {
+                showBuyColorCodeDialog = false
+            },
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .background(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Base0
+                    )
+                    .padding(top = 30.dp, start = 16.dp, end = 16.dp, bottom = 20.dp)
+                    .wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "치즈 20개로 구매하시겠어요?",
+                    style = TellingmeTheme.typography.body1Bold.copy(
+                        color = Gray600
+                    )
+                )
+                Spacer(modifier = Modifier.size(20.dp))
+                Image(
+                    modifier = Modifier.size(120.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.icon_cheese_box),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(20.dp))
+                Row {
+                    PrimaryLightButton(
+                        modifier = Modifier.weight(1f),
+                        size = ButtonSize.LARGE,
+                        text = "취소",
+                        onClick = {
+                            showBuyColorCodeDialog = false
+                        }
+                    )
+                    Spacer(modifier = Modifier.size(8.dp))
+                    PrimaryButton(
+                        modifier = Modifier.weight(1f),
+                        size = ButtonSize.LARGE,
+                        text = "구매하기",
+                        onClick = {
+                            onConfirm()
+                            showBuyColorCodeDialog = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -412,8 +475,8 @@ fun BadgeCard(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BgColorContent(
-    selectedColorCode: String,
-    onColorCodeSelected: (colorCode: String) -> Unit
+    myColors: List<com.tellingus.tellingme.data.model.home.Color>,
+    selectedColorCode: String, onColorCodeSelected: (colorCode: String) -> Unit
 ) {
     val items = List(colorCodeList.size) { "Item $it" } // 9개의 아이템 생성
     val pagerState = rememberPagerState(pageCount = { (items.size + 7) / 8 }) // 각 페이지당 8개 아이템
@@ -445,12 +508,14 @@ fun BgColorContent(
                         for (j in 0 until 4) {
                             val currentIndex = i + j
                             if (currentIndex < endIndex) {
-
                                 val colorItem = colorCodeList[currentIndex % colorCodeList.size]
                                 val topColor = colorItem.topColor
                                 val bottomColor = colorItem.bottomColor
-
                                 DiagonalHalfCircleBadge(
+                                    hasNeedCheese = isCheeseNeeded(
+                                        myColors,
+                                        colorItem.colorCode
+                                    ),
                                     colorCode = colorItem.colorCode,
                                     bottomColor = bottomColor,
                                     topColor = topColor,
@@ -496,7 +561,27 @@ fun BgColorContent(
             }
         }
     }
+}
 
+fun isCheeseNeeded(
+    userColorList: List<com.tellingus.tellingme.data.model.home.Color>,
+    colorCode: String
+): Boolean {
+    // 치즈가 필요 없는 기본 색상 목록
+    val excludedColors = setOf("CL_DEFAULT", "CL_BLUE_001", "CL_ORANGE_001", "CL_RED_001")
+
+    // colorCode가 excludedColors에 포함되어 있으면 치즈가 필요 없음 (false)
+    if (colorCode in excludedColors) {
+        return false
+    }
+
+    // colorCode가 userColorList에 포함되어 있으면 치즈가 필요 없음 (false)
+    if (userColorList.any { it.colorCode == colorCode }) {
+        return false
+    }
+
+    // 위 조건에 해당하지 않으면 치즈가 필요함 (true)
+    return true
 }
 
 @Composable

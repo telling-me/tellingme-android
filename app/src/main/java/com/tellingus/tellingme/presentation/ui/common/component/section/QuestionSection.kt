@@ -30,7 +30,8 @@ fun QuestionSection(
     description: String,
     onClickButton: () -> Unit = {},
     isButtonVisible: Boolean = true,
-    bgColor: Color = Color.White
+    bgColor: Color = Color.White,
+    isTodayAnswer: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -77,7 +78,7 @@ fun QuestionSection(
                 PrimaryButton(
                     modifier = Modifier.padding(top = 28.dp),
                     size = ButtonSize.MEDIUM,
-                    text = "기록하기",
+                    text = if(isTodayAnswer) "답변완료" else  "기록하기",
                     onClick = onClickButton
                 )
             }

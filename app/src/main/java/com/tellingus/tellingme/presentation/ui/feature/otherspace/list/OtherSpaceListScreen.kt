@@ -52,9 +52,6 @@ import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 import com.tellingus.tellingme.util.collectWithLifecycle
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -146,10 +143,6 @@ fun OtherSpaceListScreenContent(
             }
     }
 
-//    scope.launch {
-//        lazyListState.scrollToItem(0)
-//    }
-
     Box(
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp, top = 0.dp)
@@ -161,9 +154,9 @@ fun OtherSpaceListScreenContent(
                 .padding(end = 0.dp, bottom = 20.dp)
                 .zIndex(1f)
         ) {
-//            navController.navigate(
-//                ("${MySpaceDestinations.RECORD}/${uiState.todayTitle}/${uiState.todayPhrase}")
-//            )
+            navController.navigate(
+                ("${MySpaceDestinations.RECORD}/${uiState.questionData.title}/${uiState.questionData.phrase}")
+            )
         }
 
         if (communicationListData.content.isEmpty()) {
