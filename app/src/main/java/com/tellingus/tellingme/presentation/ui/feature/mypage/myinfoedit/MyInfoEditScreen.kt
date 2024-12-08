@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -60,11 +61,15 @@ import com.tellingus.tellingme.presentation.ui.common.component.button.SingleBut
 import com.tellingus.tellingme.presentation.ui.common.component.button.TellingmeIconButton
 import com.tellingus.tellingme.presentation.ui.common.component.chip.ChoiceChip
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
+import com.tellingus.tellingme.presentation.ui.common.component.toast.TellingmeToast
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.feature.auth.signup.Job
 import com.tellingus.tellingme.presentation.ui.feature.auth.signup.Worry
+import com.tellingus.tellingme.presentation.ui.feature.home.record.RecordContract
+import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageContract
 import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Base0
+import com.tellingus.tellingme.presentation.ui.theme.Error600
 import com.tellingus.tellingme.presentation.ui.theme.Gray100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray300
@@ -74,6 +79,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
+import com.tellingus.tellingme.util.collectWithLifecycle
 
 @Composable
 fun MyInfoEditScreen(
@@ -137,6 +143,22 @@ fun MyInfoEditScreenContent(
             jobOthersInputValue = ""
         }
     }
+    val context = LocalContext.current
+    var showToastMessage by remember { mutableStateOf(Pair(false, "")) }
+
+    if (showToastMessage.first) {
+        TellingmeToast(context).showToast(text = showToastMessage.second, icon = R.drawable.icon_warn)
+        showToastMessage = Pair(false, "")
+    }
+
+    viewModel.effect.collectWithLifecycle { effect ->
+        when(effect) {
+            is MyPageContract.Effect.DisableNickname -> {
+                nicknameErrorState = effect.text
+            }
+            else -> {}
+        }
+    }
 
     Column {
         BasicAppBar(modifier = Modifier
@@ -186,7 +208,7 @@ fun MyInfoEditScreenContent(
                     Text(
                         text = nicknameErrorState,
                         style = Typography.caption1Regular,
-                        color = Gray500
+                        color = Error600
                     )
                 }
             }
@@ -405,7 +427,11 @@ fun EditableTextField(
     onClearClick: () -> Unit
 ) {
     BasicTextField(value = value,
-        onValueChange = onValueChange,
+        onValueChange = {
+            if (it.length <= 8) {
+                onValueChange(it)
+            }
+        },
         textStyle = TellingmeTheme.typography.body1Regular.copy(color = Gray600),
         singleLine = true,
         modifier = Modifier
@@ -482,29 +508,6 @@ fun DropdownSelect(text: String = "", modifier: Modifier = Modifier) {
             contentDescription = "icon_caret_down"
         )
     }
-}
-
-@Composable
-fun MyInfoEditScreenHeader(navController: NavController) {
-    BasicAppBar(modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 12.dp, top = 5.dp, bottom = 5.dp, end = 10.dp),
-        leftSlot = {
-            TellingmeIconButton(iconRes = R.drawable.icon_caret_left,
-                size = ButtonSize.MEDIUM,
-                color = Gray500,
-                onClick = {
-
-                    navController.popBackStack()
-                })
-        },
-        rightSlot = {
-            Row {
-                SingleButton(size = ButtonSize.LARGE, text = "완료", onClick = {
-
-                })
-            }
-        })
 }
 
 fun verifyNicknameFormat(

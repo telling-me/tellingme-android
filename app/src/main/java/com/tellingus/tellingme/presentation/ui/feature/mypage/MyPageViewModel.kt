@@ -2,6 +2,7 @@ package com.tellingus.tellingme.presentation.ui.feature.mypage
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.tellingus.tellingme.R
 import com.tellingus.tellingme.data.model.oauth.UserRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
@@ -13,10 +14,13 @@ import com.tellingus.tellingme.domain.usecase.LogoutUseCase
 import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
 import com.tellingus.tellingme.domain.usecase.SignOutUseCase
 import com.tellingus.tellingme.domain.usecase.UpdateUserInfoUseCase
+import com.tellingus.tellingme.domain.usecase.VerifyNicknameUseCase
 import com.tellingus.tellingme.domain.usecase.mypage.GetMyPageUseCase
 import com.tellingus.tellingme.domain.usecase.user.GetNotificationUseCase
 import com.tellingus.tellingme.domain.usecase.user.UpdateNotificationUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
+import com.tellingus.tellingme.presentation.ui.feature.auth.signup.SignupContract
+import com.tellingus.tellingme.presentation.ui.feature.home.record.RecordContract
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -31,7 +35,8 @@ class MyPageViewModel @Inject constructor(
     private val getMyPageUseCase: GetMyPageUseCase,
     private val getAnswerListUseCase: GetAnswerListUseCase,
     private val getNotificationUseCase: GetNotificationUseCase,
-    private val updateNotificationUseCase: UpdateNotificationUseCase
+    private val updateNotificationUseCase: UpdateNotificationUseCase,
+    private val verifyNicknameUseCase: VerifyNicknameUseCase
 ) : BaseViewModel<MyPageContract.State, MyPageContract.Event, MyPageContract.Effect>(initialState = MyPageContract.State()) {
     val TAG: String = "로그"
 
@@ -103,25 +108,44 @@ class MyPageViewModel @Inject constructor(
         purpose: String,
         mbti: String
     ) {
+        // 닉네임 검사 후 등록
         viewModelScope.launch {
-            updateUserInfoUseCase(
-                userRequest = UserRequest(
-                    nickname = nickname,
-                    birthDate = currentState.userInfo.birthDate,
-                    job = job,
-                    jobInfo = jobInfo,
-                    purpose = purpose,
-                    mbti = mbti,
-                    gender = currentState.userInfo.gender
-                )
-            ).onSuccess {
-                Log.d("taag", it.toString())
-                getUesrInfo()
-            }.onFailure { m, c ->
-                Log.d("taag f", c.toString())
-            }.onNetworkError {
-                Log.d("taag", it.message.toString())
+            verifyNicknameUseCase(nickname).onSuccess {
+                if (it.data) {
+                    // 중복 X
+                    postEffect(MyPageContract.Effect.DisableNickname(text = "정상"))
+                } else {
+                    // 중복 O, 다른 것들도 체크
+//                    if () {
+//
+//                    }
+
+                    updateUserInfoUseCase(
+                        userRequest = UserRequest(
+                            nickname = nickname,
+                            birthDate = currentState.userInfo.birthDate,
+                            job = job,
+                            jobInfo = jobInfo,
+                            purpose = purpose,
+                            mbti = mbti,
+                            gender = currentState.userInfo.gender
+                        )
+                    ).onSuccess {
+                        Log.d("taag", it.toString())
+                        getUesrInfo()
+                    }.onFailure { m, c ->
+                        Log.d("taag f", c.toString())
+                    }.onNetworkError {
+                        Log.d("taag", it.message.toString())
+                    }
+                }
+            }.onFailure { message, i ->
+                if (message.contains("중복된 닉네임입니다.")) {
+                    postEffect(MyPageContract.Effect.DisableNickname(text = "중복된 닉네임입니다."))
+                }
             }
+
+
         }
     }
 

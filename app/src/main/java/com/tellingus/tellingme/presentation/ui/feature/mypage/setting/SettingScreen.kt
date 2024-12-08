@@ -68,6 +68,7 @@ fun SettingScreen(navController: NavController, viewModel: MyPageViewModel = hil
                     }
                 }
             }
+            else -> {}
         }
     }
 }

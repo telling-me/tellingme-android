@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

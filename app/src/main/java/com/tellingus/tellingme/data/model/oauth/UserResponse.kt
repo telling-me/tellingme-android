@@ -12,7 +12,7 @@ data class User(
     val gender: String = "",
     val birthDate: String = "",
     val purpose: String = "",
-    val job: Int = -1,
+    val job: Int = 0,
     val jobInfo: String? = "",
     val mbti: String? = "",
     val level: Int = 0,

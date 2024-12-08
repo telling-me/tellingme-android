@@ -45,7 +45,7 @@ class AuthRepositoryImpl @Inject constructor(
         return service.updateUserInfo(userRequest)
     }
 
-    override suspend fun verifyNickname(nickname: String): ApiResult<NicknameResponse> {
+    override suspend fun verifyNickname(nickname: String): ApiResult<BasicResponse> {
         return service.verifyNickname(NicknameRequest(nickname = nickname))
     }
 

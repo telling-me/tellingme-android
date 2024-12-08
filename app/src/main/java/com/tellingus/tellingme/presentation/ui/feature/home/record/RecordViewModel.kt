@@ -49,7 +49,7 @@ class RecordViewModel @Inject constructor(
                     writeAnswerUseCase(
                         answerRequest = AnswerRequest(
                             content = currentState.answer,
-                            emotion = currentState.selectedEmotion,
+                            emotion = currentState.selectedEmotion + 1,
                             date = currentState.today.replace(".", "-"),
                             isPublic = currentState.isPublic,
                             isSpare = false

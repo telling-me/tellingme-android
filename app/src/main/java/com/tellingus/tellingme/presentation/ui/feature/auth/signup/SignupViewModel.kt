@@ -112,7 +112,14 @@ class SignupViewModel @Inject constructor(
                     )
                 }
             }.onFailure { message, code ->
-
+                if (message.contains("중복된 닉네임입니다.")) {
+                    updateState(
+                        currentState.copy(
+                            isAvailableNickname = false,
+                            nicknameErrorState = "중복된 닉네임입니다."
+                        )
+                    )
+                }
             }.onNetworkError {
 
             }

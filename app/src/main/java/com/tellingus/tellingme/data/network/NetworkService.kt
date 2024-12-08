@@ -63,7 +63,7 @@ interface NetworkService {
     @POST("${END_POINT}/oauth/nickname")
     suspend fun verifyNickname(
         @Body nicknameRequest: NicknameRequest
-    ): ApiResult<NicknameResponse>
+    ): ApiResult<BasicResponse>
 
     // 추가 정보 기입 API
     @POST("${END_POINT}/oauth/join")

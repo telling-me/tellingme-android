@@ -5,6 +5,7 @@ import com.tellingus.tellingme.data.model.oauth.User
 import com.tellingus.tellingme.presentation.ui.common.base.UiEffect
 import com.tellingus.tellingme.presentation.ui.common.base.UiEvent
 import com.tellingus.tellingme.presentation.ui.common.base.UiState
+import com.tellingus.tellingme.presentation.ui.feature.home.record.RecordContract
 
 class MyPageContract {
     data class State(
@@ -35,5 +36,10 @@ class MyPageContract {
 
     sealed class Effect : UiEffect {
         object MoveToLoginScreen : Effect()
+
+        data class DisableNickname(
+            val text: String,
+        ): Effect()
+
     }
 }

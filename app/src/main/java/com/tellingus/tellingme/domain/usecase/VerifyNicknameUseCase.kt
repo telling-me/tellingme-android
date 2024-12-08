@@ -12,7 +12,7 @@ class VerifyNicknameUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         nickname: String
-    ) : ApiResult<NicknameResponse> {
+    ) : ApiResult<BasicResponse> {
         return authRepository.verifyNickname(nickname)
     }
 }
