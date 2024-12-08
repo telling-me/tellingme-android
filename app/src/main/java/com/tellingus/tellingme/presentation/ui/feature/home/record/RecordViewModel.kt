@@ -82,20 +82,22 @@ class RecordViewModel @Inject constructor(
     }
 
     fun purchaseEmotion(index: Int) {
-        Log.d("taag purchaseEmotion", index.toString())
         var code = ""
         viewModelScope.launch {
             when(index) {
-                7 -> code = "EM_EXCITED"
-                8 -> code = "EM_FUN"
-                9 -> code = "EM_RELAXED"
-                10 -> code = "EM_APATHETIC"
-                11 -> code = "EM_LONELY"
-                12 -> code = "EM_COMPLEX"
+                7 -> code = "PD_EM_EXCITED"
+                8 -> code = "PD_EM_FUN"
+                9 -> code = "PD_EM_RELAXED"
+                10 -> code = "PD_EM_APATHETIC"
+                11 -> code = "PD_EM_LONELY"
+                12 -> code = "PD_EM_COMPLEX"
             }
             purchaseEmotionUseCase(code).onSuccess {
+                Log.d("taag", "purchaseEmotionUseCase")
                 getUsableEmotionUseCase().onSuccess {
+                    Log.d("taag", "getUsableEmotionUseCase")
                     updateState(currentState.copy(usableEmotionList = it.data.emotionList))
+                    postEffect(RecordContract.Effect.CompletePurchaseEmotion)
                     postEffect(RecordContract.Effect.ShowToastMessage(text = "감정이 오픈되었어요!", icon = R.drawable.icon_unlock))
                 }
             }
