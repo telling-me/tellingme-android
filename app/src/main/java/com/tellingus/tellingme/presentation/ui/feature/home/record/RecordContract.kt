@@ -10,7 +10,10 @@ class RecordContract {
         val isCompleteWriteAnswer: Boolean = false,
         val answer: String = "",
         val today: String = "",
-        val isPublic: Boolean = true
+        val isPublic: Boolean = true,
+        val cheeseCount: Int = 0,
+        val usableEmotionList: List<Int> = emptyList(),
+
     ) : UiState
 
     sealed class Event : UiEvent {

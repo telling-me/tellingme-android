@@ -7,6 +7,7 @@ data class AnswerListResponse(
 )
 
 data class Answer(
+    val answerId: Int = 0,
     val emotion: Int = 0,
     val title: String = "",
     val phrase: String = "",

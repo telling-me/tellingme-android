@@ -6,6 +6,8 @@ import com.tellingus.tellingme.data.model.oauth.signup.SignUpRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.repository.DataStoreKey.NICKNAME
+import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.usecase.SignUpUseCase
 import com.tellingus.tellingme.domain.usecase.VerifyNicknameUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
@@ -17,6 +19,7 @@ import javax.inject.Inject
 class SignupViewModel @Inject constructor(
     private val verifyNicknameUseCase: VerifyNicknameUseCase,
     private val signupUseCase: SignUpUseCase,
+    private val dataStoreRepository: DataStoreRepository
 ): BaseViewModel<SignupContract.State, SignupContract.Event, SignupContract.Effect>(
     initialState = SignupContract.State()
 ) {
@@ -54,6 +57,7 @@ class SignupViewModel @Inject constructor(
                 signupRequest = signupRequest
             ).onSuccess {
                 Log.d("taag joinUser", it.toString())
+                dataStoreRepository.setString(NICKNAME, currentState.signupRequest.nickname)
                 postEffect(SignupContract.Effect.CompleteSignup)
             }.onFailure { message, code ->
                 Log.d("taag joinUser", message)

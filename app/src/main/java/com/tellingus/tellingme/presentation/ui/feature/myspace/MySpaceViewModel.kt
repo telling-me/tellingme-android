@@ -7,6 +7,7 @@ import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
 import com.tellingus.tellingme.domain.usecase.GetQuestionUseCase
+import com.tellingus.tellingme.domain.usecase.user.GetCheeseUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,7 +19,7 @@ import javax.inject.Inject
 class MySpaceViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val getAnswerListUseCase: GetAnswerListUseCase,
-    private val getQuestionUseCase: GetQuestionUseCase
+    private val getQuestionUseCase: GetQuestionUseCase,
 ): BaseViewModel<MySpaceContract.State, MySpaceContract.Event, MySpaceContract.Effect>(
     initialState = MySpaceContract.State()
 ) {
@@ -53,6 +54,8 @@ class MySpaceViewModel @Inject constructor(
                     )
                 )
             }
+
+
         }
     }
 
