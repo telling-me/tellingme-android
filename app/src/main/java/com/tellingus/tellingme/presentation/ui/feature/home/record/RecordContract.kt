@@ -24,6 +24,7 @@ class RecordContract {
 
     sealed class Effect : UiEffect {
         object ShowRecordDialog: Effect()
+        object CompletePurchaseEmotion: Effect()
         data class ShowToastMessage(
             val text: String,
             val icon: Int

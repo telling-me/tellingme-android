@@ -187,7 +187,11 @@ fun RecordScreen(
             is RecordContract.Effect.MoveToMoreScreen -> {
 
             }
-            
+
+            is RecordContract.Effect.CompletePurchaseEmotion -> {
+
+            }
+
             else -> {}
         }
     }
@@ -648,6 +652,17 @@ fun EmotionBottomSheet(
                     )
                 }
             }
+        }
+    }
+
+    viewModel.effect.collectWithLifecycle { effect ->
+        when(effect) {
+            is RecordContract.Effect.CompletePurchaseEmotion -> {
+                Log.d("taag", "콜렉트")
+                showBuyEmotionDialog = false
+            }
+
+            else -> {}
         }
     }
 }
