@@ -1,6 +1,5 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.tellercard
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -69,7 +68,7 @@ fun TellerScreenContent(navController: NavController, uiState: TellerCardContrac
                 navController = navController,
                 profileCardResponse = ProfileCardResponse(
                     nickname = userInfo.nickname,
-                    description = userInfo.tellerCard.badgeName,
+                    description = userInfo.tellerCard.badgeMiddleName + userInfo.tellerCard.badgeName,
                     level = "LV. ${levelInfo.levelDto.level}",
                     consecutiveWritingDate = "${recordCount}일째",
                     profileIcon = "R.drawable.icon_profile_sample",

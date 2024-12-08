@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,7 +47,6 @@ import com.google.accompanist.permissions.shouldShowRationale
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.card.OpinionCard
-import com.tellingus.tellingme.presentation.ui.common.component.chip.ActionChip
 import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushAlertDialog
 import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushDenyDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
@@ -58,16 +56,12 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileWi
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
-import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
-import com.tellingus.tellingme.presentation.ui.feature.otherspace.list.OtherSpaceListContract
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -170,8 +164,7 @@ fun HomeScreenHeader(navController: NavController, unreadNoticeStatus: Boolean) 
     BasicAppBar(
         modifier = Modifier
             .background(Background100)
-            .height(48.dp)
-            .padding(start = 20.dp, end = 20.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 7.dp, bottom = 7.dp)
             .fillMaxWidth(),
         leftSlot = {
             Icon(
@@ -219,13 +212,17 @@ fun HomeScreenContent(
     val userLevel = uiState.userLevel
     val userExp = uiState.userExp
     val daysToLevelUp = uiState.daysToLevelUp
+    val todayAnswer = uiState.todayAnswer
+    val badgeCode = uiState.badgeCode
 
     Column(
     ) {
         Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
 
-            ProfileWidget(nickname = userNickname,
-                description = "연속 $recordCount 일째 기록중",
+            ProfileWidget(
+                badgeCode = badgeCode,
+                nickname = userNickname,
+                description = "연속 $recordCount 일째 기록 중",
                 modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
 
         }
@@ -233,7 +230,7 @@ fun HomeScreenContent(
             LevelSection(
                 level = userLevel,
                 percent = userExp,
-                levelDescription = "연속 ${daysToLevelUp}일만 작성하면 LV.${userLevel + 1} 달성!"
+                levelDescription = "연속${daysToLevelUp}일만 작성하면 LV.${userLevel + 1} 달성!"
             )
 
         }
@@ -241,17 +238,23 @@ fun HomeScreenContent(
             Text(text = "오늘의 질문", style = TellingmeTheme.typography.body1Bold)
             Text(
                 modifier = Modifier.padding(top = 5.dp),
-                text = "${todayAnswerCount} 명이 대답했어요!",
+                text = "${todayAnswerCount}명이 대답했어요!",
                 style = TellingmeTheme.typography.caption1Regular
             )
 
             QuestionSection(modifier = Modifier.padding(top = 12.dp),
                 title = "${questionTitle}",
                 description = "${questionPhrase}",
+                isTodayAnswer = todayAnswer,
                 onClickButton = {
-                    navController.navigate(
-                        ("${HomeDestinations.RECORD}/${questionTitle}/${questionPhrase}")
-                    )
+                    if (todayAnswer) {
+//                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}")
+//                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${item.answerId}?date=${date}")
+                    } else {
+                        navController.navigate(
+                            ("${HomeDestinations.RECORD}/${questionTitle}/${questionPhrase}")
+                        )
+                    }
                 })
 
         }
@@ -302,29 +305,27 @@ fun HomeScreenContent(
                         color = Gray600
                     )
                 }
-
-            }
-
-        }
-        if (communicationList.isNotEmpty()) {
-            Column(
-                modifier = Modifier
-                    .padding(top = 14.dp, bottom = 30.dp)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                ActionChip(text = "더보기", onClick = {
-                    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}") {
-                        navController.navigate(OtherSpaceDestinations.OTHER_SPACE) {
-                            launchSingleTop = true // 중복 방지
-                        }
-                        // 이후 otherSpaceListScreen으로 이동
-                        launchSingleTop = true
-                    }
-                })
             }
         }
+//        if (communicationList.isNotEmpty()) {
+//            Column(
+//                modifier = Modifier
+//                    .padding(top = 14.dp, bottom = 30.dp)
+//                    .fillMaxWidth(),
+//                horizontalAlignment = Alignment.CenterHorizontally
+//            ) {
+//                ActionChip(text = "더보기", onClick = {
+//                    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+//                    navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}") {
+//                        navController.navigate(OtherSpaceDestinations.OTHER_SPACE) {
+//                            launchSingleTop = true // 중복 방지
+//                        }
+//                        // 이후 otherSpaceListScreen으로 이동
+//                        launchSingleTop = true
+//                    }
+//                })
+//            }
+//        }
 
 
     } //    Column END

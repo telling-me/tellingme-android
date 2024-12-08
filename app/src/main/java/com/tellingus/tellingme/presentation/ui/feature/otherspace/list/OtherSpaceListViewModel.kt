@@ -29,6 +29,8 @@ class OtherSpaceListViewModel @Inject constructor(
     private val postLikesUseCase: PostLikesUseCase,
     savedStateHandle: SavedStateHandle
 ) : BaseViewModel<OtherSpaceListContract.State, OtherSpaceListContract.Event, OtherSpaceListContract.Effect>(
+
+
     initialState = OtherSpaceListContract.State(
         communicationListData = CommunicationListData(
             content = emptyList(),
@@ -60,6 +62,7 @@ class OtherSpaceListViewModel @Inject constructor(
         )
     )
 ) {
+    val TAG: String = "로그"
 
     init {
         val date: String = savedStateHandle[KEY_ID] ?: LocalDate.now()
@@ -105,6 +108,7 @@ class OtherSpaceListViewModel @Inject constructor(
             }
         }
     }
+
     fun getCommunicationList(date: String, page: Int, sort: String) {
         viewModelScope.launch {
             getCommunicationListUseCase(date, page, size = 20, sort).onSuccess {
@@ -182,6 +186,8 @@ class OtherSpaceListViewModel @Inject constructor(
             is OtherSpaceListContract.Event.OnClickHeart -> {
                 if (isThrottled()) return
 
+
+                Log.d(TAG, "reduceState event.answerId: ${event.answerId}")
                 postLikes(event.answerId) {
                     val updatedContent = currentState.communicationListData.content.map { item ->
                         if (item.answerId == event.answerId) {

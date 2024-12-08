@@ -5,6 +5,7 @@ import com.tellingus.tellingme.data.model.user.GetNotificationResponse
 import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationResponse
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
+import com.tellingus.tellingme.data.model.user.UserColorResponse
 import com.tellingus.tellingme.data.network.NetworkService
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.UserRepository
@@ -17,6 +18,10 @@ class UserRepositoryImpl @Inject constructor(
 ) : UserRepository {
     override suspend fun getUserBadge(): ApiResult<UserBadgeResponse> {
         return service.getUserBadge()
+    }
+
+    override suspend fun getUserColor(): ApiResult<UserColorResponse> {
+        return service.getUserColor()
     }
 
     override suspend fun getCheese(): ApiResult<GetCheeseResponse> {

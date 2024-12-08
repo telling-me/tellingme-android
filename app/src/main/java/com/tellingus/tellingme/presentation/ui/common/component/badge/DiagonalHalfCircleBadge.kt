@@ -1,15 +1,22 @@
 package com.tellingus.tellingme.presentation.ui.common.component.badge
 
-import android.util.Log
+
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -19,6 +26,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.presentation.ui.theme.Gray600
+import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 
 
 @Composable
@@ -30,6 +39,7 @@ fun DiagonalHalfCircleBadge(
     topColor: Color,
     modifier: Modifier = Modifier,
     colorCode: String = "",
+    hasNeedCheese: Boolean = false,
 ) {
     Box(
         modifier = modifier
@@ -71,6 +81,27 @@ fun DiagonalHalfCircleBadge(
                     ),
                     size = Size(radius * 2, radius * 2)
                 )
+            }
+        }
+
+        if (hasNeedCheese) {
+            Row(
+                modifier = Modifier
+                    .background(Color.White, RoundedCornerShape(100.dp))
+                    .width(52.dp)
+                    .padding(start = 9.dp, end = 9.dp, top = 4.dp, bottom = 4.dp)
+                    .align(BottomCenter),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.icon_cheese_14),
+                    contentDescription = if (isChecked) "Checked" else "Unchecked",
+                    modifier = Modifier
+                        .zIndex(1f)
+                        .size(14.dp)
+                )
+                Text(text = "20", style = TellingmeTheme.typography.caption2Bold, color = Gray600)
             }
         }
 
