@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.tellingus.tellingme.data.model.home.CommunicationData
 import com.tellingus.tellingme.data.model.home.HomeRequest
+import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.data.repositoryimpl.HomeRepositoryImpl
@@ -13,6 +14,7 @@ import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.repository.HomeRepository
 import com.tellingus.tellingme.domain.usecase.HomeUseCase
 import com.tellingus.tellingme.domain.usecase.UpdatePushTokenUseCase
+import com.tellingus.tellingme.domain.usecase.otherspace.PostLikesUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import com.tellingus.tellingme.util.getToday
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,10 +26,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val homeRepository: HomeRepository,
     private val homeUseCase: HomeUseCase,
     private val updatePushTokenUseCase: UpdatePushTokenUseCase,
-    private val dataStoreRepository: DataStoreRepository
+    private val dataStoreRepository: DataStoreRepository,
+    private val postLikesUseCase: PostLikesUseCase,
 ) : BaseViewModel<HomeContract.State, HomeContract.Event, HomeContract.Effect>(
     initialState = HomeContract.State()
 ) {
@@ -35,7 +37,12 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            updateState(currentState.copy(denyPushNoti = dataStoreRepository.getBoolean(DataStoreKey.DENY_PUSH_NOTI).first()))
+            updateState(
+                currentState.copy(
+                    denyPushNoti = dataStoreRepository.getBoolean(DataStoreKey.DENY_PUSH_NOTI)
+                        .first()
+                )
+            )
         }
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val request = HomeRequest(
@@ -63,7 +70,12 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    override fun reduceState(event: HomeContract.Event) {
+    fun postLikes(answerId: Int, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            postLikesUseCase(PostLikesRequest((answerId))).onSuccess {
+                onSuccess()
+            }.onFailure { s, i -> }
+        }
     }
 
     fun getMain(req: HomeRequest) {
@@ -94,21 +106,44 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getNotice() {
-//        viewModelScope.launch {
-//            val notice = homeRepository.getNotice()
-//                .onSuccess {
-//                    Log.d("taag homeViewModel s", it.toString())
-//                }
-//                .onFailure { s, i ->
-//                    Log.d("taag homeViewModel f", "$s - $i")
-//                }
-//        }
+    private var lastExecutedTime: Long = 0L
+    private val THROTTLE_INTERVAL = 500L // 0.5초 (밀리초 단위)
+    fun isThrottled(): Boolean {
+        val currentTime = System.currentTimeMillis()
+        return if (currentTime - lastExecutedTime < THROTTLE_INTERVAL) {
+            true // Throttle 중
+        } else {
+            lastExecutedTime = currentTime
+            false // 실행 가능
+        }
     }
 
-//    fun getQuestion() {
-//        viewModelScope.launch {
-//            homeRepository.getQuestion()
-//        }
-//    }
+    override fun reduceState(event: HomeContract.Event) {
+        when (event) {
+            is HomeContract.Event.OnClickHeart -> {
+                if (isThrottled()) return
+
+                postLikes(event.answerId) {
+                    val updatedList = currentState.communicationList.map { item ->
+                        if (item.answerId == event.answerId) {
+                            item.copy(
+                                isLiked = !item.isLiked,
+                                likeCount = item.likeCount + if (item.isLiked) -1 else 1
+                            )
+                        } else {
+                            item
+                        }
+                    }
+
+                    updateState(
+                        currentState.copy(
+                            communicationList = updatedList,
+                        )
+                    )
+                }
+            }
+
+            else -> {}
+        }
+    }
 }

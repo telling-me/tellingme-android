@@ -45,6 +45,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayou
 import com.tellingus.tellingme.presentation.ui.common.component.section.QuestionSection
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
+import com.tellingus.tellingme.presentation.ui.common.navigation.MySpaceDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
@@ -114,7 +115,21 @@ fun OtherSpaceListScreenContent(
 
     // load more if scrolled to bottom
     LaunchedEffect(reachedBottom) {
-        if (reachedBottom) viewModel.loadMoreDataIfNeeded()
+        val TAG: String = "로그"
+        Log.d(TAG, "LaunchedEffect date: $date")
+        if (reachedBottom)  {
+            var sort = ""
+            if(isSelected == "recently") {
+                sort = "최신순"
+            }
+            if(isSelected == "related") {
+                sort = "관련순"
+            }
+            if(isSelected == "sympathy") {
+                sort = "공감순"
+            }
+            viewModel.loadMoreDataIfNeeded(date = date, sort = sort)
+        }
     }
 
     Box(
@@ -127,7 +142,11 @@ fun OtherSpaceListScreenContent(
                 .align(Alignment.BottomEnd)
                 .padding(end = 0.dp, bottom = 20.dp)
                 .zIndex(1f)
-        ) {}
+        ) {
+//            navController.navigate(
+//                ("${MySpaceDestinations.RECORD}/${uiState.todayTitle}/${uiState.todayPhrase}")
+//            )
+        }
 
         if (communicationListData.content.isEmpty()) {
             Box(
@@ -142,7 +161,7 @@ fun OtherSpaceListScreenContent(
             LazyColumn(
                 state = lazyListState,
                 verticalArrangement = Arrangement.spacedBy(10.dp),
-                contentPadding = PaddingValues(top = 0.dp, bottom = 24.dp)
+                contentPadding = PaddingValues(top = 0.dp, bottom = 24.dp),
             ) {
                 item {
                     QuestionSection(

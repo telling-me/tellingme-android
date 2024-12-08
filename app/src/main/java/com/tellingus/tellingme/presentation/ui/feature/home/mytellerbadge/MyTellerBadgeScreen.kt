@@ -43,9 +43,8 @@ fun MyTellerBadgeScreen(
     navController: NavController, myTellerBadgeViewModel: MyTellerBadgeViewModel = hiltViewModel()
 ) {
     val uiState by myTellerBadgeViewModel.uiState.collectAsStateWithLifecycle()
-    val cheeseBalance = uiState.cheeseBalance
     MainLayout(isScrollable = false,
-        header = { MyTellerBadgeScreenHeader(navController, cheeseBalance = cheeseBalance) },
+        header = { MyTellerBadgeScreenHeader(navController)},
         content = { MyTellerBadgeScreenContent(uiState) })
 }
 
@@ -97,7 +96,7 @@ fun EmptyContent() {
 }
 
 @Composable
-fun MyTellerBadgeScreenHeader(navController: NavController, cheeseBalance: Int = 0) {
+fun MyTellerBadgeScreenHeader(navController: NavController) {
     BasicAppBar(modifier = Modifier
         .background(Background100)
         .height(48.dp)
@@ -108,5 +107,5 @@ fun MyTellerBadgeScreenHeader(navController: NavController, cheeseBalance: Int =
             contentDescription = "tellingme_logo",
             modifier = Modifier.clickable(onClick = { navController.popBackStack() })
         )
-    }, rightSlot = { CheeseBadge(cheeseBalance = cheeseBalance) })
+    })
 }

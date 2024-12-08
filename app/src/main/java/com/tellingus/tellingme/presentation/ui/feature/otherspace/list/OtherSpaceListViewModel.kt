@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.otherspace.list
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.model.home.QuestionData
@@ -62,6 +63,8 @@ class OtherSpaceListViewModel @Inject constructor(
     init {
         val date: String = savedStateHandle[KEY_ID] ?: LocalDate.now()
             .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val TAG: String = "로그"
+        Log.d(TAG, "init date: $date")
         getQuestion(date)
         getCommunicationList(date, page = 0, sort = "최신순")
     }
@@ -78,15 +81,41 @@ class OtherSpaceListViewModel @Inject constructor(
         }
     }
 
+
+    fun getCommunicationListBySort(date: String, page: Int, sort: String) {
+        viewModelScope.launch {
+            getCommunicationListUseCase(date, page = 0, size = 20, sort).onSuccess {
+                val communicationData = it.data
+                val isLastPage =
+                    communicationData.pageable.pageNumber == communicationData.totalPages - 1
+
+                updateState(
+                    currentState.copy(
+                        communicationListData = communicationData,
+                        currentPage = page,
+                        isLastPage = isLastPage
+                    )
+                )
+            }.onFailure { s, i ->
+                // 실패 시 처리 로직 추가 (예: 에러 메시지 처리)
+            }
+        }
+    }
     fun getCommunicationList(date: String, page: Int, sort: String) {
         viewModelScope.launch {
             getCommunicationListUseCase(date, page, size = 20, sort).onSuccess {
                 val communicationData = it.data
                 val isLastPage =
                     communicationData.pageable.pageNumber == communicationData.totalPages - 1
+
+                // 기존 content와 새로 받아온 content 병합
+                val updatedCommunicationListData = currentState.communicationListData.copy(
+                    content = currentState.communicationListData.content + communicationData.content
+                )
+
                 updateState(
                     currentState.copy(
-                        communicationListData = communicationData,
+                        communicationListData = updatedCommunicationListData,
                         currentPage = page,
                         isLastPage = isLastPage
                     )
@@ -105,14 +134,14 @@ class OtherSpaceListViewModel @Inject constructor(
         }
     }
 
-    fun loadMoreDataIfNeeded() {
+    fun loadMoreDataIfNeeded(date: String, sort: String) {
         if (!currentState.isLastPage) {
             // 다음 페이지로 데이터 요청
             val nextPage = currentState.currentPage + 1
             getCommunicationList(
-                date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                date = date,
                 page = nextPage,
-                sort = "최신순"
+                sort = sort
             )
         }
     }
@@ -133,21 +162,21 @@ class OtherSpaceListViewModel @Inject constructor(
         when (event) {
             is OtherSpaceListContract.Event.OnClickRecently -> {
                 updateState(currentState.copy(currentPage = 0, isLastPage = false))
-                getCommunicationList(date = event.date, page = 0, sort = "최신순")
+                getCommunicationListBySort(date = event.date, page = 0, sort = "최신순")
             }
 
             is OtherSpaceListContract.Event.OnClickRelative -> {
                 updateState(currentState.copy(currentPage = 0, isLastPage = false))
-                getCommunicationList(date = event.date, page = 0, sort = "관련순")
+                getCommunicationListBySort(date = event.date, page = 0, sort = "관련순")
             }
 
             is OtherSpaceListContract.Event.OnClickEmpathy -> {
                 updateState(currentState.copy(currentPage = 0, isLastPage = false))
-                getCommunicationList(date = event.date, page = 0, sort = "공감순")
+                getCommunicationListBySort(date = event.date, page = 0, sort = "공감순")
             }
 
             is OtherSpaceListContract.Event.OnClickHeart -> {
-                if (isThrottled()) return // Throttle 적용: 실행 제한
+                if (isThrottled()) return
 
                 postLikes(event.answerId) {
                     val updatedContent = currentState.communicationListData.content.map { item ->

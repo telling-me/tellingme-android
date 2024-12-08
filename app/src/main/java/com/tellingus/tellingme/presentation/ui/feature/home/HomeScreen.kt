@@ -2,7 +2,6 @@ package com.tellingus.tellingme.presentation.ui.feature.home
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
@@ -60,6 +59,7 @@ import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
+import com.tellingus.tellingme.presentation.ui.feature.otherspace.list.OtherSpaceListContract
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
@@ -88,7 +88,7 @@ fun HomeScreen(
         HomeScreenHeader(navController, unreadNoticeStatus = uiState.unreadNoticeStatus)
     }, content = {
         HomeScreenContent(
-            navController = navController, uiState = uiState
+            navController = navController, uiState = uiState, viewModel = viewModel
         )
     })
 
@@ -208,12 +208,11 @@ fun HomeScreenHeader(navController: NavController, unreadNoticeStatus: Boolean) 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreenContent(
-    navController: NavController, uiState: HomeContract.State
+    navController: NavController, uiState: HomeContract.State, viewModel: HomeViewModel
 ) {
     val recordCount = uiState.recordCount
     val todayAnswerCount = uiState.todayAnswerCount
     val communicationList = uiState.communicationList
-    val unreadNoticeStatus = uiState.unreadNoticeStatus
     val questionTitle = uiState.questionTitle
     val questionPhrase = uiState.questionPhrase
     val userNickname = uiState.userNickname
@@ -226,7 +225,7 @@ fun HomeScreenContent(
         Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
 
             ProfileWidget(nickname = userNickname,
-                description = "연속 $recordCount 일째 기록",
+                description = "연속 $recordCount 일째 기록중",
                 modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
 
         }
@@ -258,7 +257,11 @@ fun HomeScreenContent(
         }
 
         Column(modifier = Modifier.padding(start = 20.dp, top = 32.dp)) {
-            Text(text = "나와 비슷한 텔러들의 이야기", style = TellingmeTheme.typography.body1Bold)
+            Text(
+                text = "나와 비슷한 텔러들의 이야기",
+                style = TellingmeTheme.typography.body1Bold,
+                color = Gray600
+            )
 
 
             if (communicationList.isNotEmpty()) {
@@ -276,6 +279,9 @@ fun HomeScreenContent(
                         buttonState = if (item.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
                         description = item.content,
                         emotion = item.emotion,
+                        onClickHeart = {
+                            viewModel.processEvent(HomeContract.Event.OnClickHeart(item.answerId))
+                        }
                     )
                 }
             } else {
