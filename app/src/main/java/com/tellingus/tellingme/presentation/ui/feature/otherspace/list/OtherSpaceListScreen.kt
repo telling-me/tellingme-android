@@ -24,6 +24,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -50,6 +51,10 @@ import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDesti
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Typography
+import com.tellingus.tellingme.util.collectWithLifecycle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -103,6 +108,7 @@ fun OtherSpaceListScreenContent(
     val questionData = uiState.questionData
     var isSelected by remember { mutableStateOf("recently") }
 
+    val scope = rememberCoroutineScope()
 
     val lazyListState = rememberLazyListState()
     // observe list scrolling
@@ -132,9 +138,17 @@ fun OtherSpaceListScreenContent(
         }
     }
 
-    LaunchedEffect(isSelected) {
-        lazyListState.scrollToItem(0)
+    viewModel.effect.collectWithLifecycle {effect ->
+            when(effect) {
+                is OtherSpaceListContract.Effect.ScrollToTop -> {
+                    lazyListState.scrollToItem(0)
+                }
+            }
     }
+
+//    scope.launch {
+//        lazyListState.scrollToItem(0)
+//    }
 
     Box(
         modifier = Modifier
@@ -187,6 +201,7 @@ fun OtherSpaceListScreenContent(
                             selected = isSelected == "recently",
                             text = "최신순",
                             onClick = {
+
                                 isSelected = "recently"
                                 viewModel.processEvent(OtherSpaceListContract.Event.OnClickRecently(date))
                             }

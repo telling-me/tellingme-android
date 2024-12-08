@@ -29,6 +29,6 @@ class OtherSpaceListContract {
     }
 
     sealed class Effect : UiEffect {
-
+        object ScrollToTop : Effect()
     }
 }
