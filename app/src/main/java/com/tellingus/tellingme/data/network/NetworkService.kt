@@ -32,8 +32,10 @@ import com.tellingus.tellingme.data.model.otherspace.PostLikesResponse
 import com.tellingus.tellingme.data.model.otherspace.PostReportRequest
 import com.tellingus.tellingme.data.model.user.GetCheeseResponse
 import com.tellingus.tellingme.data.model.user.GetNotificationResponse
+import com.tellingus.tellingme.data.model.user.PurchaseRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationResponse
+import com.tellingus.tellingme.data.model.user.UsableEmotionResponse
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
@@ -201,8 +203,18 @@ interface NetworkService {
     suspend fun updateNotification(@Body updateNotificationRequest: UpdateNotificationRequest): ApiResult<UpdateNotificationResponse>
 
     // 푸시토큰 업데이트
+    @POST("${END_POINT}/v2/payment")
+    suspend fun purchaseEmotion(
+        @Body purchaseRequest: PurchaseRequest
+    ): ApiResult<BasicResponse>
+
+    // 푸시토큰 업데이트
     @POST("${END_POINT}/user/update/pushToken")
     suspend fun updatePushToken(
         @Body pushTokenRequest: PushTokenRequest
     ): ApiResult<BasicResponse>
+
+    // 사용가능한 감정 반환
+    @GET("${END_POINT}/v2/user/emotion")
+    suspend fun getUsableEmotion(): ApiResult<UsableEmotionResponse>
 }

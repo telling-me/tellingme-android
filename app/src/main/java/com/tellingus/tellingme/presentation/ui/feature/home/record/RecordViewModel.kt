@@ -1,10 +1,14 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.usecase.GetUsableEmotionUseCase
+import com.tellingus.tellingme.domain.usecase.PurchaseEmotionUseCase
 import com.tellingus.tellingme.domain.usecase.WriteAnswerUseCase
+import com.tellingus.tellingme.domain.usecase.user.GetCheeseUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import com.tellingus.tellingme.util.getToday
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,7 +17,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RecordViewModel @Inject constructor(
-    private val writeAnswerUseCase: WriteAnswerUseCase
+    private val writeAnswerUseCase: WriteAnswerUseCase,
+    private val getCheeseUseCase: GetCheeseUseCase,
+    private val getUsableEmotionUseCase: GetUsableEmotionUseCase,
+    private val purchaseEmotionUseCase: PurchaseEmotionUseCase
 ) : BaseViewModel<RecordContract.State, RecordContract.Event, RecordContract.Effect>(
     initialState = RecordContract.State()
 ) {
@@ -24,6 +31,16 @@ class RecordViewModel @Inject constructor(
                 today = getToday()
             )
         )
+
+        viewModelScope.launch {
+            getCheeseUseCase().onSuccess {
+                updateState(currentState.copy(cheeseCount = it.data.cheeseBalance))
+            }
+
+            getUsableEmotionUseCase().onSuccess {
+                updateState(currentState.copy(usableEmotionList = it.data.emotionList))
+            }
+        }
     }
 
     override fun reduceState(event: RecordContract.Event) {
@@ -61,6 +78,27 @@ class RecordViewModel @Inject constructor(
             }
 
             else -> {}
+        }
+    }
+
+    fun purchaseEmotion(index: Int) {
+        Log.d("taag purchaseEmotion", index.toString())
+        var code = ""
+        viewModelScope.launch {
+            when(index) {
+                7 -> code = "EM_EXCITED"
+                8 -> code = "EM_FUN"
+                9 -> code = "EM_RELAXED"
+                10 -> code = "EM_APATHETIC"
+                11 -> code = "EM_LONELY"
+                12 -> code = "EM_COMPLEX"
+            }
+            purchaseEmotionUseCase(code).onSuccess {
+                getUsableEmotionUseCase().onSuccess {
+                    updateState(currentState.copy(usableEmotionList = it.data.emotionList))
+                    postEffect(RecordContract.Effect.ShowToastMessage(text = "감정이 오픈되었어요!", icon = R.drawable.icon_unlock))
+                }
+            }
         }
     }
 

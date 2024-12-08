@@ -64,6 +64,7 @@ import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MySpaceDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background200
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Error400
@@ -400,63 +401,79 @@ fun MySpaceScreen(
                 usePlatformDefaultWidth = false
             )
         ) {
-            HorizontalPager(
+            Box(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .padding(top = 130.dp, bottom = 88.dp),
-                state = pagerState,
-                contentPadding = PaddingValues(horizontal = 25.5.dp),
-                pageSpacing = 14.dp
-            ) { index ->
-                Box(
+                    .fillMaxSize()
+                    .clickable(
+                        onClick = { isShowAnswerListPagerDialog = false },
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    )
+            ) {
+                HorizontalPager(
                     modifier = modifier
-                        .clickable(
-                            onClick = { isShowAnswerListPagerDialog = false},
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        )
-                ) {
-                    Column(
-//                        modifier = modifier
-//                            .padding(top = 130.dp, bottom = 88.dp, start = 25.dp, end = 25.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth()
+                        .padding(top = 130.dp, bottom = 88.dp),
+                    state = pagerState,
+                    contentPadding = PaddingValues(horizontal = 25.5.dp),
+                    pageSpacing = 14.dp
+                ) { index ->
+                    Box(
+                        modifier = modifier
+                            .clickable(
+                                onClick = {
+                                    navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${uiState.answerList[index].answerId}?date=${uiState.answerList[index].date}")
+                                },
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            )
                     ) {
-                        CalendarCardView(
-                            modifier = modifier.weight(1f),
-                            title = uiState.answerList[index].title,
-                            subTitle = uiState.answerList[index].phrase,
-                            emotion = getMediumEmotion(index = uiState.answerList[index].emotion),
-                            emotionDesc = getEmotionText(index = uiState.answerList[index].emotion),
-                            date = LocalDate.of(uiState.answerList[index].date[0], uiState.answerList[index].date[1], uiState.answerList[index].date[2]),
-                            contents = uiState.answerList[index].content,
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        Row(
-                            modifier = modifier
-                                .background(shape = RoundedCornerShape(100.dp), color = Gray500)
-                                .padding(vertical = 16.dp, horizontal = 9.5.dp)
-                                .clickable(
-                                    onClick = {
-                                        isShowShareBottomSheet = true
-                                    },
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ),
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            //                        modifier = modifier
+                            //                            .padding(top = 130.dp, bottom = 88.dp, start = 25.dp, end = 25.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                modifier = modifier.padding(end = 4.dp),
-                                text = "공유하기",
-                                style = TellingmeTheme.typography.body2Bold.copy(
-                                    color = Color.White,
-                                    fontSize = 14.sp
+                            CalendarCardView(
+                                modifier = modifier.weight(1f),
+                                title = uiState.answerList[index].title,
+                                subTitle = uiState.answerList[index].phrase,
+                                emotion = getMediumEmotion(index = uiState.answerList[index].emotion),
+                                emotionDesc = getEmotionText(index = uiState.answerList[index].emotion),
+                                date = LocalDate.of(
+                                    uiState.answerList[index].date[0],
+                                    uiState.answerList[index].date[1],
+                                    uiState.answerList[index].date[2]
+                                ),
+                                contents = uiState.answerList[index].content,
+                            )
+                            Spacer(modifier = Modifier.size(16.dp))
+
+                            Row(
+                                modifier = modifier
+                                    .background(shape = RoundedCornerShape(100.dp), color = Gray500)
+                                    .padding(vertical = 16.dp, horizontal = 9.5.dp)
+                                    .clickable(
+                                        onClick = {
+                                            isShowShareBottomSheet = true
+                                        },
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    modifier = modifier.padding(end = 4.dp),
+                                    text = "공유하기",
+                                    style = TellingmeTheme.typography.body2Bold.copy(
+                                        color = Color.White,
+                                        fontSize = 14.sp
+                                    )
                                 )
-                            )
-                            Image(
-                                imageVector = ImageVector.vectorResource(R.drawable.icon_share),
-                                contentDescription = null
-                            )
+                                Image(
+                                    imageVector = ImageVector.vectorResource(R.drawable.icon_share),
+                                    contentDescription = null
+                                )
+                            }
                         }
                     }
                 }
