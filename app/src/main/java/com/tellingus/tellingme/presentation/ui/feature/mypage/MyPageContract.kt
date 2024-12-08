@@ -36,6 +36,7 @@ class MyPageContract {
 
     sealed class Effect : UiEffect {
         object MoveToLoginScreen : Effect()
+        object CompleteEdit: Effect()
 
         data class DisableNickname(
             val text: String,

@@ -74,6 +74,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.util.collectWithLifecycle
+import com.tellingus.tellingme.util.noRippleClickable
 import java.time.LocalDate
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -385,6 +386,8 @@ fun MySpaceScreen(
         }
     }
 
+    var selectedIndex by remember { mutableStateOf(0) }
+
     if (isShowAnswerListPagerDialog) {
         val pagerState = rememberPagerState(
             initialPage = uiState.initialAnswerPageIndex,
@@ -455,6 +458,7 @@ fun MySpaceScreen(
                                     .clickable(
                                         onClick = {
                                             isShowShareBottomSheet = true
+                                            selectedIndex = pagerState.currentPage
                                         },
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = null
@@ -463,7 +467,7 @@ fun MySpaceScreen(
                             ) {
                                 Text(
                                     modifier = modifier.padding(end = 4.dp),
-                                    text = "공유하기",
+                                    text = "수정/삭제",
                                     style = TellingmeTheme.typography.body2Bold.copy(
                                         color = Color.White,
                                         fontSize = 14.sp
@@ -517,23 +521,21 @@ fun MySpaceScreen(
                 ) {
                     Text(
                         modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                        text = "이미지로 저장하기",
+                        text = "수정하기",
                         style = TellingmeTheme.typography.body2Regular.copy(
                             color = Gray600,
                             fontSize = 14.sp
                         )
                     )
                     Text(
-                        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                        text = "인스타그램 스토리로 공유하기",
-                        style = TellingmeTheme.typography.body2Regular.copy(
-                            color = Gray600,
-                            fontSize = 14.sp
-                        )
-                    )
-                    Text(
-                        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                        text = "다른 방법으로 공유하기",
+                        modifier = modifier
+                            .noRippleClickable {
+                                viewModel.deleteAnswer(uiState.isAnsweredDateList[selectedIndex].toString())
+                                isShowShareBottomSheet = false
+                                isShowAnswerListPagerDialog = false
+                            }
+                            .padding(horizontal = 12.dp, vertical = 16.dp),
+                        text = "삭제하기",
                         style = TellingmeTheme.typography.body2Regular.copy(
                             color = Gray600,
                             fontSize = 14.sp

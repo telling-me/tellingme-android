@@ -4,15 +4,18 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.data.model.home.AnswerRequest
+import com.tellingus.tellingme.data.model.home.UpdateAnswerRequest
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.usecase.GetUsableEmotionUseCase
 import com.tellingus.tellingme.domain.usecase.PurchaseEmotionUseCase
+import com.tellingus.tellingme.domain.usecase.UpdateAnswerUseCase
 import com.tellingus.tellingme.domain.usecase.WriteAnswerUseCase
 import com.tellingus.tellingme.domain.usecase.user.GetCheeseUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import com.tellingus.tellingme.util.getToday
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,7 +23,8 @@ class RecordViewModel @Inject constructor(
     private val writeAnswerUseCase: WriteAnswerUseCase,
     private val getCheeseUseCase: GetCheeseUseCase,
     private val getUsableEmotionUseCase: GetUsableEmotionUseCase,
-    private val purchaseEmotionUseCase: PurchaseEmotionUseCase
+    private val purchaseEmotionUseCase: PurchaseEmotionUseCase,
+    private val updateAnswerUseCase: UpdateAnswerUseCase
 ) : BaseViewModel<RecordContract.State, RecordContract.Event, RecordContract.Effect>(
     initialState = RecordContract.State()
 ) {
@@ -39,6 +43,28 @@ class RecordViewModel @Inject constructor(
 
             getUsableEmotionUseCase().onSuccess {
                 updateState(currentState.copy(usableEmotionList = it.data.emotionList))
+            }
+        }
+    }
+
+    fun updateAnswer(
+        date: String,
+        content: String,
+        isPublic: Boolean
+    ) {
+        viewModelScope.launch {
+            updateAnswerUseCase(UpdateAnswerRequest(date, content, isPublic)).onSuccess {
+//                getAnswerListUseCase()
+//                    .onSuccess {
+//                        updateState(
+//                            currentState.copy(
+//                                answerList = it.data.reversed(),
+//                                isAnsweredDateList = it.data.map {
+//                                    LocalDate.of(it.date[0], it.date[1], it.date[2])
+//                                }.reversed()
+//                            )
+//                        )
+//                    }
             }
         }
     }
@@ -72,7 +98,7 @@ class RecordViewModel @Inject constructor(
                             isSpare = false
                         )
                     ).onSuccess {
-                        updateState(currentState.copy(isCompleteWriteAnswer = true))
+                        postEffect(RecordContract.Effect.CompleteRecord)
                     }
                 }
             }
@@ -94,6 +120,9 @@ class RecordViewModel @Inject constructor(
             }
             purchaseEmotionUseCase(code).onSuccess {
                 getUsableEmotionUseCase().onSuccess {
+                    getCheeseUseCase().onSuccess {
+                        updateState(currentState.copy(cheeseCount = it.data.cheeseBalance))
+                    }
                     updateState(currentState.copy(usableEmotionList = it.data.emotionList))
                     postEffect(RecordContract.Effect.CompletePurchaseEmotion)
                     postEffect(RecordContract.Effect.ShowToastMessage(text = "감정이 오픈되었어요!", icon = R.drawable.icon_unlock))

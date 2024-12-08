@@ -41,6 +41,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
 
 @Composable
 fun CustomDatePicker(
@@ -48,7 +49,7 @@ fun CustomDatePicker(
     startMonth: Int,
     selectedDate: (String, String) -> Unit
 ) {
-    val year = remember { (2000..2025).map { it.toString() } }
+    val year = remember { (2020..LocalDate.now().year).map { it.toString() } }
     val month = remember { (1..12).map { it.toString() } }
     val yearPickerState = rememberPickerState()
     val monthPickerState = rememberPickerState()
@@ -140,7 +141,9 @@ fun Picker(
         snapshotFlow { listState.firstVisibleItemIndex }
             .map { index -> getItem(index + visibleItemsMiddle) }
             .distinctUntilChanged()
-            .collect { item -> state.selectedItem = item }
+            .collect { item ->
+                state.selectedItem = item
+            }
     }
 
     Box {

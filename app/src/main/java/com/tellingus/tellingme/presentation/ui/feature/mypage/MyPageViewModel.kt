@@ -99,7 +99,7 @@ class MyPageViewModel @Inject constructor(
                 updateState(
                     currentState.copy(userInfo = it.data)
                 )
-                Log.d("taag", it.data.toString())
+                dataStoreRepository.setString(NICKNAME, it.data.nickname)
             }
         }
     }
@@ -117,7 +117,6 @@ class MyPageViewModel @Inject constructor(
                 if (it.data) {
                     // 중복 X
                     postEffect(MyPageContract.Effect.DisableNickname(text = "정상"))
-                } else {
                     updateUserInfoUseCase(
                         userRequest = UserRequest(
                             nickname = nickname,
@@ -129,13 +128,9 @@ class MyPageViewModel @Inject constructor(
                             gender = currentState.userInfo.gender
                         )
                     ).onSuccess {
-                        Log.d("taag", it.toString())
+                        postEffect(MyPageContract.Effect.CompleteEdit)
                         getUesrInfo()
-                    }.onFailure { m, c ->
-                        Log.d("taag f", c.toString())
-                    }.onNetworkError {
-                        Log.d("taag", it.message.toString())
-                    }
+                    }.onFailure { m, c -> }
                 }
             }.onFailure { message, i ->
                 if (message.contains("중복된 닉네임입니다.")) {
@@ -151,15 +146,12 @@ class MyPageViewModel @Inject constructor(
                                 gender = currentState.userInfo.gender
                             )
                         ).onSuccess {
-                            Log.d("taag", it.toString())
+                            postEffect(MyPageContract.Effect.CompleteEdit)
                             getUesrInfo()
-                        }.onFailure { m, c ->
-                            Log.d("taag f", c.toString())
-                        }.onNetworkError {
-                            Log.d("taag", it.message.toString())
-                        }
+                        }.onFailure { m, c -> }
+                    } else {
+                        postEffect(MyPageContract.Effect.DisableNickname(text = "중복된 닉네임입니다."))
                     }
-                    postEffect(MyPageContract.Effect.DisableNickname(text = "중복된 닉네임입니다."))
                 }
             }
 

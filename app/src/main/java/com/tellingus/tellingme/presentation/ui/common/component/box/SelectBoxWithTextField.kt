@@ -137,7 +137,7 @@ fun SelectBoxWithTextField(
                                                 interactionSource = remember { MutableInteractionSource() },
                                                 indication = null,
                                                 onClick = {
-                                                    onChangeTextField(contents)
+                                                    onChangeTextField("")
                                                 }
                                             ),
                                         imageVector = ImageVector.vectorResource(id = R.drawable.icon_clear_text),

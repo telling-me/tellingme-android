@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import com.tellingus.tellingme.presentation.ui.theme.Gray300
 import com.tellingus.tellingme.presentation.ui.theme.Gray50
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
+import com.tellingus.tellingme.presentation.ui.theme.Gray700
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import java.time.LocalDate
 
@@ -67,8 +68,8 @@ fun CalendarCardView(
             modifier = Modifier
                 .padding(top = 10.dp),
             text = title,
-            style = TellingmeTheme.typography.body1Regular.copy(
-                color = Gray300,
+            style = TellingmeTheme.typography.body2Bold.copy(
+                color = Gray700,
                 fontSize = 14.sp
             ),
             textAlign = TextAlign.Center
@@ -78,7 +79,7 @@ fun CalendarCardView(
             modifier = Modifier
                 .padding(top = 7.dp),
             text = subTitle,
-            style = TellingmeTheme.typography.body1Regular.copy(
+            style = TellingmeTheme.typography.caption1Regular.copy(
                 color = Gray600,
                 fontSize = 12.sp
             ),
@@ -106,8 +107,8 @@ fun CalendarCardView(
             ) {
                 Text(
                     text = emotionDesc,
-                    style = TellingmeTheme.typography.body1Regular.copy(
-                        color = Gray300,
+                    style = TellingmeTheme.typography.body2Bold.copy(
+                        color = Gray600,
                         fontSize = 14.sp
                     )
                 )
@@ -119,7 +120,7 @@ fun CalendarCardView(
             modifier = Modifier.fillMaxWidth(),
             text = date.toString().replace("-", "."),
             style = TellingmeTheme.typography.body1Regular.copy(
-                color = Gray600,
+                color = Gray300,
                 fontSize = 12.sp
             ),
             textAlign = TextAlign.Start

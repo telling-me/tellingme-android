@@ -7,7 +7,6 @@ import com.tellingus.tellingme.presentation.ui.common.base.UiState
 class RecordContract {
     data class State(
         val selectedEmotion: Int = -1,
-        val isCompleteWriteAnswer: Boolean = false,
         val answer: String = "",
         val today: String = "",
         val isPublic: Boolean = true,
@@ -25,6 +24,7 @@ class RecordContract {
     sealed class Effect : UiEffect {
         object ShowRecordDialog: Effect()
         object CompletePurchaseEmotion: Effect()
+        object CompleteRecord: Effect()
         data class ShowToastMessage(
             val text: String,
             val icon: Int

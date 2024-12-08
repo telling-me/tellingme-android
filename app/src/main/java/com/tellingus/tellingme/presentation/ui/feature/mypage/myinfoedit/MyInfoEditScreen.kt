@@ -156,6 +156,11 @@ fun MyInfoEditScreenContent(
             is MyPageContract.Effect.DisableNickname -> {
                 nicknameErrorState = effect.text
             }
+
+            is MyPageContract.Effect.CompleteEdit -> {
+                navController.popBackStack()
+            }
+
             else -> {}
         }
     }

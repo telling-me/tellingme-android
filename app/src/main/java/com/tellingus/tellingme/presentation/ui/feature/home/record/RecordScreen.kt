@@ -92,7 +92,6 @@ fun RecordScreen(
     val context = LocalContext.current
     var showDialogState by remember { mutableStateOf(false) }
     var showToastMessage by remember { mutableStateOf(Pair(false, "")) }
-    var showTodayQuestionChangeBottomSheet by remember { mutableStateOf(false) }
 
     MainLayout(
         header = {
@@ -157,18 +156,6 @@ fun RecordScreen(
         )
     }
 
-    if (uiState.isCompleteWriteAnswer) {
-        navController.popBackStack()
-    }
-
-//    if (showTodayQuestionChangeBottomSheet) {
-//        TodayQuestionChangeBottomSheet(
-//            onDismiss = { showTodayQuestionChangeBottomSheet = false },
-//            onClickCancel = { showTodayQuestionChangeBottomSheet = false },
-//            onClickConfirm = { showTodayQuestionChangeBottomSheet = false },
-//        )
-//    }
-
     if (showToastMessage.first) {
         TellingmeToast(context).showToast(text = showToastMessage.second, icon = R.drawable.icon_warn)
         showToastMessage = Pair(false, "")
@@ -192,6 +179,10 @@ fun RecordScreen(
 
             }
 
+            is RecordContract.Effect.CompleteRecord -> {
+                navController.popBackStack()
+            }
+
             else -> {}
         }
     }
@@ -208,17 +199,6 @@ fun RecordScreenContent(
     var isEmotionBottomSheetOpen by remember { mutableStateOf(false) }
 
     Box {
-        if (isEmotionBottomSheetOpen) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(end = 20.dp, top = 5.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                CheeseBadge(cheeseBalance = uiState.cheeseCount)
-            }
-        }
-
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -418,23 +398,33 @@ fun EmotionBottomSheet(
                 )
                 .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
         ) {
-            Text(
-                text = "이 글 속 나의 감정을 떠올려 봐요",
-                style = TellingmeTheme.typography.body1Bold.copy(
-                    color = Gray600,
-                ),
-            )
-            Spacer(modifier = modifier.size(4.dp))
-            Text(
-                text = if (selectedEmotion == -1) "듀이 감정티콘을 선택해주세요" else getEmotionText(
-                    selectedEmotion + 1
-                ),
-                style = TellingmeTheme.typography.body2Regular.copy(
-                    color = Gray600
-                ),
-            )
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "이 글 속 나의 감정을 떠올려 봐요",
+                        style = TellingmeTheme.typography.body1Bold.copy(
+                            color = Gray600,
+                        ),
+                    )
+                    Spacer(modifier = modifier.size(4.dp))
+                    Text(
+                        text = if (selectedEmotion == -1) "듀이 감정티콘을 선택해주세요" else getEmotionText(
+                            selectedEmotion + 1
+                        ),
+                        style = TellingmeTheme.typography.body2Regular.copy(
+                            color = Gray600
+                        ),
+                    )
+                }
+                CheeseBadge(cheeseBalance = cheeseCount)
+            }
             Spacer(modifier = modifier.size(16.dp))
-
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(Base0),
@@ -466,7 +456,7 @@ fun EmotionBottomSheet(
                                             if (position < 6) {
                                                 selectedEmotion = position
                                             } else {
-                                                if (position+1 in usableEmotionList) {
+                                                if (position + 1 in usableEmotionList) {
                                                     selectedEmotion = position
                                                 } else {
                                                     purchaseIndex = position + 1
@@ -483,7 +473,7 @@ fun EmotionBottomSheet(
                                 contentDescription = "emotion"
                             )
                             if (position >= 6) {
-                                if (position+1 !in usableEmotionList) {
+                                if (position + 1 !in usableEmotionList) {
                                     Row(
                                         modifier = modifier
                                             .background(
@@ -627,7 +617,8 @@ fun EmotionBottomSheet(
                     text = "치즈가 부족해요!",
                     style = TellingmeTheme.typography.body1Bold.copy(
                         color = Gray600
-                    )
+                    ),
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(
@@ -656,123 +647,4 @@ fun EmotionBottomSheet(
             }
         }
     }
-}
-
-//@Composable
-//fun TodayQuestionChangeBottomSheet(
-//    onDismiss: () -> Unit,
-//    onClickCancel: () -> Unit,
-//    onClickConfirm: () -> Unit,
-//    bottomSheetState: QuestionState = QuestionState.ORIGINAL,
-//    modifier: Modifier = Modifier
-//) {
-//
-//    BottomSheetDialog(
-//        onDismissRequest = onDismiss,
-//        properties = BottomSheetDialogProperties(
-//            navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),  /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
-//            dismissOnClickOutside = false,
-//            behaviorProperties = BottomSheetBehaviorProperties(isDraggable = true)
-//        )
-//    ) {
-//        Column(
-//            modifier = modifier
-//                .background(
-//                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-//                    color = Base0
-//                ),
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            Box(modifier = modifier.padding(vertical = 16.dp)) {
-//                Box(
-//                    modifier = modifier
-//                        .background(
-//                            color = Gray300,
-//                            shape = RoundedCornerShape(100.dp)
-//                        )
-//                        .size(width = 32.dp, height = 4.dp)
-//                )
-//            }
-//            Column(
-//                modifier = modifier
-//                    .fillMaxWidth()
-//                    .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp)
-//            ) {
-//                Text(
-//                    text = "오늘의 질문을 바꿀 수 있어요!",
-//                    style = TellingmeTheme.typography.head3Bold,
-//                    color = Gray600
-//                )
-//                Spacer(modifier = Modifier.size(4.dp))
-//                Text(
-//                    text = "단, 스페셜 질문은 모두의 공간에 공개할 수 없어요.",
-//                    style = TellingmeTheme.typography.body2Regular,
-//                    color = Gray600
-//                )
-//                Spacer(modifier = Modifier.size(12.dp))
-//
-//                Column(
-//                    modifier = modifier
-//                        .fillMaxWidth()
-//                        .background(
-//                            shape = RoundedCornerShape(8.dp),
-//                            color = Background100
-//                        )
-//                        .padding(vertical = 16.dp, horizontal = 12.dp)
-//                ) {
-//                    Box(
-//                        modifier = modifier
-//                            .background(
-//                                shape = RoundedCornerShape(8.dp),
-//                                color = Base0
-//                            )
-//                            .padding(vertical = 6.dp, horizontal = 8.dp),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        Text(
-//                            text = "스페셜 질문",
-//                            style = TellingmeTheme.typography.caption1Bold,
-//                            color = Gray600
-//                        )
-//                    }
-//                    Spacer(modifier = Modifier.size(12.dp))
-//
-//                    Text(
-//                        text = "텔링미를 사용하실 때\n어떤 기분과 생각을 하시나요?",
-//                        style = TellingmeTheme.typography.body1Regular,
-//                        color = Gray700
-//                    )
-//                    Spacer(modifier = Modifier.size(8.dp))
-//                    Text(
-//                        text = "하루 한번 질문에 답변하며 나를 깨닫는 시간",
-//                        style = TellingmeTheme.typography.body2Regular,
-//                        color = Gray500
-//                    )
-//                }
-//                Spacer(modifier = modifier.size(16.dp))
-//
-//                Row {
-//                    PrimaryLightButton(
-//                        modifier = modifier.weight(1f),
-//                        size = ButtonSize.LARGE,
-//                        text = "취소",
-//                        onClick = onClickCancel
-//                    )
-//                    Spacer(modifier = modifier.size(8.dp))
-//                    PrimaryButton(
-//                        modifier = modifier.weight(1f),
-//                        size = ButtonSize.LARGE,
-//                        text = "바꾸기",
-//                        onClick = onClickConfirm
-//                    )
-//                }
-//            }
-//
-//        }
-//
-//    }
-//}
-
-enum class QuestionState {
-    ORIGINAL, NEW
 }

@@ -5,13 +5,16 @@ import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.AnswerResponse
+import com.tellingus.tellingme.data.model.home.DeleteAnswerRequest
 import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
+import com.tellingus.tellingme.data.model.home.NoticeRewardResponse
 import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
 import com.tellingus.tellingme.data.model.home.PatchTellerCardResponse
 import com.tellingus.tellingme.data.model.home.PushTokenRequest
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
+import com.tellingus.tellingme.data.model.home.UpdateAnswerRequest
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.model.myspace.MyPageResponse
 import com.tellingus.tellingme.data.model.notice.LoadNoticeResponse
@@ -87,6 +90,18 @@ interface NetworkService {
     @POST("${END_POINT}/answer")
     suspend fun writeAnswer(
         @Body answerRequest: AnswerRequest
+    ): ApiResult<BasicResponse>
+
+    // 답변 수정 API
+    @PATCH("${END_POINT}/answer/update")
+    suspend fun updateAnswer(
+        @Body updateAnswerRequest: UpdateAnswerRequest
+    ): ApiResult<BasicResponse>
+
+    // 답변 삭제 API
+    @DELETE("${END_POINT}/answer/delete")
+    suspend fun deleteAnswer(
+        @Body deleteAnswerRequest: DeleteAnswerRequest
     ): ApiResult<BasicResponse>
 
     // 알림 조회 API
@@ -218,4 +233,8 @@ interface NetworkService {
     // 사용가능한 감정 반환
     @GET("${END_POINT}/v2/user/emotion")
     suspend fun getUsableEmotion(): ApiResult<UsableEmotionResponse>
+
+    // 보상 알림 조회 API
+    @GET("${END_POINT}/notice/reward")
+    suspend fun getNoticeReward(): ApiResult<NoticeRewardResponse>
 }

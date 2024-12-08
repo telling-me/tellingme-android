@@ -1,12 +1,15 @@
 package com.tellingus.tellingme.presentation.ui.feature.myspace
 
 import androidx.lifecycle.viewModelScope
+import com.tellingus.tellingme.data.model.home.UpdateAnswerRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
+import com.tellingus.tellingme.domain.usecase.DeleteAnswerUseCase
 import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
 import com.tellingus.tellingme.domain.usecase.GetQuestionUseCase
+import com.tellingus.tellingme.domain.usecase.UpdateAnswerUseCase
 import com.tellingus.tellingme.domain.usecase.user.GetCheeseUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +23,8 @@ class MySpaceViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val getAnswerListUseCase: GetAnswerListUseCase,
     private val getQuestionUseCase: GetQuestionUseCase,
+    private val deleteAnswerUseCase: DeleteAnswerUseCase,
+    private val updateAnswerUseCase: UpdateAnswerUseCase
 ): BaseViewModel<MySpaceContract.State, MySpaceContract.Event, MySpaceContract.Effect>(
     initialState = MySpaceContract.State()
 ) {
@@ -56,6 +61,46 @@ class MySpaceViewModel @Inject constructor(
             }
 
 
+        }
+    }
+
+    fun updateAnswer(
+        date: String,
+        content: String,
+        isPublic: Boolean
+    ) {
+        viewModelScope.launch {
+            updateAnswerUseCase(UpdateAnswerRequest(date, content, isPublic)).onSuccess {
+                getAnswerListUseCase()
+                    .onSuccess {
+                        updateState(
+                            currentState.copy(
+                                answerList = it.data.reversed(),
+                                isAnsweredDateList = it.data.map {
+                                    LocalDate.of(it.date[0], it.date[1], it.date[2])
+                                }.reversed()
+                            )
+                        )
+                    }
+            }
+        }
+    }
+
+    fun deleteAnswer(date: String) {
+        viewModelScope.launch {
+            deleteAnswerUseCase(date).onSuccess {
+                getAnswerListUseCase()
+                    .onSuccess {
+                        updateState(
+                            currentState.copy(
+                                answerList = it.data.reversed(),
+                                isAnsweredDateList = it.data.map {
+                                    LocalDate.of(it.date[0], it.date[1], it.date[2])
+                                }.reversed()
+                            )
+                        )
+                    }
+            }
         }
     }
 
