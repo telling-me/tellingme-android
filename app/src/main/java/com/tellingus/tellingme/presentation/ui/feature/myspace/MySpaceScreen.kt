@@ -310,8 +310,6 @@ fun MySpaceScreen(
                 .padding(bottom = 16.dp, end = 20.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
-            Log.d("taag", uiState.todayTitle)
-            Log.d("taag", uiState.todayPhrase)
             FloatingButton {
                 navController.navigate(
                     ("${MySpaceDestinations.RECORD}/${uiState.todayTitle}/${uiState.todayPhrase}")

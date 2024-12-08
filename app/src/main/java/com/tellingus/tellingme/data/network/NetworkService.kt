@@ -7,7 +7,6 @@ import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.AnswerResponse
 import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
-import com.tellingus.tellingme.data.model.home.PushTokenRequest
 import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
 import com.tellingus.tellingme.data.model.home.PatchTellerCardResponse
 import com.tellingus.tellingme.data.model.home.PushTokenRequest

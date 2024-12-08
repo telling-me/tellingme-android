@@ -3,7 +3,7 @@ package com.tellingus.tellingme.data.model.home
 data class QuestionResponse(
     val code: Int,
     val message: String,
-    val data: Question
+    val data: QuestionData
 )
 
 data class QuestionData(
@@ -12,10 +12,7 @@ data class QuestionData(
     val phrase: String = "",
     val spareTitle: String = "",
     val sparePhrase: String = "",
-    val userQuestionType: String = ""
-    val code: Int,
-    val message: String,
-    val data: Question
+    val userQuestionType: String = "",
 )
 
 data class Question(

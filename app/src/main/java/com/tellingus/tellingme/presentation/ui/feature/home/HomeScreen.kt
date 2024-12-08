@@ -38,8 +38,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -49,7 +47,6 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.tellingus.tellingme.R
-import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.card.OpinionCard
 import com.tellingus.tellingme.presentation.ui.common.component.chip.ActionChip
@@ -62,9 +59,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileWi
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
-import com.tellingus.tellingme.presentation.ui.feature.MainActivity
 import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
-import com.tellingus.tellingme.presentation.ui.feature.MainActivity
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
