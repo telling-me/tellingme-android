@@ -2,8 +2,8 @@ package com.tellingus.tellingme.data.model.home
 
 data class QuestionResponse(
     val code: Int,
-    val data: QuestionData,
-    val message: String
+    val message: String,
+    val data: Question
 )
 
 data class QuestionData(

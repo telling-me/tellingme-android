@@ -87,6 +87,21 @@ fun MyPageScreen(
     }, content = {
         MyPageScreenContent(navController, uiState, viewModel = viewModel)
     })
+
+//    viewModel.effect.collectWithLifecycle { effect ->
+//        when(effect) {
+//            is MyPageContract.Effect.MoveToLoginScreen -> {
+//                // 홈화면으로 이동
+//                Log.d("taag", "1")
+//                navController.navigate(AuthDestinations.Login.LOGIN)
+////                navController.navigate(AuthDestinations.Login.LOGIN) {
+////                    popUpTo(AuthDestinations.ROUTE) {
+////                        inclusive = true
+////                    }
+////                }
+//            }
+//        }
+//    }
 }
 
 @Composable

@@ -2,17 +2,23 @@ package com.tellingus.tellingme.presentation.ui.feature.mypage
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.tellingus.tellingme.data.model.oauth.User
+import com.tellingus.tellingme.data.model.oauth.UserRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.model.oauth.User
 import com.tellingus.tellingme.data.model.oauth.UserRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.repository.DataStoreRepository
+import com.tellingus.tellingme.domain.usecase.GetUserInfoUseCase
+import com.tellingus.tellingme.domain.usecase.LogoutUseCase
 import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.usecase.GetUserInfoUseCase
 import com.tellingus.tellingme.domain.usecase.LogoutUseCase
 import com.tellingus.tellingme.domain.usecase.SignOutUseCase
+import com.tellingus.tellingme.domain.usecase.UpdateUserInfoUseCase
 import com.tellingus.tellingme.domain.usecase.mypage.GetMyPageUseCase
 import com.tellingus.tellingme.domain.usecase.user.GetNotificationUseCase
 import com.tellingus.tellingme.domain.usecase.user.UpdateNotificationUseCase
@@ -87,6 +93,11 @@ class MyPageViewModel @Inject constructor(
     private val logoutUseCase: LogoutUseCase,
     private val getUserInfoUseCase: GetUserInfoUseCase,
     private val updateUserInfoUseCase: UpdateUserInfoUseCase
+    private val dataStoreRepository: DataStoreRepository,
+    private val signOutUseCase: SignOutUseCase,
+    private val logoutUseCase: LogoutUseCase,
+    private val getUserInfoUseCase: GetUserInfoUseCase,
+    private val updateUserInfoUseCase: UpdateUserInfoUseCase
 ): BaseViewModel<MyPageContract.State, MyPageContract.Event, MyPageContract.Effect>(initialState = MyPageContract.State()) {
 
     init {
@@ -142,6 +153,16 @@ class MyPageViewModel @Inject constructor(
             }
         }
     }
+
+    fun logout() {
+        viewModelScope.launch {
+            logoutUseCase().onSuccess {
+                dataStoreRepository.deleteAll()
+                postEffect(MyPageContract.Effect.MoveToLoginScreen)
+            }
+        }
+    }
+
 
     fun logout() {
         viewModelScope.launch {
