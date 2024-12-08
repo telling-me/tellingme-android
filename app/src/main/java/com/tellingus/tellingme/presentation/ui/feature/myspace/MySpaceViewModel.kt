@@ -1,28 +1,33 @@
 package com.tellingus.tellingme.presentation.ui.feature.myspace
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
-import com.tellingus.tellingme.domain.repository.MySpaceRepository
 import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
+import com.tellingus.tellingme.domain.usecase.GetQuestionUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class MySpaceViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
-    private val getAnswerListUseCase: GetAnswerListUseCase
+    private val getAnswerListUseCase: GetAnswerListUseCase,
+    private val getQuestionUseCase: GetQuestionUseCase
 ): BaseViewModel<MySpaceContract.State, MySpaceContract.Event, MySpaceContract.Effect>(
     initialState = MySpaceContract.State()
 ) {
 
     init {
+        val today: LocalDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formattedDate = today.format(formatter)
+
         viewModelScope.launch {
             getAnswerListUseCase()
                 .onSuccess {
@@ -37,6 +42,17 @@ class MySpaceViewModel @Inject constructor(
                 }
                 .onFailure { s, i -> }
                 .onNetworkError {}
+
+            getQuestionUseCase(
+                today = formattedDate
+            ).onSuccess {
+                updateState(
+                    currentState.copy(
+                        todayTitle = it.data.title,
+                        todayPhrase = it.data.phrase
+                    )
+                )
+            }
         }
     }
 

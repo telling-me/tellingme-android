@@ -20,6 +20,8 @@ class HomeContract {
         val userNickname: String = "",
         val userLevel: Int = 0,
         val userExp: Int = 0,
+
+        val denyPushNoti: Boolean = true,
         val requiredExp: Int = 0,
         val daysToLevelUp: Int = 0,
     ) : UiState

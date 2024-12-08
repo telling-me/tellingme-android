@@ -20,10 +20,13 @@ interface DataStoreRepository {
     suspend fun getAccessToken(): Flow<String>
     suspend fun getRefreshToken(): Flow<String>
 
+    suspend fun deleteAll()
+
     suspend fun deleteTokens()
 }
 
 object DataStoreKey {
     const val SOCIAL_ID = "socialId"
+    const val DENY_PUSH_NOTI = "denyPushNoti"
 
 }

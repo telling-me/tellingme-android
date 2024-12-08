@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.mypage.setting
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,11 +23,17 @@ import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppB
 import com.tellingus.tellingme.presentation.ui.common.component.button.TellingmeIconButton
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
+import com.tellingus.tellingme.presentation.ui.common.navigation.AuthDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.MySpaceDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
+import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageContract
 import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Typography
+import com.tellingus.tellingme.util.collectWithLifecycle
 
 @Composable
 fun SettingScreen(navController: NavController, viewModel: MyPageViewModel = hiltViewModel()) {
@@ -40,7 +47,7 @@ fun SettingScreen(navController: NavController, viewModel: MyPageViewModel = hil
                     hasArrow = true,
                     onClick = { navController.navigate(MyPageDestinations.MY_INFO_EDIT) })
                 RowItem(text = "로그아웃", hasArrow = false, onClick = {
-                    viewModel.signOutUser()
+                    viewModel.logout()
                 })
                 RowItem(text = "탈퇴하기", hasArrow = true, onClick = {
                     navController.navigate(MyPageDestinations.WITH_DRAW)
@@ -50,6 +57,19 @@ fun SettingScreen(navController: NavController, viewModel: MyPageViewModel = hil
         isScrollable = false,
         background = Color.White
     )
+
+    viewModel.effect.collectWithLifecycle { effect ->
+        when(effect) {
+            is MyPageContract.Effect.MoveToLoginScreen -> {
+                // 홈화면으로 이동
+                navController.navigate(AuthDestinations.Login.LOGIN) {
+                    popUpTo(0) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
 }
 
 @Composable

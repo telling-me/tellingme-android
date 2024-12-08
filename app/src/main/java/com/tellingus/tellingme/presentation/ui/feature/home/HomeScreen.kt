@@ -1,5 +1,13 @@
 package com.tellingus.tellingme.presentation.ui.feature.home
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.Settings
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,11 +42,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.tellingus.tellingme.R
-import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.card.OpinionCard
 import com.tellingus.tellingme.presentation.ui.common.component.chip.ActionChip
+import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushAlertDialog
+import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushDenyDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.section.QuestionSection
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
@@ -53,13 +69,20 @@ import com.tellingus.tellingme.presentation.ui.theme.Typography
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController, viewModel: HomeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
+    val permissionState = rememberPermissionState(
+        Manifest.permission.POST_NOTIFICATIONS
+    )
 
+    var isShowPushDenyDialog by remember { mutableStateOf(false) }
+    var isShowPushAlertDialog by remember { mutableStateOf(false) }
 
     MainLayout(header = {
         HomeScreenHeader(navController, unreadNoticeStatus = uiState.unreadNoticeStatus)
@@ -68,6 +91,77 @@ fun HomeScreen(
             navController = navController, uiState = uiState
         )
     })
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            if (permissionState.status.shouldShowRationale) {
+                // 이전에 거부한 경우가 있는 경우 == 영구거부
+                Log.d("taag", "shouldShowRationale")
+                if (uiState.denyPushNoti) {
+                    isShowPushAlertDialog = true
+                }
+                viewModel.denyPushNoti(true)
+            } else {
+                // 최초 거부
+                Log.d("taag", "!shouldShowRationale")
+                isShowPushDenyDialog = true
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (!permissionState.status.isGranted) {
+            if (uiState.denyPushNoti) {
+                isShowPushAlertDialog = true
+            } else {
+                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    if (isShowPushDenyDialog) {
+        PushDenyDialog(
+            onClickPositive = {
+                isShowPushDenyDialog = false
+                if (uiState.denyPushNoti) {
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            },
+            onClickNegative = {
+                isShowPushDenyDialog = false
+            }
+        )
+    }
+
+    if (isShowPushAlertDialog) {
+        PushAlertDialog(
+            onClickPositive = {
+                isShowPushAlertDialog = false
+                if (uiState.denyPushNoti) {
+                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+                    }
+                    context.startActivity(intent)
+                } else {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    }
+                }
+            },
+            onClickNegative = {
+                isShowPushAlertDialog = false
+            }
+        )
+    }
 
 }
 

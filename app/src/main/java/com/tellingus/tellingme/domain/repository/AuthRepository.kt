@@ -1,6 +1,8 @@
 package com.tellingus.tellingme.domain.repository
 
 import com.tellingus.tellingme.data.model.common.BasicResponse
+import com.tellingus.tellingme.data.model.oauth.UserRequest
+import com.tellingus.tellingme.data.model.oauth.UserResponse
 import com.tellingus.tellingme.data.model.oauth.login.OauthRequest
 import com.tellingus.tellingme.data.model.oauth.login.TokenResponse
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpRequest
@@ -16,6 +18,11 @@ interface AuthRepository {
         oauthRequest: OauthRequest
     ): ApiResult<TokenResponse>
 
+    suspend fun logout(): ApiResult<BasicResponse>
+
+    suspend fun getUserInfo(): ApiResult<UserResponse>
+    suspend fun updateUserInfo(userRequest: UserRequest): ApiResult<BasicResponse>
+
     suspend fun verifyNickname(
         nickname: String
     ): ApiResult<NicknameResponse>
@@ -30,4 +37,5 @@ interface AuthRepository {
     ): ApiResult<TokenResponse>
 
     suspend fun signOutUser(): ApiResult<BasicResponse>
+    suspend fun updatePushToken(pushToken: String): ApiResult<BasicResponse>
 }

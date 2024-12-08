@@ -41,7 +41,8 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun writeAnswer(answer: AnswerRequest): ApiResult<BasicResponse> {
-        TODO("Not yet implemented")
+        return networkService.writeAnswer(answer)
     }
+
 
 }
