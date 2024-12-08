@@ -134,11 +134,14 @@ fun TellingMeBottomNavigationBar(
                 selected = currentDestination?.hierarchy?.any { it.route == navigationItem.route } == true,
                 selectedContentColor = Primary400,
                 onClick = {
-                    navController.navigate(navigationItem.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true    // 최상위 아이템은 백스택에 쌓지 않기
+                    if (navController.currentDestination?.route != navigationItem.route) {
+                        navController.navigate(navigationItem.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true    // 최상위 아이템은 백스택에 쌓지 않기
+                            }
+                            launchSingleTop = true
+                            restoreState = true    // 이전 아이템 클릭 시 상태 복원
                         }
-                        restoreState = true    // 이전 아이템 클릭 시 상태 복원
                     }
                 }
             )

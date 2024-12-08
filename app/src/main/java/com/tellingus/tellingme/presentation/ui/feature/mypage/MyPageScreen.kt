@@ -230,7 +230,7 @@ fun MyPageScreenContent(
 
                     )
                 Text(
-                    text = uiState.nickname,
+                    text = uiState.userInfo.nickname,
                     modifier = Modifier.padding(top = 4.dp),
                     style = TellingmeTheme.typography.head3Bold
                 )
