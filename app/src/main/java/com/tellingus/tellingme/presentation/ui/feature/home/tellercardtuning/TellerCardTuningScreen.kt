@@ -96,11 +96,12 @@ fun TellerCardTuningScreen(
         TellerCardTuningScreenHeader(
             navController = navController, cheeseBalance
         )
-    }, content = { TellerCardTuningScreenContent(uiState, viewModel = viewModel) })
+    }, content = { TellerCardTuningScreenContent(navController= navController, uiState, viewModel = viewModel) })
 }
 
 @Composable
 fun TellerCardTuningScreenContent(
+    navController: NavController,
     uiState: TellerCardTuningContract.State,
     viewModel: TellerCardTuningViewModel
 ) {
@@ -197,6 +198,7 @@ fun TellerCardTuningScreenContent(
                             badgeCode = selectedBadgeCode
                         )
                     )
+                    navController.popBackStack()
                 }
             )
         }

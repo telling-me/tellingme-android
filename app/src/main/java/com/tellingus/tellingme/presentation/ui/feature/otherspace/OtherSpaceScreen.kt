@@ -27,6 +27,8 @@ import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayou
 import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun OtherSpaceScreen(
@@ -79,10 +81,11 @@ fun OtherSpaceScreenContent(navController: NavController, uiState: OtherSpaceCon
             ) {
                 items(items = communications) {
                     val date = "${it.date[0]}-${it.date[1]}-${it.date[2]}";
+                    val parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-M-d")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                     CommunityCard(
-                        id = date,
+                        id = parsedDate,
                         title = it.title,
-                        date = date,
+                        date = parsedDate,
                         commentCount = it.answerCount,
                         onClickCard = { id ->
                             navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${id}")
