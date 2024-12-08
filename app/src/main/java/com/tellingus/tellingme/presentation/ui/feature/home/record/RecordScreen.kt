@@ -588,6 +588,8 @@ fun EmotionBottomSheet(
                         onClick = {
                             if (cheeseCount >= 33) {
                                 viewModel.purchaseEmotion(purchaseIndex)
+                                showBuyEmotionDialog = false
+
                             } else {
                                 showBuyEmotionDialog = true
                             }
@@ -652,17 +654,6 @@ fun EmotionBottomSheet(
                     )
                 }
             }
-        }
-    }
-
-    viewModel.effect.collectWithLifecycle { effect ->
-        when(effect) {
-            is RecordContract.Effect.CompletePurchaseEmotion -> {
-                Log.d("taag", "콜렉트")
-                showBuyEmotionDialog = false
-            }
-
-            else -> {}
         }
     }
 }

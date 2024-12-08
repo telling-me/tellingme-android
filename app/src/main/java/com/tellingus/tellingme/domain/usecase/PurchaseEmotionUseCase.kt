@@ -3,6 +3,7 @@ package com.tellingus.tellingme.domain.usecase
 import com.tellingus.tellingme.data.model.common.BasicResponse
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameResponse
+import com.tellingus.tellingme.data.model.user.PurchaseResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.AuthRepository
 import com.tellingus.tellingme.domain.repository.HomeRepository
@@ -15,7 +16,7 @@ class PurchaseEmotionUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(
         code: String
-    ) : ApiResult<BasicResponse> {
+    ) : ApiResult<PurchaseResponse> {
         return authRepository.purchaseEmotion(code)
     }
 }

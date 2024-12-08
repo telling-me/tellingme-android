@@ -33,6 +33,7 @@ import com.tellingus.tellingme.data.model.otherspace.PostReportRequest
 import com.tellingus.tellingme.data.model.user.GetCheeseResponse
 import com.tellingus.tellingme.data.model.user.GetNotificationResponse
 import com.tellingus.tellingme.data.model.user.PurchaseRequest
+import com.tellingus.tellingme.data.model.user.PurchaseResponse
 import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationResponse
 import com.tellingus.tellingme.data.model.user.UsableEmotionResponse
@@ -206,7 +207,7 @@ interface NetworkService {
     @POST("${END_POINT}/v2/payment")
     suspend fun purchaseEmotion(
         @Body purchaseRequest: PurchaseRequest
-    ): ApiResult<BasicResponse>
+    ): ApiResult<PurchaseResponse>
 
     // 푸시토큰 업데이트
     @POST("${END_POINT}/user/update/pushToken")

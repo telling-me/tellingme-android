@@ -12,6 +12,7 @@ import com.tellingus.tellingme.data.model.oauth.signup.NicknameRequest
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameResponse
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpResponse
 import com.tellingus.tellingme.data.model.user.PurchaseRequest
+import com.tellingus.tellingme.data.model.user.PurchaseResponse
 import com.tellingus.tellingme.data.model.user.UsableEmotionResponse
 import com.tellingus.tellingme.data.network.NetworkService
 import com.tellingus.tellingme.data.network.adapter.ApiResult
@@ -74,7 +75,7 @@ class AuthRepositoryImpl @Inject constructor(
         return service.getUsableEmotion()
     }
 
-    override suspend fun purchaseEmotion(code: String): ApiResult<BasicResponse> {
+    override suspend fun purchaseEmotion(code: String): ApiResult<PurchaseResponse> {
         return service.purchaseEmotion(PurchaseRequest(code))
     }
 

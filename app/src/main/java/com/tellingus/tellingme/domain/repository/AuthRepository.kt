@@ -8,6 +8,7 @@ import com.tellingus.tellingme.data.model.oauth.login.TokenResponse
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpRequest
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameResponse
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpResponse
+import com.tellingus.tellingme.data.model.user.PurchaseResponse
 import com.tellingus.tellingme.data.model.user.UsableEmotionResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 
@@ -40,5 +41,5 @@ interface AuthRepository {
     suspend fun signOutUser(): ApiResult<BasicResponse>
     suspend fun updatePushToken(pushToken: String): ApiResult<BasicResponse>
     suspend fun getUsableEmotion(): ApiResult<UsableEmotionResponse>
-    suspend fun purchaseEmotion(code: String): ApiResult<BasicResponse>
+    suspend fun purchaseEmotion(code: String): ApiResult<PurchaseResponse>
 }

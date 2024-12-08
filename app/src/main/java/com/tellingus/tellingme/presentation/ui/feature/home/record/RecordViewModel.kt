@@ -93,9 +93,7 @@ class RecordViewModel @Inject constructor(
                 12 -> code = "PD_EM_COMPLEX"
             }
             purchaseEmotionUseCase(code).onSuccess {
-                Log.d("taag", "purchaseEmotionUseCase")
                 getUsableEmotionUseCase().onSuccess {
-                    Log.d("taag", "getUsableEmotionUseCase")
                     updateState(currentState.copy(usableEmotionList = it.data.emotionList))
                     postEffect(RecordContract.Effect.CompletePurchaseEmotion)
                     postEffect(RecordContract.Effect.ShowToastMessage(text = "감정이 오픈되었어요!", icon = R.drawable.icon_unlock))
