@@ -132,6 +132,10 @@ fun OtherSpaceListScreenContent(
         }
     }
 
+    LaunchedEffect(isSelected) {
+        lazyListState.scrollToItem(0)
+    }
+
     Box(
         modifier = Modifier
             .padding(start = 20.dp, end = 20.dp, top = 0.dp)
