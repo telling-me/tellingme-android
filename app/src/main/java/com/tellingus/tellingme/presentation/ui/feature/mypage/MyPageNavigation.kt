@@ -44,7 +44,10 @@ fun NavGraphBuilder.myPageGraph(
             )
         }
         composable(route = MyPageDestinations.WITH_DRAW) {
-            WithDrawScreen(navController = navController)
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry(MyPageDestinations.MY_PAGE)
+            }
+            WithDrawScreen(navController = navController, hiltViewModel(parentEntry))
         }
         composable(route = MyPageDestinations.ABOUT_TELLING_ME) {
             AboutTellingMe(navController = navController)

@@ -25,7 +25,7 @@ interface AuthRepository {
 
     suspend fun verifyNickname(
         nickname: String
-    ): ApiResult<NicknameResponse>
+    ): ApiResult<BasicResponse>
 
     suspend fun signUpUser(
         signupRequest: SignUpRequest

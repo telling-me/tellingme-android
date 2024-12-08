@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
@@ -35,23 +36,31 @@ import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowDoubl
 import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowSingleButtonDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
+import com.tellingus.tellingme.presentation.ui.common.navigation.AuthDestinations
 import com.tellingus.tellingme.presentation.ui.feature.auth.signup.SignupContract
+import com.tellingus.tellingme.presentation.ui.feature.mypage.MyPageViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Error600
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 
 @Composable
-fun WithDrawScreen(navController: NavController) {
+fun WithDrawScreen(
+    navController: NavController,
+    viewModel: MyPageViewModel = hiltViewModel()
+) {
     MainLayout(
         header = { WithDrawScreenHeader { navController.popBackStack() } },
-        content = { WithDrawScreenContent() },
+        content = { WithDrawScreenContent(navController, viewModel) },
         isScrollable = false,
     )
 }
 
 @Composable
-fun WithDrawScreenContent() {
+fun WithDrawScreenContent(
+    navController: NavController,
+    viewModel: MyPageViewModel
+) {
     var isChecked by remember {
         mutableStateOf(false)
     }
@@ -181,7 +190,11 @@ fun WithDrawScreenContent() {
                     text = "네, 안녕히",
                     onClick = {
                         showByeDialogState = false
-                        Toast.makeText(context, "완료 후 홈으로 이동", Toast.LENGTH_SHORT).show()
+                        navController.navigate(AuthDestinations.Login.LOGIN) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
                     }
 
                 )
@@ -201,7 +214,6 @@ fun WithDrawScreenContent() {
                     text = "아니요",
                     onClick = {
                         showConfirmDialogState = false
-
                     }
                 )
             },
@@ -214,6 +226,7 @@ fun WithDrawScreenContent() {
 //                    Toast.makeText(context, "완료 후 홈으로 이동", Toast.LENGTH_SHORT).show()
                         showConfirmDialogState = false
                         showByeDialogState = true
+                        viewModel.signOutUser()
                     }
                 )
             }
