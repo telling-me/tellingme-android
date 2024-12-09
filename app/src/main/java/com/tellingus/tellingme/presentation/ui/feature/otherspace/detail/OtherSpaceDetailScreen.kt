@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -94,42 +95,42 @@ fun OtherSpaceDetailScreen(
                     isComplaintBottomSheetOpen = true
                 })
         })
-    }, content = {
-        OtherSpaceDetailScreenContent(uiState, viewModel)
-        if (isComplaintBottomSheetOpen) {
-            ComplaintBottomSheet(onDismiss = { isComplaintBottomSheetOpen = false },
-                onClick = { isComplainReasonBottomSheetOpen = true })
-        }
-        if (isComplainReasonBottomSheetOpen) {
-            ComplainReasonBottomSheet(onDismiss = {
-                isComplaintBottomSheetOpen = false
-                isComplainReasonBottomSheetOpen = false
-            }, onConfirm = {
-                isComplaintBottomSheetOpen = false
-                selectedComplainReason = it
-                isComplainConfirmModalOpen = true
-            })
-        }
-        if (isComplainConfirmModalOpen) {
-            ShowSingleButtonDialog(title = "신고가 접수되었습니다.", contents = "", completeButton = {
-                PrimaryButton(modifier = Modifier.fillMaxWidth(),
-                    size = ButtonSize.LARGE,
-                    text = "확인",
-                    onClick = {
-                        answerId?.let {
-                            OtherSpaceDetailContract.Event.OnClickReport(
-                                answerId = it, reason = selectedComplainReason.toInt()
-                            )
-                        }?.let {
-                            viewModel.processEvent(
-                                it
-                            )
-                        }
-                        isComplainConfirmModalOpen = false
-                    })
-            })
-        }
-    })
+    }, content = { OtherSpaceDetailScreenContent(uiState, viewModel) })
+
+
+    if (isComplaintBottomSheetOpen) {
+        ComplaintBottomSheet(onDismiss = { isComplaintBottomSheetOpen = false },
+            onClick = { isComplainReasonBottomSheetOpen = true })
+    }
+    if (isComplainReasonBottomSheetOpen) {
+        ComplainReasonBottomSheet(onDismiss = {
+            isComplaintBottomSheetOpen = false
+            isComplainReasonBottomSheetOpen = false
+        }, onConfirm = {
+            isComplaintBottomSheetOpen = false
+            selectedComplainReason = it
+            isComplainConfirmModalOpen = true
+        })
+    }
+    if (isComplainConfirmModalOpen) {
+        ShowSingleButtonDialog(title = "신고가 접수되었습니다.", contents = "", completeButton = {
+            PrimaryButton(modifier = Modifier.fillMaxWidth(),
+                size = ButtonSize.LARGE,
+                text = "확인",
+                onClick = {
+                    answerId?.let {
+                        OtherSpaceDetailContract.Event.OnClickReport(
+                            answerId = it, reason = selectedComplainReason.toInt()
+                        )
+                    }?.let {
+                        viewModel.processEvent(
+                            it
+                        )
+                    }
+                    isComplainConfirmModalOpen = false
+                })
+        })
+    }
 }
 
 
@@ -205,7 +206,7 @@ fun ComplaintBottomSheet(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
         onDismissRequest = { onDismiss }, properties = BottomSheetDialogProperties(
             navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),
             /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
-            dismissOnClickOutside = false,
+            dismissOnClickOutside = true,
             behaviorProperties = BottomSheetBehaviorProperties(isDraggable = true)
         )
     ) {
@@ -252,7 +253,8 @@ fun OtherSpaceDetailScreenContent(
             isButtonVisible = false,
             bgColor = Background100
         )
-        OpinionCard(heartCount = answerData.likeCount,
+        OpinionCard(modifier = Modifier.heightIn(min = 774.dp),
+            heartCount = answerData.likeCount,
             buttonState = if (answerData.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
             emotion = answerData.emotion,
             description = answerData.content,
