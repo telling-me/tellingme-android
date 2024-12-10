@@ -3,9 +3,13 @@ package com.tellingus.tellingme.presentation.ui.feature.home.record
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.data.model.home.Answer
 import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.UpdateAnswerRequest
+import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.usecase.GetAnswerByDateUseCase
+import com.tellingus.tellingme.domain.usecase.GetQuestionUseCase
 import com.tellingus.tellingme.domain.usecase.GetUsableEmotionUseCase
 import com.tellingus.tellingme.domain.usecase.PurchaseEmotionUseCase
 import com.tellingus.tellingme.domain.usecase.UpdateAnswerUseCase
@@ -24,7 +28,9 @@ class RecordViewModel @Inject constructor(
     private val getCheeseUseCase: GetCheeseUseCase,
     private val getUsableEmotionUseCase: GetUsableEmotionUseCase,
     private val purchaseEmotionUseCase: PurchaseEmotionUseCase,
-    private val updateAnswerUseCase: UpdateAnswerUseCase
+    private val updateAnswerUseCase: UpdateAnswerUseCase,
+    private val getAnswerByDateUseCase: GetAnswerByDateUseCase,
+    private val getQuestionUseCase: GetQuestionUseCase,
 ) : BaseViewModel<RecordContract.State, RecordContract.Event, RecordContract.Effect>(
     initialState = RecordContract.State()
 ) {
@@ -43,6 +49,36 @@ class RecordViewModel @Inject constructor(
 
             getUsableEmotionUseCase().onSuccess {
                 updateState(currentState.copy(usableEmotionList = it.data.emotionList))
+            }
+        }
+    }
+
+    fun getQuestion(date: String) {
+        viewModelScope.launch {
+            getQuestionUseCase(date).onSuccess {
+                updateState(currentState.copy(questionResponse = it.data))
+                getAnswer(date)
+            }
+        }
+    }
+
+    fun getAnswer(date: String) {
+        viewModelScope.launch {
+            getAnswerByDateUseCase(date).onSuccess {
+                // 이미 답변을 작성한 경우 -> 수정
+                updateState(
+                    currentState.copy(
+                        answerResponse = it.data,
+                        isAnswered = true,
+                        selectedEmotion = it.data.emotion - 1,
+                        answer = it.data.content,
+                        isPublic = it.data.isPublic
+                    )
+                )
+            }.onFailure { message, code ->
+                if (message.contains("해당 답변을 찾을 수 없습니다.")) {
+
+                }
             }
         }
     }
@@ -99,6 +135,18 @@ class RecordViewModel @Inject constructor(
                         )
                     ).onSuccess {
                         postEffect(RecordContract.Effect.CompleteRecord)
+                    }.onFailure { s, i ->
+                        if (s.contains("이미 답변을 작성하였습니다.")) {
+                            updateAnswerUseCase(
+                                UpdateAnswerRequest(
+                                    content = currentState.answer,
+                                    date = currentState.today.replace(".", "-"),
+                                    isPublic = currentState.isPublic
+                                )
+                            ).onSuccess {
+                                postEffect(RecordContract.Effect.CompleteUpdate)
+                            }
+                        }
                     }
                 }
             }

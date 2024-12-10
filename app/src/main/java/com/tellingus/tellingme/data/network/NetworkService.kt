@@ -45,6 +45,7 @@ import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -99,7 +100,7 @@ interface NetworkService {
     ): ApiResult<BasicResponse>
 
     // 답변 삭제 API
-    @DELETE("${END_POINT}/answer/delete")
+    @HTTP(method = "DELETE", path = "${END_POINT}/answer/delete", hasBody = true)
     suspend fun deleteAnswer(
         @Body deleteAnswerRequest: DeleteAnswerRequest
     ): ApiResult<BasicResponse>
@@ -187,6 +188,12 @@ interface NetworkService {
     suspend fun getAnswerById(
         @Query("answerId") answerId: Int,
     ): ApiResult<GetAnswerByIdResponse>
+
+    // 날짜로 답변 조회 API
+    @GET("${END_POINT}/answer/date")
+    suspend fun getAnswerByDate(
+        @Query("date") date: String,
+    ): ApiResult<AnswerResponse>
 
     // 신고 등록, reason : 1~6
     @POST("${END_POINT}/report")

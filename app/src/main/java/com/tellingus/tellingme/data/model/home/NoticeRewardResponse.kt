@@ -3,7 +3,7 @@ package com.tellingus.tellingme.data.model.home
 data class NoticeRewardResponse(
     val code: Int,
     val message: String,
-    val data: NoticeReward
+    val data: List<NoticeReward>
 )
 
 data class NoticeReward(
@@ -11,7 +11,7 @@ data class NoticeReward(
     val title: String,
     val content: String,
     val isRead: Boolean,
-    val createdAt: String,
+    val createdAt: List<Int>,
     val link: String,
     val isInternal: Boolean,
     val answerId: Int,

@@ -2,6 +2,7 @@ package com.tellingus.tellingme.data.repositoryimpl
 
 import com.tellingus.tellingme.data.model.common.BasicResponse
 import com.tellingus.tellingme.data.model.home.AnswerRequest
+import com.tellingus.tellingme.data.model.home.AnswerResponse
 import com.tellingus.tellingme.data.model.home.DeleteAnswerRequest
 import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.HomeResponse
@@ -29,6 +30,10 @@ class HomeRepositoryImpl @Inject constructor(
 
     override suspend fun getQuestion(today: String): ApiResult<QuestionResponse> {
         return networkService.getQuestion(date = today)
+    }
+
+    override suspend fun getAnswerByDate(date: String): ApiResult<AnswerResponse> {
+        return networkService.getAnswerByDate(date)
     }
 
     override suspend fun getMain(req: HomeRequest): ApiResult<HomeResponse> {

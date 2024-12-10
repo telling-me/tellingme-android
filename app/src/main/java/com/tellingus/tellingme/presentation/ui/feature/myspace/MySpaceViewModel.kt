@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.myspace
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.model.home.UpdateAnswerRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
@@ -49,16 +50,6 @@ class MySpaceViewModel @Inject constructor(
                 .onFailure { s, i -> }
                 .onNetworkError {}
 
-            getQuestionUseCase(
-                today = formattedDate
-            ).onSuccess {
-                updateState(
-                    currentState.copy(
-                        todayTitle = it.data.title,
-                        todayPhrase = it.data.phrase
-                    )
-                )
-            }
 
 
         }
@@ -89,17 +80,27 @@ class MySpaceViewModel @Inject constructor(
     fun deleteAnswer(date: String) {
         viewModelScope.launch {
             deleteAnswerUseCase(date).onSuccess {
-                getAnswerListUseCase()
-                    .onSuccess {
-                        updateState(
-                            currentState.copy(
-                                answerList = it.data.reversed(),
-                                isAnsweredDateList = it.data.map {
-                                    LocalDate.of(it.date[0], it.date[1], it.date[2])
-                                }.reversed()
-                            )
+                Log.d("taag", "1")
+                getAnswerListUseCase().onSuccess {
+                    Log.d("taag", "2")
+                    updateState(
+                        currentState.copy(
+                            answerList = it.data.reversed(),
+                            isAnsweredDateList = it.data.map {
+                                LocalDate.of(it.date[0], it.date[1], it.date[2])
+                            }.reversed()
                         )
-                    }
+                    )
+                    Log.d("taag", it.data.toString())
+                }.onFailure { s, i ->
+                    Log.d("taag", s)
+                }.onNetworkError {
+                    Log.d("taag", "네트웤 에러")
+                }
+            }.onFailure {s, i ->
+                Log.d("taag", s)
+            }.onNetworkError {
+                Log.d("taag", it.message.toString())
             }
         }
     }

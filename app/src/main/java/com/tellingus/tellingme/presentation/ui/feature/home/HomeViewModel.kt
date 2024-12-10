@@ -8,6 +8,7 @@ import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.NoticeRewardResponse
 import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
+import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.data.repositoryimpl.HomeRepositoryImpl
 import com.tellingus.tellingme.domain.repository.DataStoreKey
@@ -78,6 +79,19 @@ class HomeViewModel @Inject constructor(
             postLikesUseCase(PostLikesRequest((answerId))).onSuccess {
                 onSuccess()
             }.onFailure { s, i -> }
+        }
+    }
+
+    fun getNoticeReward() {
+        viewModelScope.launch {
+            getNoticeRewardUseCase().onSuccess {
+                Log.d("taag getNoticeReward", it.data[0].content)
+                postEffect(HomeContract.Effect.ShowToastMessage(it.data[0].content))
+            }.onFailure { s, i ->
+                Log.d("taag getNoticeReward", s)
+            }.onNetworkError {
+                Log.d("taag getNoticeReward", it.message.toString())
+            }
         }
     }
 

@@ -76,6 +76,7 @@ import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.util.collectWithLifecycle
 import com.tellingus.tellingme.util.noRippleClickable
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("NewApi")
@@ -312,11 +313,16 @@ fun MySpaceScreen(
                 .padding(bottom = 16.dp, end = 20.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
-            FloatingButton {
-                navController.navigate(
-                    ("${MySpaceDestinations.RECORD}/${uiState.todayTitle}/${uiState.todayPhrase}")
-                )
-            }
+            FloatingButton(
+                onClick = {
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val formattedDate = LocalDate.now().format(formatter)
+                    navController.navigate(
+                        "${MySpaceDestinations.RECORD}/${formattedDate}"
+                    )
+                }
+            )
+
         }
     }
 
@@ -520,7 +526,15 @@ fun MySpaceScreen(
                         .padding(top = 4.dp, start = 4.dp, end = 4.dp, bottom = 8.dp)
                 ) {
                     Text(
-                        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .noRippleClickable {
+                                val date = uiState.isAnsweredDateList[selectedIndex].toString()
+                                navController.navigate(
+                                    ("${HomeDestinations.RECORD}/${date}")
+                                )
+                            }
+                            .padding(horizontal = 12.dp, vertical = 16.dp),
                         text = "수정하기",
                         style = TellingmeTheme.typography.body2Regular.copy(
                             color = Gray600,
@@ -529,6 +543,7 @@ fun MySpaceScreen(
                     )
                     Text(
                         modifier = modifier
+                            .fillMaxWidth()
                             .noRippleClickable {
                                 viewModel.deleteAnswer(uiState.isAnsweredDateList[selectedIndex].toString())
                                 isShowShareBottomSheet = false

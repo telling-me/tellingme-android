@@ -15,8 +15,6 @@ class MySpaceContract {
         val answerList: List<Answer> = emptyList(),
         val isAnsweredDateList: List<LocalDate> = emptyList(),
         val initialAnswerPageIndex: Int = 0,
-        val todayTitle: String = "",
-        val todayPhrase: String = "",
     ): UiState
 
     sealed class Event: UiEvent {

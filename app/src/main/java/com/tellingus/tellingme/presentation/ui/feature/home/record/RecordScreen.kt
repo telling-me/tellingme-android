@@ -1,7 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +28,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +69,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
 import com.tellingus.tellingme.presentation.ui.common.const.LargeEmotionList
 import com.tellingus.tellingme.presentation.ui.common.const.getEmotionText
 import com.tellingus.tellingme.presentation.ui.common.const.getLargeEmotion
+import com.tellingus.tellingme.presentation.ui.feature.home.HomeViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray300
@@ -84,14 +85,18 @@ import com.tellingus.tellingme.util.collectWithLifecycle
 fun RecordScreen(
     modifier: Modifier = Modifier,
     viewModel: RecordViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navController: NavController,
-    title: String,
-    phrase: String,
+    date: String
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var showDialogState by remember { mutableStateOf(false) }
     var showToastMessage by remember { mutableStateOf(Pair(false, "")) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getQuestion(date)
+    }
 
     MainLayout(
         header = {
@@ -123,8 +128,8 @@ fun RecordScreen(
         content = {
             RecordScreenContent(
                 viewModel = viewModel,
-                title = title,
-                phrase = phrase
+                title = uiState.questionResponse.title,
+                phrase = uiState.questionResponse.phrase
             )
         },
         isScrollable = false
@@ -180,6 +185,12 @@ fun RecordScreen(
             }
 
             is RecordContract.Effect.CompleteRecord -> {
+                navController.popBackStack()
+                homeViewModel.getNoticeReward()
+            }
+
+            is RecordContract.Effect.CompleteUpdate -> {
+                Log.d("taag", "수정완료")
                 navController.popBackStack()
             }
 

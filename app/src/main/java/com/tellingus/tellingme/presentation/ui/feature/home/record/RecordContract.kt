@@ -1,5 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
+import com.tellingus.tellingme.data.model.home.QuestionData
+import com.tellingus.tellingme.data.model.home.Answer
 import com.tellingus.tellingme.presentation.ui.common.base.UiEffect
 import com.tellingus.tellingme.presentation.ui.common.base.UiEvent
 import com.tellingus.tellingme.presentation.ui.common.base.UiState
@@ -13,6 +15,9 @@ class RecordContract {
         val cheeseCount: Int = 0,
         val usableEmotionList: List<Int> = emptyList(),
 
+        val isAnswered: Boolean = false,
+        val questionResponse: QuestionData = QuestionData(),
+        val answerResponse: Answer = Answer()
     ) : UiState
 
     sealed class Event : UiEvent {
@@ -25,6 +30,7 @@ class RecordContract {
         object ShowRecordDialog: Effect()
         object CompletePurchaseEmotion: Effect()
         object CompleteRecord: Effect()
+        object CompleteUpdate: Effect()
         data class ShowToastMessage(
             val text: String,
             val icon: Int
