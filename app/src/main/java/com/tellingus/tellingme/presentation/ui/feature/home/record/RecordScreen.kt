@@ -87,7 +87,8 @@ fun RecordScreen(
     viewModel: RecordViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
     navController: NavController,
-    date: String
+    date: String,
+    type: String
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -129,7 +130,8 @@ fun RecordScreen(
             RecordScreenContent(
                 viewModel = viewModel,
                 title = uiState.questionResponse.title,
-                phrase = uiState.questionResponse.phrase
+                phrase = uiState.questionResponse.phrase,
+                type = type
             )
         },
         isScrollable = false
@@ -190,7 +192,6 @@ fun RecordScreen(
             }
 
             is RecordContract.Effect.CompleteUpdate -> {
-                Log.d("taag", "수정완료")
                 navController.popBackStack()
             }
 
@@ -205,6 +206,7 @@ fun RecordScreenContent(
     viewModel: RecordViewModel,
     title: String,
     phrase: String,
+    type: String
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isEmotionBottomSheetOpen by remember { mutableStateOf(false) }
@@ -251,7 +253,11 @@ fun RecordScreenContent(
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = null,
-                                        onClick = { isEmotionBottomSheetOpen = true }
+                                        onClick = {
+                                            if (type == "1") {
+                                                isEmotionBottomSheetOpen = true
+                                            }
+                                        }
                                     ),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {

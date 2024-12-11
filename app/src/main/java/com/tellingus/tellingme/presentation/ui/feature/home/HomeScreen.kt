@@ -275,9 +275,11 @@ fun HomeScreenContent(
                     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                     val formattedDate = LocalDate.now().format(formatter)
                     navController.navigate(
-                        ("${HomeDestinations.RECORD}/${formattedDate}")
+                        ("${HomeDestinations.RECORD}/${formattedDate}/1")
                     )
-                })
+                },
+//                isButtonVisible = !uiState.isTodayAnswer
+            )
 
         }
 

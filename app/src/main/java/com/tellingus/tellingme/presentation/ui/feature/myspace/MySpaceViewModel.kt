@@ -8,6 +8,7 @@ import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.usecase.DeleteAnswerUseCase
+import com.tellingus.tellingme.domain.usecase.GetAnswerByDateUseCase
 import com.tellingus.tellingme.domain.usecase.GetAnswerListUseCase
 import com.tellingus.tellingme.domain.usecase.GetQuestionUseCase
 import com.tellingus.tellingme.domain.usecase.UpdateAnswerUseCase
@@ -25,7 +26,8 @@ class MySpaceViewModel @Inject constructor(
     private val getAnswerListUseCase: GetAnswerListUseCase,
     private val getQuestionUseCase: GetQuestionUseCase,
     private val deleteAnswerUseCase: DeleteAnswerUseCase,
-    private val updateAnswerUseCase: UpdateAnswerUseCase
+    private val updateAnswerUseCase: UpdateAnswerUseCase,
+    private val getAnswerByDateUseCase: GetAnswerByDateUseCase
 ): BaseViewModel<MySpaceContract.State, MySpaceContract.Event, MySpaceContract.Effect>(
     initialState = MySpaceContract.State()
 ) {
@@ -46,12 +48,46 @@ class MySpaceViewModel @Inject constructor(
                             }.reversed()
                         )
                     )
+                    refreshFloatingButton()
                 }
                 .onFailure { s, i -> }
                 .onNetworkError {}
 
 
 
+        }
+    }
+
+    fun refreshFloatingButton() {
+        val today: LocalDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formattedDate = today.format(formatter)
+        viewModelScope.launch {
+            getAnswerByDateUseCase(formattedDate).onSuccess {
+                // 이미 답변을 작성한 경우 -> 수정
+                updateState(currentState.copy(isTodayAnswer = true))
+            }.onFailure { message, code ->
+                if (message.contains("해당 답변을 찾을 수 없습니다.")) {
+                    updateState(currentState.copy(isTodayAnswer = false))
+                }
+            }
+        }
+    }
+
+    fun getAnswerList() {
+        viewModelScope.launch {
+            getAnswerListUseCase()
+                .onSuccess {
+                    updateState(
+                        currentState.copy(
+                            answerList = it.data.reversed(),
+                            isAnsweredDateList = it.data.map {
+                                LocalDate.of(it.date[0], it.date[1], it.date[2])
+                            }.reversed()
+                        )
+                    )
+                    refreshFloatingButton()
+                }
         }
     }
 
@@ -80,9 +116,7 @@ class MySpaceViewModel @Inject constructor(
     fun deleteAnswer(date: String) {
         viewModelScope.launch {
             deleteAnswerUseCase(date).onSuccess {
-                Log.d("taag", "1")
                 getAnswerListUseCase().onSuccess {
-                    Log.d("taag", "2")
                     updateState(
                         currentState.copy(
                             answerList = it.data.reversed(),
@@ -91,6 +125,7 @@ class MySpaceViewModel @Inject constructor(
                             }.reversed()
                         )
                     )
+                    refreshFloatingButton()
                     Log.d("taag", it.data.toString())
                 }.onFailure { s, i ->
                     Log.d("taag", s)

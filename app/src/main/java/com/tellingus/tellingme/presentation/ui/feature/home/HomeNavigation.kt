@@ -28,9 +28,10 @@ fun NavGraphBuilder.homeGraph(
             HomeScreen(navController = navController)
         }
         composable(
-            route = "${HomeDestinations.RECORD}/{date}",
+            route = "${HomeDestinations.RECORD}/{date}/{type}",
             arguments = listOf(
                 navArgument("date") { type = NavType.StringType },
+                navArgument("type") { type = NavType.StringType }
             )
             ) {
             val parentEntry = remember(it) {
@@ -38,11 +39,13 @@ fun NavGraphBuilder.homeGraph(
             }
 
             val date = it.arguments?.getString("date")
+            val type = it.arguments?.getString("type")
 
             RecordScreen(
                 navController = navController,
                 date = date!!,
-                homeViewModel = hiltViewModel(parentEntry)
+                homeViewModel = hiltViewModel(parentEntry),
+                type = type!!
             )
         }
         composable(route = HomeDestinations.TELLER_CARD) {

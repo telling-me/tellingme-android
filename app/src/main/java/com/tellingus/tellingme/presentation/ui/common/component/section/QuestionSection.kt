@@ -30,7 +30,7 @@ fun QuestionSection(
     description: String,
     onClickButton: () -> Unit = {},
     isButtonVisible: Boolean = true,
-    bgColor: Color = Color.White
+    bgColor: Color = Color.White,
 ) {
     Box(
         modifier = modifier

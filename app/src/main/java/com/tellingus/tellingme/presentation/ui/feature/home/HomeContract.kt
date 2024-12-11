@@ -25,6 +25,7 @@ class HomeContract {
         val denyPushNoti: Boolean = true,
         val requiredExp: Int = 0,
         val daysToLevelUp: Int = 0,
+        val isTodayAnswer: Boolean = false
     ) : UiState
     {
         data class TodayQuestionCardInfo(val title: String = "", val content: String = "")

@@ -14,6 +14,7 @@ import com.tellingus.tellingme.data.repositoryimpl.HomeRepositoryImpl
 import com.tellingus.tellingme.domain.repository.DataStoreKey
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.repository.HomeRepository
+import com.tellingus.tellingme.domain.usecase.GetAnswerByDateUseCase
 import com.tellingus.tellingme.domain.usecase.GetNoticeRewardUseCase
 import com.tellingus.tellingme.domain.usecase.HomeUseCase
 import com.tellingus.tellingme.domain.usecase.UpdatePushTokenUseCase
@@ -33,7 +34,8 @@ class HomeViewModel @Inject constructor(
     private val updatePushTokenUseCase: UpdatePushTokenUseCase,
     private val dataStoreRepository: DataStoreRepository,
     private val postLikesUseCase: PostLikesUseCase,
-    private val getNoticeRewardUseCase: GetNoticeRewardUseCase
+    private val getNoticeRewardUseCase: GetNoticeRewardUseCase,
+    private val getAnswerByDateUseCase: GetAnswerByDateUseCase
 ) : BaseViewModel<HomeContract.State, HomeContract.Event, HomeContract.Effect>(
     initialState = HomeContract.State()
 ) {
@@ -68,6 +70,22 @@ class HomeViewModel @Inject constructor(
         isLoading = false, todayQuestionCardInfo = HomeContract.State.TodayQuestionCardInfo("", "")
     )
 
+    fun checkTodayAnswer() {
+        val today: LocalDate = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formattedDate = today.format(formatter)
+        viewModelScope.launch {
+            getAnswerByDateUseCase(formattedDate).onSuccess {
+                // 이미 답변을 작성한 경우 -> 수정
+                updateState(currentState.copy(isTodayAnswer = true))
+            }.onFailure { message, code ->
+                if (message.contains("해당 답변을 찾을 수 없습니다.")) {
+                    updateState(currentState.copy(isTodayAnswer = false))
+                }
+            }
+        }
+    }
+
     fun denyPushNoti(state: Boolean) {
         viewModelScope.launch {
             dataStoreRepository.setBoolean(DataStoreKey.DENY_PUSH_NOTI, state)
@@ -85,8 +103,10 @@ class HomeViewModel @Inject constructor(
     fun getNoticeReward() {
         viewModelScope.launch {
             getNoticeRewardUseCase().onSuccess {
-                Log.d("taag getNoticeReward", it.data[0].content)
-                postEffect(HomeContract.Effect.ShowToastMessage(it.data[0].content))
+                if (it.data.isNotEmpty()) {
+                    Log.d("taag getNoticeReward", it.data[0].content)
+                    postEffect(HomeContract.Effect.ShowToastMessage(it.data[0].content))
+                }
             }.onFailure { s, i ->
                 Log.d("taag getNoticeReward", s)
             }.onNetworkError {

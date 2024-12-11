@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -73,6 +74,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import com.tellingus.tellingme.util.AppUtils.OnLifecycleEvent
 import com.tellingus.tellingme.util.collectWithLifecycle
 import com.tellingus.tellingme.util.noRippleClickable
 import java.time.LocalDate
@@ -307,22 +309,34 @@ fun MySpaceScreen(
             }
         }
 
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(bottom = 16.dp, end = 20.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            FloatingButton(
-                onClick = {
-                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                    val formattedDate = LocalDate.now().format(formatter)
-                    navController.navigate(
-                        "${MySpaceDestinations.RECORD}/${formattedDate}"
-                    )
-                }
-            )
+        if (!uiState.isTodayAnswer) {
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(bottom = 16.dp, end = 20.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                FloatingButton(
+                    onClick = {
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                        val formattedDate = LocalDate.now().format(formatter)
+                        navController.navigate(
+                            "${MySpaceDestinations.RECORD}/${formattedDate}/1"
+                        )
+                    }
+                )
 
+            }
+        }
+    }
+
+    OnLifecycleEvent { owner, event ->
+        // do stuff on event
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {
+                viewModel.getAnswerList()
+            }
+            else -> { /* other stuff */ }
         }
     }
 
@@ -472,16 +486,11 @@ fun MySpaceScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    modifier = modifier.padding(end = 4.dp),
                                     text = "수정/삭제",
                                     style = TellingmeTheme.typography.body2Bold.copy(
                                         color = Color.White,
                                         fontSize = 14.sp
                                     )
-                                )
-                                Image(
-                                    imageVector = ImageVector.vectorResource(R.drawable.icon_share),
-                                    contentDescription = null
                                 )
                             }
                         }
@@ -530,9 +539,11 @@ fun MySpaceScreen(
                             .fillMaxWidth()
                             .noRippleClickable {
                                 val date = uiState.isAnsweredDateList[selectedIndex].toString()
-                                navController.navigate(
-                                    ("${HomeDestinations.RECORD}/${date}")
-                                )
+                                if (uiState.isTodayAnswer) {
+                                    navController.navigate(("${HomeDestinations.RECORD}/${date}/2"))   // 수정
+                                } else {
+                                    navController.navigate(("${HomeDestinations.RECORD}/${date}/1"))   // 쓰기
+                                }
                             }
                             .padding(horizontal = 12.dp, vertical = 16.dp),
                         text = "수정하기",
