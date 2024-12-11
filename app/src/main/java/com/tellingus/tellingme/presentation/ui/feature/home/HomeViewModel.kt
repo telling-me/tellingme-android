@@ -70,22 +70,6 @@ class HomeViewModel @Inject constructor(
         isLoading = false, todayQuestionCardInfo = HomeContract.State.TodayQuestionCardInfo("", "")
     )
 
-    fun checkTodayAnswer() {
-        val today: LocalDate = LocalDate.now()
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val formattedDate = today.format(formatter)
-        viewModelScope.launch {
-            getAnswerByDateUseCase(formattedDate).onSuccess {
-                // 이미 답변을 작성한 경우 -> 수정
-                updateState(currentState.copy(isTodayAnswer = true))
-            }.onFailure { message, code ->
-                if (message.contains("해당 답변을 찾을 수 없습니다.")) {
-                    updateState(currentState.copy(isTodayAnswer = false))
-                }
-            }
-        }
-    }
-
     fun denyPushNoti(state: Boolean) {
         viewModelScope.launch {
             dataStoreRepository.setBoolean(DataStoreKey.DENY_PUSH_NOTI, state)

@@ -277,8 +277,7 @@ fun HomeScreenContent(
                     navController.navigate(
                         ("${HomeDestinations.RECORD}/${formattedDate}/1")
                     )
-                },
-//                isButtonVisible = !uiState.isTodayAnswer
+                }
             )
 
         }
