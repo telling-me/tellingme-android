@@ -62,7 +62,7 @@ fun LoginScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
-                        imageVector = ImageVector.vectorResource(R.drawable.tellingme_logo),
+                        imageVector = ImageVector.vectorResource(R.drawable.tellingme_logo_big),
                         contentDescription = null
                     )
                     Spacer(modifier = modifier.size(8.dp))

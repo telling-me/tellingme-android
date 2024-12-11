@@ -64,6 +64,9 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
+import com.tellingus.tellingme.util.collectWithLifecycle
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -272,11 +275,9 @@ fun HomeScreenContent(
 //                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}")
 //                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${item.answerId}?date=${date}")
                     } else {
-                         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                    val formattedDate = LocalDate.now().format(formatter)
-                    navController.navigate(
-                        ("${HomeDestinations.RECORD}/${formattedDate}/1")
-                    )
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                        val formattedDate = LocalDate.now().format(formatter)
+                        navController.navigate(("${HomeDestinations.RECORD}/${formattedDate}/1"))
                     }
                 })
         }
