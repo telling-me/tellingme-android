@@ -5,13 +5,17 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.tellingus.tellingme.data.model.home.CommunicationData
 import com.tellingus.tellingme.data.model.home.HomeRequest
+import com.tellingus.tellingme.data.model.home.NoticeRewardResponse
 import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
+import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.data.repositoryimpl.HomeRepositoryImpl
 import com.tellingus.tellingme.domain.repository.DataStoreKey
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.repository.HomeRepository
+import com.tellingus.tellingme.domain.usecase.GetAnswerByDateUseCase
+import com.tellingus.tellingme.domain.usecase.GetNoticeRewardUseCase
 import com.tellingus.tellingme.domain.usecase.HomeUseCase
 import com.tellingus.tellingme.domain.usecase.UpdatePushTokenUseCase
 import com.tellingus.tellingme.domain.usecase.otherspace.PostLikesUseCase
@@ -30,6 +34,8 @@ class HomeViewModel @Inject constructor(
     private val updatePushTokenUseCase: UpdatePushTokenUseCase,
     private val dataStoreRepository: DataStoreRepository,
     private val postLikesUseCase: PostLikesUseCase,
+    private val getNoticeRewardUseCase: GetNoticeRewardUseCase,
+    private val getAnswerByDateUseCase: GetAnswerByDateUseCase
 ) : BaseViewModel<HomeContract.State, HomeContract.Event, HomeContract.Effect>(
     initialState = HomeContract.State()
 ) {
@@ -77,6 +83,21 @@ class HomeViewModel @Inject constructor(
             postLikesUseCase(PostLikesRequest((answerId))).onSuccess {
                 onSuccess()
             }.onFailure { s, i -> }
+        }
+    }
+
+    fun getNoticeReward() {
+        viewModelScope.launch {
+            getNoticeRewardUseCase().onSuccess {
+                if (it.data.isNotEmpty()) {
+                    Log.d("taag getNoticeReward", it.data[0].content)
+                    postEffect(HomeContract.Effect.ShowToastMessage(it.data[0].content))
+                }
+            }.onFailure { s, i ->
+                Log.d("taag getNoticeReward", s)
+            }.onNetworkError {
+                Log.d("taag getNoticeReward", it.message.toString())
+            }
         }
     }
 

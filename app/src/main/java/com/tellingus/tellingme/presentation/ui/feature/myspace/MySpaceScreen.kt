@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -64,6 +65,7 @@ import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MySpaceDestinations
+import com.tellingus.tellingme.presentation.ui.common.navigation.OtherSpaceDestinations
 import com.tellingus.tellingme.presentation.ui.theme.Background200
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Error400
@@ -72,8 +74,11 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
+import com.tellingus.tellingme.util.AppUtils.OnLifecycleEvent
 import com.tellingus.tellingme.util.collectWithLifecycle
+import com.tellingus.tellingme.util.noRippleClickable
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalFoundationApi::class)
 @SuppressLint("NewApi")
@@ -304,17 +309,34 @@ fun MySpaceScreen(
             }
         }
 
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(bottom = 16.dp, end = 20.dp),
-            contentAlignment = Alignment.BottomEnd
-        ) {
-            FloatingButton {
-                navController.navigate(
-                    ("${MySpaceDestinations.RECORD}/${uiState.todayTitle}/${uiState.todayPhrase}")
+        if (!uiState.isTodayAnswer) {
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(bottom = 16.dp, end = 20.dp),
+                contentAlignment = Alignment.BottomEnd
+            ) {
+                FloatingButton(
+                    onClick = {
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                        val formattedDate = LocalDate.now().format(formatter)
+                        navController.navigate(
+                            "${MySpaceDestinations.RECORD}/${formattedDate}/1"
+                        )
+                    }
                 )
+
             }
+        }
+    }
+
+    OnLifecycleEvent { owner, event ->
+        // do stuff on event
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {
+                viewModel.getAnswerList()
+            }
+            else -> { /* other stuff */ }
         }
     }
 
@@ -384,6 +406,8 @@ fun MySpaceScreen(
         }
     }
 
+    var selectedIndex by remember { mutableStateOf(0) }
+
     if (isShowAnswerListPagerDialog) {
         val pagerState = rememberPagerState(
             initialPage = uiState.initialAnswerPageIndex,
@@ -400,63 +424,75 @@ fun MySpaceScreen(
                 usePlatformDefaultWidth = false
             )
         ) {
-            HorizontalPager(
+            Box(
                 modifier = modifier
-                    .fillMaxWidth()
-                    .padding(top = 130.dp, bottom = 88.dp),
-                state = pagerState,
-                contentPadding = PaddingValues(horizontal = 25.5.dp),
-                pageSpacing = 14.dp
-            ) { index ->
-                Box(
+                    .fillMaxSize()
+                    .clickable(
+                        onClick = { isShowAnswerListPagerDialog = false },
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    )
+            ) {
+                HorizontalPager(
                     modifier = modifier
-                        .clickable(
-                            onClick = { isShowAnswerListPagerDialog = false},
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        )
-                ) {
-                    Column(
-//                        modifier = modifier
-//                            .padding(top = 130.dp, bottom = 88.dp, start = 25.dp, end = 25.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        .fillMaxWidth()
+                        .padding(top = 130.dp, bottom = 88.dp),
+                    state = pagerState,
+                    contentPadding = PaddingValues(horizontal = 25.5.dp),
+                    pageSpacing = 14.dp
+                ) { index ->
+                    Box(
+                        modifier = modifier
+                            .clickable(
+                                onClick = {
+                                    navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${uiState.answerList[index].answerId}?date=${uiState.answerList[index].date}")
+                                },
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            )
                     ) {
-                        CalendarCardView(
-                            modifier = modifier.weight(1f),
-                            title = uiState.answerList[index].title,
-                            subTitle = uiState.answerList[index].phrase,
-                            emotion = getMediumEmotion(index = uiState.answerList[index].emotion),
-                            emotionDesc = getEmotionText(index = uiState.answerList[index].emotion),
-                            date = LocalDate.of(uiState.answerList[index].date[0], uiState.answerList[index].date[1], uiState.answerList[index].date[2]),
-                            contents = uiState.answerList[index].content,
-                        )
-                        Spacer(modifier = Modifier.size(16.dp))
-
-                        Row(
-                            modifier = modifier
-                                .background(shape = RoundedCornerShape(100.dp), color = Gray500)
-                                .padding(vertical = 16.dp, horizontal = 9.5.dp)
-                                .clickable(
-                                    onClick = {
-                                        isShowShareBottomSheet = true
-                                    },
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null
-                                ),
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            //                        modifier = modifier
+                            //                            .padding(top = 130.dp, bottom = 88.dp, start = 25.dp, end = 25.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                modifier = modifier.padding(end = 4.dp),
-                                text = "공유하기",
-                                style = TellingmeTheme.typography.body2Bold.copy(
-                                    color = Color.White,
-                                    fontSize = 14.sp
+                            CalendarCardView(
+                                modifier = modifier.weight(1f),
+                                title = uiState.answerList[index].title,
+                                subTitle = uiState.answerList[index].phrase,
+                                emotion = getMediumEmotion(index = uiState.answerList[index].emotion),
+                                emotionDesc = getEmotionText(index = uiState.answerList[index].emotion),
+                                date = LocalDate.of(
+                                    uiState.answerList[index].date[0],
+                                    uiState.answerList[index].date[1],
+                                    uiState.answerList[index].date[2]
+                                ),
+                                contents = uiState.answerList[index].content,
+                            )
+                            Spacer(modifier = Modifier.size(16.dp))
+
+                            Row(
+                                modifier = modifier
+                                    .background(shape = RoundedCornerShape(100.dp), color = Gray500)
+                                    .padding(vertical = 16.dp, horizontal = 9.5.dp)
+                                    .clickable(
+                                        onClick = {
+                                            isShowShareBottomSheet = true
+                                            selectedIndex = pagerState.currentPage
+                                        },
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null
+                                    ),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "수정/삭제",
+                                    style = TellingmeTheme.typography.body2Bold.copy(
+                                        color = Color.White,
+                                        fontSize = 14.sp
+                                    )
                                 )
-                            )
-                            Image(
-                                imageVector = ImageVector.vectorResource(R.drawable.icon_share),
-                                contentDescription = null
-                            )
+                            }
                         }
                     }
                 }
@@ -499,24 +535,33 @@ fun MySpaceScreen(
                         .padding(top = 4.dp, start = 4.dp, end = 4.dp, bottom = 8.dp)
                 ) {
                     Text(
-                        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                        text = "이미지로 저장하기",
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .noRippleClickable {
+                                val date = uiState.isAnsweredDateList[selectedIndex].toString()
+                                if (uiState.isTodayAnswer) {
+                                    navController.navigate(("${HomeDestinations.RECORD}/${date}/2"))   // 수정
+                                } else {
+                                    navController.navigate(("${HomeDestinations.RECORD}/${date}/1"))   // 쓰기
+                                }
+                            }
+                            .padding(horizontal = 12.dp, vertical = 16.dp),
+                        text = "수정하기",
                         style = TellingmeTheme.typography.body2Regular.copy(
                             color = Gray600,
                             fontSize = 14.sp
                         )
                     )
                     Text(
-                        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                        text = "인스타그램 스토리로 공유하기",
-                        style = TellingmeTheme.typography.body2Regular.copy(
-                            color = Gray600,
-                            fontSize = 14.sp
-                        )
-                    )
-                    Text(
-                        modifier = modifier.padding(horizontal = 12.dp, vertical = 16.dp),
-                        text = "다른 방법으로 공유하기",
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .noRippleClickable {
+                                viewModel.deleteAnswer(uiState.isAnsweredDateList[selectedIndex].toString())
+                                isShowShareBottomSheet = false
+                                isShowAnswerListPagerDialog = false
+                            }
+                            .padding(horizontal = 12.dp, vertical = 16.dp),
+                        text = "삭제하기",
                         style = TellingmeTheme.typography.body2Regular.copy(
                             color = Gray600,
                             fontSize = 14.sp

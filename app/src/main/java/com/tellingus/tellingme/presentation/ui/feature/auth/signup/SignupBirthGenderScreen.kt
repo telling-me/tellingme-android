@@ -225,9 +225,9 @@ fun SignupBirthGenderContentScreen(
                 .fillMaxWidth(),
             size = ButtonSize.LARGE,
             text = "다음",
-            enable = gender.isNotBlank() && birth.length==4 && birth.toInt() < 2024,
+            enable = gender.isNotBlank() && birth.length==4 && birth.toInt() <= 2024,
             onClick = {
-                if (gender.isNotBlank() && birth.length==4 && birth.toInt() < 2024) {
+                if (gender.isNotBlank() && birth.length==4 && birth.toInt() <= 2024) {
                     viewModel.processEvent(
                         SignupContract.Event.NextButtonClickedInBirthGender(
                             birth = birth,

@@ -1,5 +1,7 @@
 package com.tellingus.tellingme.presentation.ui.feature.home
 
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -26,19 +28,24 @@ fun NavGraphBuilder.homeGraph(
             HomeScreen(navController = navController)
         }
         composable(
-            route = "${HomeDestinations.RECORD}/{title}/{phrase}",
+            route = "${HomeDestinations.RECORD}/{date}/{type}",
             arguments = listOf(
-                navArgument("title") { type = NavType.StringType },
-                navArgument("phrase") { type = NavType.StringType },
+                navArgument("date") { type = NavType.StringType },
+                navArgument("type") { type = NavType.StringType }
             )
             ) {
-            val title = it.arguments?.getString("title")
-            val phrase = it.arguments?.getString("phrase")
+            val parentEntry = remember(it) {
+                navController.getBackStackEntry(HomeDestinations.HOME)
+            }
+
+            val date = it.arguments?.getString("date")
+            val type = it.arguments?.getString("type")
 
             RecordScreen(
                 navController = navController,
-                title = title.toString(),
-                phrase = phrase.toString()
+                date = date!!,
+                homeViewModel = hiltViewModel(parentEntry),
+                type = type!!
             )
         }
         composable(route = HomeDestinations.TELLER_CARD) {

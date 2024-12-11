@@ -1,7 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.record
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +28,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,6 +55,7 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.holix.android.bottomsheetdialog.compose.NavigationBarProperties
 import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
+import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLightButton
 import com.tellingus.tellingme.presentation.ui.common.component.button.SingleButton
@@ -68,6 +69,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
 import com.tellingus.tellingme.presentation.ui.common.const.LargeEmotionList
 import com.tellingus.tellingme.presentation.ui.common.const.getEmotionText
 import com.tellingus.tellingme.presentation.ui.common.const.getLargeEmotion
+import com.tellingus.tellingme.presentation.ui.feature.home.HomeViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray300
@@ -83,15 +85,19 @@ import com.tellingus.tellingme.util.collectWithLifecycle
 fun RecordScreen(
     modifier: Modifier = Modifier,
     viewModel: RecordViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navController: NavController,
-    title: String,
-    phrase: String,
+    date: String,
+    type: String
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var showDialogState by remember { mutableStateOf(false) }
     var showToastMessage by remember { mutableStateOf(Pair(false, "")) }
-    var showTodayQuestionChangeBottomSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.getQuestion(date)
+    }
 
     MainLayout(
         header = {
@@ -123,8 +129,9 @@ fun RecordScreen(
         content = {
             RecordScreenContent(
                 viewModel = viewModel,
-                title = title,
-                phrase = phrase
+                title = uiState.questionResponse.title,
+                phrase = uiState.questionResponse.phrase,
+                type = type
             )
         },
         isScrollable = false
@@ -156,18 +163,6 @@ fun RecordScreen(
         )
     }
 
-    if (uiState.isCompleteWriteAnswer) {
-        navController.popBackStack()
-    }
-
-    if (showTodayQuestionChangeBottomSheet) {
-        TodayQuestionChangeBottomSheet(
-            onDismiss = { showTodayQuestionChangeBottomSheet = false },
-            onClickCancel = { showTodayQuestionChangeBottomSheet = false },
-            onClickConfirm = { showTodayQuestionChangeBottomSheet = false }
-        )
-    }
-
     if (showToastMessage.first) {
         TellingmeToast(context).showToast(text = showToastMessage.second, icon = R.drawable.icon_warn)
         showToastMessage = Pair(false, "")
@@ -186,7 +181,20 @@ fun RecordScreen(
             is RecordContract.Effect.MoveToMoreScreen -> {
 
             }
-            
+
+            is RecordContract.Effect.CompletePurchaseEmotion -> {
+
+            }
+
+            is RecordContract.Effect.CompleteRecord -> {
+                navController.popBackStack()
+                homeViewModel.getNoticeReward()
+            }
+
+            is RecordContract.Effect.CompleteUpdate -> {
+                navController.popBackStack()
+            }
+
             else -> {}
         }
     }
@@ -198,181 +206,198 @@ fun RecordScreenContent(
     viewModel: RecordViewModel,
     title: String,
     phrase: String,
+    type: String
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var isEmotionBottomSheetOpen by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-    ) {
+    Box {
         Column(
             modifier = modifier
-                .weight(1f)
-                .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 31.dp)
+                .fillMaxSize()
         ) {
-            Text(
-                text = title,
-                style = TellingmeTheme.typography.body1Regular.copy(
-                    color = Gray700,
-                ),
-            )
-            Spacer(modifier = modifier.size(8.dp))
-            Text(
-                text = phrase,
-                style = TellingmeTheme.typography.body2Regular,
-                color = Gray500
-            )
-            Spacer(modifier = modifier.size(16.dp))
-
-            Card(
+            Column(
                 modifier = modifier
-                    .fillMaxSize(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(Base0)
+                    .weight(1f)
+                    .padding(top = 16.dp, start = 20.dp, end = 20.dp, bottom = 31.dp)
             ) {
-                Column(
+                Text(
+                    text = title,
+                    style = TellingmeTheme.typography.body1Regular.copy(
+                        color = Gray700,
+                    ),
+                )
+                Spacer(modifier = modifier.size(8.dp))
+                Text(
+                    text = phrase,
+                    style = TellingmeTheme.typography.body2Regular,
+                    color = Gray500
+                )
+                Spacer(modifier = modifier.size(16.dp))
+
+                Card(
                     modifier = modifier
-                        .padding(horizontal = 16.dp, vertical = 20.dp)
+                        .fillMaxSize(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(Base0)
                 ) {
-                    Row(
-                        modifier = modifier.fillMaxWidth()
+                    Column(
+                        modifier = modifier
+                            .padding(horizontal = 16.dp, vertical = 20.dp)
                     ) {
-                        Column(
-                            modifier = modifier
-                                .clickable(
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = null,
-                                    onClick = { isEmotionBottomSheetOpen = true }
-                                ),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                        Row(
+                            modifier = modifier.fillMaxWidth()
                         ) {
-                            Image(
-                                modifier = modifier.size(52.dp),
-                                imageVector = if (uiState.selectedEmotion == -1) {
-                                    ImageVector.vectorResource(R.drawable.emotion_circle)
-                                } else ImageVector.vectorResource(getLargeEmotion(uiState.selectedEmotion + 1)),
-                                contentDescription = null
-                            )
-                            Spacer(modifier = modifier.size(4.dp))
-                            Text(
+                            Column(
                                 modifier = modifier
-                                    .defaultMinSize(minWidth = 63.dp)
-                                    .background(
-                                        color = Background100,
-                                        shape = RoundedCornerShape(4.dp)
-                                    )
-                                    .padding(horizontal = 6.dp, vertical = 1.5.dp),
-                                text = if (uiState.selectedEmotion == -1) "?" else getEmotionText(uiState.selectedEmotion + 1),
-                                textAlign = TextAlign.Center,
-                                style = TellingmeTheme.typography.body2Bold,
-                                color = Gray600
-                            )
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null,
+                                        onClick = {
+                                            if (type == "1") {
+                                                isEmotionBottomSheetOpen = true
+                                            }
+                                        }
+                                    ),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Image(
+                                    modifier = modifier.size(52.dp),
+                                    imageVector = if (uiState.selectedEmotion == -1) {
+                                        ImageVector.vectorResource(R.drawable.emotion_circle)
+                                    } else ImageVector.vectorResource(getLargeEmotion(uiState.selectedEmotion + 1)),
+                                    contentDescription = null
+                                )
+                                Spacer(modifier = modifier.size(4.dp))
+                                Text(
+                                    modifier = modifier
+                                        .defaultMinSize(minWidth = 63.dp)
+                                        .background(
+                                            color = Background100,
+                                            shape = RoundedCornerShape(4.dp)
+                                        )
+                                        .padding(horizontal = 6.dp, vertical = 1.5.dp),
+                                    text = if (uiState.selectedEmotion == -1) "?" else getEmotionText(
+                                        uiState.selectedEmotion + 1
+                                    ),
+                                    textAlign = TextAlign.Center,
+                                    style = TellingmeTheme.typography.body2Bold,
+                                    color = Gray600
+                                )
+                            }
+                            Spacer(modifier = modifier.size(12.dp))
+                            if (uiState.selectedEmotion == -1) {
+                                ToolTip(
+                                    modifier = modifier.padding(top = 4.dp),
+                                    type = ToolTipType.BASIC,
+                                    text = "감정을 선택해주세요!"
+                                )
+                            }
                         }
                         Spacer(modifier = modifier.size(12.dp))
-                        if (uiState.selectedEmotion == -1) {
-                            ToolTip(
-                                modifier = modifier.padding(top = 4.dp),
-                                type = ToolTipType.BASIC,
-                                text = "감정을 선택해주세요!"
-                            )
-                        }
-                    }
-                    Spacer(modifier = modifier.size(12.dp))
-                    Text(
-                        text = uiState.today,
-                        style = TellingmeTheme.typography.caption1Bold,
-                        color = Gray300
-                    )
-                    Spacer(modifier = modifier.size(8.dp))
+                        Text(
+                            text = uiState.today,
+                            style = TellingmeTheme.typography.caption1Bold,
+                            color = Gray300
+                        )
+                        Spacer(modifier = modifier.size(8.dp))
 
-                    BasicTextField(
-                        modifier = modifier.fillMaxWidth(),
-                        value = uiState.answer,
-                        onValueChange = {
-                            if (it.length <= 300) {
-                                viewModel.updateAnswer(it)
-                            }
-                        },
-                        textStyle = TellingmeTheme.typography.body2Regular.copy(
-                            color = Gray800,
-                            lineHeight = 24.sp,
-                            textAlign = TextAlign.Start
-                        ),
-                        decorationBox = { innerTextField ->
-                            Box {
-                                if (uiState.answer.isBlank()) {
-                                    Text(
-                                        text = "여기를 눌러 작성해주세요!",
-                                        style = TellingmeTheme.typography.body2Regular.copy(
-                                            color = Gray300
-                                        )
-                                    )
+                        BasicTextField(
+                            modifier = modifier.fillMaxWidth(),
+                            value = uiState.answer,
+                            onValueChange = {
+                                if (it.length <= 300) {
+                                    viewModel.updateAnswer(it)
                                 }
-                                innerTextField()
+                            },
+                            textStyle = TellingmeTheme.typography.body2Regular.copy(
+                                color = Gray800,
+                                lineHeight = 24.sp,
+                                textAlign = TextAlign.Start
+                            ),
+                            decorationBox = { innerTextField ->
+                                Box {
+                                    if (uiState.answer.isBlank()) {
+                                        Text(
+                                            text = "여기를 눌러 작성해주세요!",
+                                            style = TellingmeTheme.typography.body2Regular.copy(
+                                                color = Gray300
+                                            )
+                                        )
+                                    }
+                                    innerTextField()
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
-        }
 
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "공개",
-                style = TellingmeTheme.typography.caption1Bold,
-                color = Gray600
-            )
-            Spacer(modifier = modifier.size(10.dp))
-            Switch(
-                modifier = modifier.scale(0.8f),
-                checked = uiState.isPublic,
-                onCheckedChange = {
-                    viewModel.processEvent(RecordContract.Event.OnClickOpenSwitch)
-                },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Base0,
-                    checkedTrackColor = Primary400
-                ),
-                interactionSource = remember { MutableInteractionSource() }
-            )
-            Spacer(modifier = modifier.weight(1f))
-            Text(
-                text = "${uiState.answer.length} / 300",
-                style = TellingmeTheme.typography.caption1Bold,
-                color = Gray600
-            )
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "공개",
+                    style = TellingmeTheme.typography.caption1Bold,
+                    color = Gray600
+                )
+                Spacer(modifier = modifier.size(10.dp))
+                Switch(
+                    modifier = modifier.scale(0.8f),
+                    checked = uiState.isPublic,
+                    onCheckedChange = {
+                        viewModel.processEvent(RecordContract.Event.OnClickOpenSwitch)
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Base0,
+                        checkedTrackColor = Primary400
+                    ),
+                    interactionSource = remember { MutableInteractionSource() }
+                )
+                Spacer(modifier = modifier.weight(1f))
+                Text(
+                    text = "${uiState.answer.length} / 300",
+                    style = TellingmeTheme.typography.caption1Bold,
+                    color = Gray600
+                )
+            }
         }
     }
 
     if (isEmotionBottomSheetOpen) {
         EmotionBottomSheet(
+            viewModel = viewModel,
             selectedEmotion = uiState.selectedEmotion,
             onDismiss = { isEmotionBottomSheetOpen = false },
             onClickCancel = { isEmotionBottomSheetOpen = false },
             onClickConfirm = {
                 viewModel.updateSelectedEmotion(it)
                 isEmotionBottomSheetOpen = false
-            }
+            },
+            cheeseCount = uiState.cheeseCount,
+            usableEmotionList = uiState.usableEmotionList
         )
     }
 }
+var purchaseIndex = 0
 
 @Composable
 fun EmotionBottomSheet(
+    viewModel: RecordViewModel,
     selectedEmotion: Int = -1,
     modifier: Modifier = Modifier,
     onDismiss: () -> Unit,
     onClickCancel: () -> Unit,
     onClickConfirm: (Int) -> Unit,
+    cheeseCount: Int = 0,
+    usableEmotionList: List<Int>
 ) {
     var selectedEmotion by remember { mutableStateOf(selectedEmotion) }
     var showBuyEmotionDialog by remember { mutableStateOf(false) }
+    var notEnoughDialog by remember { mutableStateOf(false) }
 
     BottomSheetDialog(
         onDismissRequest = onDismiss,
@@ -390,21 +415,33 @@ fun EmotionBottomSheet(
                 )
                 .padding(top = 24.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
         ) {
-            Text(
-                text = "이 글 속 나의 감정을 떠올려 봐요",
-                style = TellingmeTheme.typography.body1Bold.copy(
-                    color = Gray600,
-                ),
-            )
-            Spacer(modifier = modifier.size(4.dp))
-            Text(
-                text = if (selectedEmotion == -1) "듀이 감정티콘을 선택해주세요" else getEmotionText(selectedEmotion + 1),
-                style = TellingmeTheme.typography.body2Regular.copy(
-                    color = Gray600
-                ),
-            )
+            Row(
+                modifier = modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = modifier.weight(1f)
+                ) {
+                    Text(
+                        text = "이 글 속 나의 감정을 떠올려 봐요",
+                        style = TellingmeTheme.typography.body1Bold.copy(
+                            color = Gray600,
+                        ),
+                    )
+                    Spacer(modifier = modifier.size(4.dp))
+                    Text(
+                        text = if (selectedEmotion == -1) "듀이 감정티콘을 선택해주세요" else getEmotionText(
+                            selectedEmotion + 1
+                        ),
+                        style = TellingmeTheme.typography.body2Regular.copy(
+                            color = Gray600
+                        ),
+                    )
+                }
+                CheeseBadge(cheeseBalance = cheeseCount)
+            }
             Spacer(modifier = modifier.size(16.dp))
-
             Card(
                 shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(Base0),
@@ -436,7 +473,16 @@ fun EmotionBottomSheet(
                                             if (position < 6) {
                                                 selectedEmotion = position
                                             } else {
-                                                showBuyEmotionDialog = true
+                                                if (position + 1 in usableEmotionList) {
+                                                    selectedEmotion = position
+                                                } else {
+                                                    purchaseIndex = position + 1
+                                                    if (cheeseCount >= 33) {
+                                                        showBuyEmotionDialog = true
+                                                    } else {
+                                                        notEnoughDialog = true
+                                                    }
+                                                }
                                             }
                                         }
                                     ),
@@ -444,28 +490,30 @@ fun EmotionBottomSheet(
                                 contentDescription = "emotion"
                             )
                             if (position >= 6) {
-                                Row(
-                                    modifier = modifier
-                                        .background(
-                                            shape = RoundedCornerShape(100.dp),
-                                            color = Color.White
+                                if (position + 1 !in usableEmotionList) {
+                                    Row(
+                                        modifier = modifier
+                                            .background(
+                                                shape = RoundedCornerShape(100.dp),
+                                                color = Color.White
+                                            )
+                                            .padding(horizontal = 8.5.dp, vertical = 3.5.dp)
+                                            .align(Alignment.BottomCenter),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Image(
+                                            modifier = modifier.size(14.dp),
+                                            imageVector = ImageVector.vectorResource(R.drawable.icon_cheese),
+                                            contentDescription = null
                                         )
-                                        .padding(horizontal = 8.5.dp, vertical = 3.5.dp)
-                                        .align(Alignment.BottomCenter),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Image(
-                                        modifier = modifier.size(14.dp),
-                                        imageVector = ImageVector.vectorResource(R.drawable.icon_cheese),
-                                        contentDescription = null
-                                    )
-                                    Spacer(modifier = Modifier.size(4.dp))
-                                    Text(
-                                        text = "33",
-                                        style = TellingmeTheme.typography.caption2Bold.copy(
-                                            color = Gray600
+                                        Spacer(modifier = Modifier.size(4.dp))
+                                        Text(
+                                            text = "33",
+                                            style = TellingmeTheme.typography.caption2Bold.copy(
+                                                color = Gray600
+                                            )
                                         )
-                                    )
+                                    }
                                 }
                             }
                         }
@@ -486,7 +534,7 @@ fun EmotionBottomSheet(
                     size = ButtonSize.LARGE,
                     text = "확인",
                     enable = selectedEmotion != -1,
-                    onClick =  {
+                    onClick = {
                         onClickConfirm(selectedEmotion)
                     }
                 )
@@ -545,130 +593,75 @@ fun EmotionBottomSheet(
                         size = ButtonSize.LARGE,
                         text = "구매하기",
                         onClick = {
+                            if (cheeseCount >= 33) {
+                                viewModel.purchaseEmotion(purchaseIndex)
+                                showBuyEmotionDialog = false
 
+                            } else {
+                                showBuyEmotionDialog = true
+                            }
                         }
                     )
                 }
             }
         }
     }
-}
 
-@Composable
-fun TodayQuestionChangeBottomSheet(
-    onDismiss: () -> Unit,
-    onClickCancel: () -> Unit,
-    onClickConfirm: () -> Unit,
-    bottomSheetState: QuestionState = QuestionState.ORIGINAL,
-    modifier: Modifier = Modifier
-) {
-
-    BottomSheetDialog(
-        onDismissRequest = onDismiss,
-        properties = BottomSheetDialogProperties(
-            navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),  /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
-            dismissOnClickOutside = false,
-            behaviorProperties = BottomSheetBehaviorProperties(isDraggable = true)
-        )
-    ) {
-        Column(
-            modifier = modifier
-                .background(
-                    shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-                    color = Base0
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
+    if (notEnoughDialog) {
+        Dialog(
+            onDismissRequest = {
+                showBuyEmotionDialog = false
+            },
+            properties = DialogProperties(
+                dismissOnBackPress = false,
+                dismissOnClickOutside = false,
+                usePlatformDefaultWidth = false
+            )
         ) {
-            Box(modifier = modifier.padding(vertical = 16.dp)) {
-                Box(
-                    modifier = modifier
-                        .background(
-                            color = Gray300,
-                            shape = RoundedCornerShape(100.dp)
-                        )
-                        .size(width = 32.dp, height = 4.dp)
-                )
-            }
             Column(
                 modifier = modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp)
+                    .padding(horizontal = 20.dp)
+                    .background(
+                        shape = RoundedCornerShape(20.dp),
+                        color = Base0
+                    )
+                    .padding(top = 30.dp, start = 16.dp, end = 16.dp, bottom = 20.dp)
+                    .wrapContentHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "오늘의 질문을 바꿀 수 있어요!",
-                    style = TellingmeTheme.typography.head3Bold,
-                    color = Gray600
+                    text = "치즈가 부족해요!",
+                    style = TellingmeTheme.typography.body1Bold.copy(
+                        color = Gray600
+                    ),
+                    textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(
-                    text = "단, 스페셜 질문은 모두의 공간에 공개할 수 없어요.",
-                    style = TellingmeTheme.typography.body2Regular,
-                    color = Gray600
+                    text = "텔링미 플러스를 구독하면\n" + "모든 감정을 이용할 수 있어요.",
+                    style = TellingmeTheme.typography.body2Regular.copy(
+                        color = Gray600
+                    )
                 )
-                Spacer(modifier = Modifier.size(12.dp))
-
-                Column(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .background(
-                            shape = RoundedCornerShape(8.dp),
-                            color = Background100
-                        )
-                        .padding(vertical = 16.dp, horizontal = 12.dp)
-                ) {
-                    Box(
-                        modifier = modifier
-                            .background(
-                                shape = RoundedCornerShape(8.dp),
-                                color = Base0
-                            )
-                            .padding(vertical = 6.dp, horizontal = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "스페셜 질문",
-                            style = TellingmeTheme.typography.caption1Bold,
-                            color = Gray600
-                        )
-                    }
-                    Spacer(modifier = Modifier.size(12.dp))
-
-                    Text(
-                        text = "텔링미를 사용하실 때\n어떤 기분과 생각을 하시나요?",
-                        style = TellingmeTheme.typography.body1Regular,
-                        color = Gray700
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text(
-                        text = "하루 한번 질문에 답변하며 나를 깨닫는 시간",
-                        style = TellingmeTheme.typography.body2Regular,
-                        color = Gray500
-                    )
-                }
-                Spacer(modifier = modifier.size(16.dp))
-
+                Spacer(modifier = Modifier.size(20.dp))
+                Image(
+                    modifier = modifier.size(120.dp),
+                    imageVector = ImageVector.vectorResource(R.drawable.icon_cheese_empty),
+                    contentDescription = null
+                )
+                Spacer(modifier = Modifier.size(20.dp))
                 Row {
-                    PrimaryLightButton(
-                        modifier = modifier.weight(1f),
-                        size = ButtonSize.LARGE,
-                        text = "취소",
-                        onClick = onClickCancel
-                    )
-                    Spacer(modifier = modifier.size(8.dp))
                     PrimaryButton(
                         modifier = modifier.weight(1f),
                         size = ButtonSize.LARGE,
-                        text = "바꾸기",
-                        onClick = onClickConfirm
+                        text = "확인",
+                        onClick = {
+                            notEnoughDialog = false
+                        }
                     )
                 }
             }
-
         }
-
     }
-}
-
-enum class QuestionState {
-    ORIGINAL, NEW
 }

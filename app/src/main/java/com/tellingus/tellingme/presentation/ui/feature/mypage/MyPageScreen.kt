@@ -54,6 +54,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryBu
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryLightButton
 import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowDoubleButtonDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
+import com.tellingus.tellingme.presentation.ui.common.component.toast.TellingmeToast
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
 import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotionBadge
@@ -72,6 +73,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.util.AppUtils
 import com.tellingus.tellingme.util.collectWithLifecycle
+import com.tellingus.tellingme.util.noRippleClickable
 
 
 @Composable
@@ -166,6 +168,7 @@ fun MyPageScreenContent(
         isAlarmChecked = allowNotification
     }
 
+    var showToastMessage by remember { mutableStateOf(Pair(false, "")) }
 
     val items = remember {
         mutableStateOf(
@@ -230,7 +233,7 @@ fun MyPageScreenContent(
 
                     )
                 Text(
-                    text = uiState.nickname,
+                    text = uiState.userInfo.nickname,
                     modifier = Modifier.padding(top = 4.dp),
                     style = TellingmeTheme.typography.head3Bold
                 )
@@ -345,6 +348,9 @@ fun MyPageScreenContent(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
+                .noRippleClickable {
+                    showToastMessage = Pair(true, "준비중입니다.")
+                }
                 .height(78.dp),
             shape = RoundedCornerShape(12.dp),
             colors = CardDefaults.cardColors(Color(0xFF93A0FF)),
@@ -595,6 +601,11 @@ fun MyPageScreenContent(
                 }
             }
         }
+    }
+
+    if (showToastMessage.first) {
+        TellingmeToast(context).showToast(text = showToastMessage.second, icon = R.drawable.icon_unlock)
+        showToastMessage = Pair(false, "")
     }
 }
 

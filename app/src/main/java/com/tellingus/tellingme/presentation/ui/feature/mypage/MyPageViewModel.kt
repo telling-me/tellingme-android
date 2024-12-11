@@ -8,6 +8,7 @@ import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.repository.DataStoreKey.NICKNAME
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.usecase.GetUserInfoUseCase
 import com.tellingus.tellingme.domain.usecase.LogoutUseCase
@@ -22,6 +23,7 @@ import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import com.tellingus.tellingme.presentation.ui.feature.auth.signup.SignupContract
 import com.tellingus.tellingme.presentation.ui.feature.home.record.RecordContract
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -43,6 +45,7 @@ class MyPageViewModel @Inject constructor(
     init {
         getMypage()
         getNotification()
+        getUesrInfo()
     }
 
     fun getMypage() {
@@ -90,13 +93,13 @@ class MyPageViewModel @Inject constructor(
         }
     }
 
-    fun getUesrInfo() {
+    private fun getUesrInfo() {
         viewModelScope.launch {
             getUserInfoUseCase().onSuccess {
                 updateState(
                     currentState.copy(userInfo = it.data)
                 )
-                Log.d("taag", it.data.toString())
+                dataStoreRepository.setString(NICKNAME, it.data.nickname)
             }
         }
     }
@@ -114,12 +117,6 @@ class MyPageViewModel @Inject constructor(
                 if (it.data) {
                     // 중복 X
                     postEffect(MyPageContract.Effect.DisableNickname(text = "정상"))
-                } else {
-                    // 중복 O, 다른 것들도 체크
-//                    if () {
-//
-//                    }
-
                     updateUserInfoUseCase(
                         userRequest = UserRequest(
                             nickname = nickname,
@@ -131,17 +128,30 @@ class MyPageViewModel @Inject constructor(
                             gender = currentState.userInfo.gender
                         )
                     ).onSuccess {
-                        Log.d("taag", it.toString())
+                        postEffect(MyPageContract.Effect.CompleteEdit)
                         getUesrInfo()
-                    }.onFailure { m, c ->
-                        Log.d("taag f", c.toString())
-                    }.onNetworkError {
-                        Log.d("taag", it.message.toString())
-                    }
+                    }.onFailure { m, c -> }
                 }
             }.onFailure { message, i ->
                 if (message.contains("중복된 닉네임입니다.")) {
-                    postEffect(MyPageContract.Effect.DisableNickname(text = "중복된 닉네임입니다."))
+                    if (dataStoreRepository.getString(NICKNAME).first() == nickname) {
+                        updateUserInfoUseCase(
+                            userRequest = UserRequest(
+                                nickname = nickname,
+                                birthDate = currentState.userInfo.birthDate,
+                                job = job,
+                                jobInfo = jobInfo,
+                                purpose = purpose,
+                                mbti = mbti,
+                                gender = currentState.userInfo.gender
+                            )
+                        ).onSuccess {
+                            postEffect(MyPageContract.Effect.CompleteEdit)
+                            getUesrInfo()
+                        }.onFailure { m, c -> }
+                    } else {
+                        postEffect(MyPageContract.Effect.DisableNickname(text = "중복된 닉네임입니다."))
+                    }
                 }
             }
 

@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +52,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushAlert
 import com.tellingus.tellingme.presentation.ui.common.component.dialog.PushDenyDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
 import com.tellingus.tellingme.presentation.ui.common.component.section.QuestionSection
+import com.tellingus.tellingme.presentation.ui.common.component.toast.TellingmeToast
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileWidget
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
@@ -70,6 +72,7 @@ fun HomeScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val permissionState = rememberPermissionState(
         Manifest.permission.POST_NOTIFICATIONS
@@ -77,6 +80,7 @@ fun HomeScreen(
 
     var isShowPushDenyDialog by remember { mutableStateOf(false) }
     var isShowPushAlertDialog by remember { mutableStateOf(false) }
+    var showToast by remember { mutableStateOf(Pair(false, "")) }
 
     MainLayout(header = {
         HomeScreenHeader(navController, unreadNoticeStatus = uiState.unreadNoticeStatus)
@@ -113,6 +117,23 @@ fun HomeScreen(
                 permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
+    }
+
+    viewModel.effect.collectWithLifecycle { effect ->
+        when(effect) {
+            is HomeContract.Effect.ShowToastMessage -> {
+                Log.d("taag", effect.text)
+                showToast = Pair(true, effect.text)
+            }
+
+            else -> {}
+        }
+    }
+
+    if (showToast.first) {
+        Log.d("taag", showToast.second)
+        TellingmeToast(context).showToast(text = showToast.second, icon = R.drawable.icon_reward_cheese)
+        showToast = Pair(false, "")
     }
 
     if (isShowPushDenyDialog) {
@@ -251,12 +272,13 @@ fun HomeScreenContent(
 //                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}")
 //                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${item.answerId}?date=${date}")
                     } else {
-                        navController.navigate(
-                            ("${HomeDestinations.RECORD}/${questionTitle}/${questionPhrase}")
-                        )
+                         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val formattedDate = LocalDate.now().format(formatter)
+                    navController.navigate(
+                        ("${HomeDestinations.RECORD}/${formattedDate}/1")
+                    )
                     }
                 })
-
         }
 
         Column(modifier = Modifier.padding(start = 20.dp, top = 32.dp)) {

@@ -41,12 +41,8 @@ class HomeContract {
     }
 
     sealed class Effect : UiEffect {
-        data class MoveToRecordScreen(
-            val questionId: Int
-        ) : Effect()
-
-        data class MoveToMoreScreen(
-            val date: String
-        ) : Effect()
+        data class ShowToastMessage(
+            val text: String
+        ): Effect()
     }
 }

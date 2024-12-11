@@ -1,19 +1,22 @@
 package com.tellingus.tellingme.domain.usecase
 
+import com.tellingus.tellingme.data.model.common.BasicResponse
 import com.tellingus.tellingme.data.model.home.QuestionResponse
 import com.tellingus.tellingme.data.model.oauth.signup.NicknameResponse
+import com.tellingus.tellingme.data.model.user.PurchaseResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
+import com.tellingus.tellingme.domain.repository.AuthRepository
 import com.tellingus.tellingme.domain.repository.HomeRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetQuestionUseCase @Inject constructor(
-    private val homeRepository: HomeRepository
+class PurchaseEmotionUseCase @Inject constructor(
+    private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(
-        date: String
-    ) : ApiResult<QuestionResponse> {
-        return homeRepository.getQuestion(date)
+        code: String
+    ) : ApiResult<PurchaseResponse> {
+        return authRepository.purchaseEmotion(code)
     }
 }

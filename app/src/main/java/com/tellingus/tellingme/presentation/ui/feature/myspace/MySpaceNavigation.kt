@@ -22,19 +22,19 @@ fun NavGraphBuilder.mySpaceGraph(
         }
 
         composable(
-            route = "${MySpaceDestinations.RECORD}/{title}/{phrase}",
+            route = "${MySpaceDestinations.RECORD}/{date}/{type}",
             arguments = listOf(
-                navArgument("title") { type = NavType.StringType },
-                navArgument("phrase") { type = NavType.StringType },
+                navArgument("date") { type = NavType.StringType },
+                navArgument("date") { type = NavType.StringType },
             )
         ) {
-            val title = it.arguments?.getString("title")
-            val phrase = it.arguments?.getString("phrase")
+            val date = it.arguments?.getString("date")
+            val type = it.arguments?.getString("type")
 
             RecordScreen(
                 navController = navController,
-                title = title.toString(),
-                phrase = phrase.toString()
+                date = date!!,
+                type = type!!
             )
         }
     }

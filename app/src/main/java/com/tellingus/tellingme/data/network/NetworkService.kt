@@ -5,13 +5,16 @@ import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.data.model.home.HomeResponse
 import com.tellingus.tellingme.data.model.home.AnswerRequest
 import com.tellingus.tellingme.data.model.home.AnswerResponse
+import com.tellingus.tellingme.data.model.home.DeleteAnswerRequest
 import com.tellingus.tellingme.data.model.home.MobileTellerCardResponse
 import com.tellingus.tellingme.data.model.home.NoticeResponse
+import com.tellingus.tellingme.data.model.home.NoticeRewardResponse
 import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
 import com.tellingus.tellingme.data.model.home.PatchTellerCardResponse
 import com.tellingus.tellingme.data.model.home.PushTokenRequest
 import com.tellingus.tellingme.data.model.home.QuestionRequest
 import com.tellingus.tellingme.data.model.home.QuestionResponse
+import com.tellingus.tellingme.data.model.home.UpdateAnswerRequest
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.model.myspace.MyPageResponse
 import com.tellingus.tellingme.data.model.notice.LoadNoticeResponse
@@ -32,14 +35,18 @@ import com.tellingus.tellingme.data.model.otherspace.PostLikesResponse
 import com.tellingus.tellingme.data.model.otherspace.PostReportRequest
 import com.tellingus.tellingme.data.model.user.GetCheeseResponse
 import com.tellingus.tellingme.data.model.user.GetNotificationResponse
+import com.tellingus.tellingme.data.model.user.PurchaseRequest
+import com.tellingus.tellingme.data.model.user.PurchaseResponse
 import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationResponse
+import com.tellingus.tellingme.data.model.user.UsableEmotionResponse
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
 import com.tellingus.tellingme.data.model.user.UserColorResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -85,6 +92,18 @@ interface NetworkService {
     @POST("${END_POINT}/answer")
     suspend fun writeAnswer(
         @Body answerRequest: AnswerRequest
+    ): ApiResult<BasicResponse>
+
+    // 답변 수정 API
+    @PATCH("${END_POINT}/answer/update")
+    suspend fun updateAnswer(
+        @Body updateAnswerRequest: UpdateAnswerRequest
+    ): ApiResult<BasicResponse>
+
+    // 답변 삭제 API
+    @HTTP(method = "DELETE", path = "${END_POINT}/answer/delete", hasBody = true)
+    suspend fun deleteAnswer(
+        @Body deleteAnswerRequest: DeleteAnswerRequest
     ): ApiResult<BasicResponse>
 
     // 알림 조회 API
@@ -174,6 +193,12 @@ interface NetworkService {
         @Query("answerId") answerId: Int,
     ): ApiResult<GetAnswerByIdResponse>
 
+    // 날짜로 답변 조회 API
+    @GET("${END_POINT}/answer/date")
+    suspend fun getAnswerByDate(
+        @Query("date") date: String,
+    ): ApiResult<AnswerResponse>
+
     // 신고 등록, reason : 1~6
     @POST("${END_POINT}/report")
     suspend fun postReport(
@@ -205,8 +230,22 @@ interface NetworkService {
     suspend fun updateNotification(@Body updateNotificationRequest: UpdateNotificationRequest): ApiResult<UpdateNotificationResponse>
 
     // 푸시토큰 업데이트
+    @POST("${END_POINT}/v2/payment")
+    suspend fun purchaseEmotion(
+        @Body purchaseRequest: PurchaseRequest
+    ): ApiResult<PurchaseResponse>
+
+    // 푸시토큰 업데이트
     @POST("${END_POINT}/user/update/pushToken")
     suspend fun updatePushToken(
         @Body pushTokenRequest: PushTokenRequest
     ): ApiResult<BasicResponse>
+
+    // 사용가능한 감정 반환
+    @GET("${END_POINT}/v2/user/emotion")
+    suspend fun getUsableEmotion(): ApiResult<UsableEmotionResponse>
+
+    // 보상 알림 조회 API
+    @GET("${END_POINT}/notice/reward")
+    suspend fun getNoticeReward(): ApiResult<NoticeRewardResponse>
 }

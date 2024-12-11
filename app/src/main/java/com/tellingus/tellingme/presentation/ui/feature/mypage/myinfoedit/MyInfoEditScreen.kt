@@ -107,7 +107,7 @@ fun MyInfoEditScreenContent(
     var isJobOthersFocused by remember { mutableStateOf(false) }
 
     val selectedConcerns = remember { mutableStateListOf<Int>() }
-    if (selectedConcerns.size == 0) {
+    LaunchedEffect(Unit) {
         uiState.userInfo.purpose
             .removeSurrounding("[", "]") // 대괄호 제거
             .takeIf { it.isNotEmpty() } // 빈 문자열일 경우 처리
@@ -156,6 +156,11 @@ fun MyInfoEditScreenContent(
             is MyPageContract.Effect.DisableNickname -> {
                 nicknameErrorState = effect.text
             }
+
+            is MyPageContract.Effect.CompleteEdit -> {
+                navController.popBackStack()
+            }
+
             else -> {}
         }
     }
@@ -174,20 +179,30 @@ fun MyInfoEditScreenContent(
             },
             rightSlot = {
                 Row {
-                    SingleButton(size = ButtonSize.LARGE, text = "완료", onClick = {
-                        if (nicknameErrorState == "정상" && selectedConcerns.size != 0) {
-                            Log.d("taag", "완료 가능")
-                            viewModel.updateUserInfo(
-                                nickname = nicknameValue,
-                                job = selectedJobType,
-                                jobInfo = jobOthersInputValue ?: "",
-                                purpose = selectedConcerns.joinToString(prefix = "[", postfix = "]"),
-                                mbti = selectedMBTI ?: ""
-                            )
-                        } else {
-                            Log.d("taag", "완료 불가능")
-                        }
-                    })
+                    SingleButton(
+                        size = ButtonSize.LARGE,
+                        text = "완료",
+                        onClick = {
+                            if (nicknameErrorState == "정상" && selectedConcerns.size != 0) {
+                                Log.d("taag", "완료 가능")
+                                viewModel.updateUserInfo(
+                                    nickname = nicknameValue,
+                                    job = selectedJobType,
+                                    jobInfo = jobOthersInputValue ?: "",
+                                    purpose = selectedConcerns.joinToString(prefix = "[", postfix = "]"),
+                                    mbti = selectedMBTI ?: ""
+                                )
+                            } else {
+                                Log.d("taag", "완료 불가능")
+                            }
+                        },
+                        enable = if (nicknameErrorState == "정상" && selectedConcerns.size != 0 && selectedJobType != 5) {
+                            true
+                        } else if (nicknameErrorState == "정상" && selectedConcerns.size != 0
+                            && selectedJobType == 5 && jobOthersInputValue!!.isNotEmpty()) {
+                            true
+                        } else false
+                    )
                 }
             })
 
@@ -217,7 +232,9 @@ fun MyInfoEditScreenContent(
 
             // 최대 2개 선택 가능하도록 선택 상태를 토글하는 함수
             fun toggleSelection(index: Int) {
-                if (selectedConcerns.contains(index)) {
+                Log.d("taag", selectedConcerns.joinToString(""))
+                Log.d("taag", index.toString())
+                if (selectedConcerns.joinToString("").contains(index.toString())) {
                     selectedConcerns.remove(index)
                 } else {
                     if (selectedConcerns.size < 2) {
@@ -241,7 +258,7 @@ fun MyInfoEditScreenContent(
                             text = worry.text,
                             onClick = { toggleSelection(it) },
                             index = index,
-                            selected = selectedConcerns.contains(index)
+                            selected = selectedConcerns.joinToString("").contains(index.toString())
                         )
                     }
                 }

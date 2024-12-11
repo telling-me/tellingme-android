@@ -333,7 +333,11 @@ fun SignupTermsBottomSheet(
                 size = ButtonSize.LARGE,
                 text = "다음",
                 enable = term1 && term2,
-                onClick = onClickNext
+                onClick = {
+                    if (term1 && term2) {
+                        onClickNext()
+                    }
+                }
             )
         }
     }

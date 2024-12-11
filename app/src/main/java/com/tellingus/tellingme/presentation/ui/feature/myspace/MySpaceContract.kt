@@ -11,12 +11,11 @@ class MySpaceContract {
     data class State(
         val isLoading: Boolean = false,
         val today: LocalDate = LocalDate.now(),
+        val isTodayAnswer: Boolean = true,
         val currentDate: LocalDate = LocalDate.now(),
         val answerList: List<Answer> = emptyList(),
         val isAnsweredDateList: List<LocalDate> = emptyList(),
         val initialAnswerPageIndex: Int = 0,
-        val todayTitle: String = "",
-        val todayPhrase: String = "",
     ): UiState
 
     sealed class Event: UiEvent {
