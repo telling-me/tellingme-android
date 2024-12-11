@@ -3,6 +3,7 @@ package com.tellingus.tellingme.presentation.ui.feature.mypage.alarm
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -38,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -68,7 +70,8 @@ fun AlarmScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    MainLayout(header = { AlarmScreenHeader { navController.popBackStack() } },
+    MainLayout(
+        header = { AlarmScreenHeader { navController.popBackStack() } },
         content = { AlarmScreenContent(uiState = uiState, viewModel = viewModel) },
         isScrollable = false,
         background = Color.White
@@ -121,13 +124,18 @@ fun AlarmScreenContent(
         }
         if (list.isEmpty()) {
             // 알림이 없을 경우
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(20.dp),
-                contentAlignment = Alignment.Center
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "알림이 없어요", style = Typography.body2Bold)
+                Image(
+                    painter = painterResource(R.drawable.my_teller_badge_empty),
+                    contentDescription = ""
+                )
+                Text(text = "아직 받은 알림이 없어요", style = Typography.body2Bold)
             }
         } else {
             // 알림이 있을 경우

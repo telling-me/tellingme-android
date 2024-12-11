@@ -15,9 +15,9 @@ class HomeContract {
         val recordCount: Int = 0,
         val todayAnswerCount: Int = 0,
         val communicationList: List<CommunicationData> = listOf(),
-        val unreadNoticeStatus :Boolean = false,
+        val unreadNoticeStatus: Boolean = false,
         val questionTitle: String = "",
-        val questionPhrase: String= "",
+        val questionPhrase: String = "",
         val userNickname: String = "",
         val userLevel: Int = 0,
         val userExp: Int = 0,
@@ -25,8 +25,11 @@ class HomeContract {
         val denyPushNoti: Boolean = true,
         val requiredExp: Int = 0,
         val daysToLevelUp: Int = 0,
-    ) : UiState
-    {
+        val todayAnswer: Boolean = false,
+
+        val badgeCode: String = "",
+        val colorCode: String = ""
+    ) : UiState {
         data class TodayQuestionCardInfo(val title: String = "", val content: String = "")
     }
 

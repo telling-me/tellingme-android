@@ -6,6 +6,7 @@ import com.tellingus.tellingme.data.model.home.LevelDto
 import com.tellingus.tellingme.data.model.home.LevelInfo
 import com.tellingus.tellingme.data.model.home.TellerCard
 import com.tellingus.tellingme.data.model.home.UserInfo
+import com.tellingus.tellingme.data.model.user.UserColorData
 import com.tellingus.tellingme.presentation.ui.common.base.UiEffect
 import com.tellingus.tellingme.presentation.ui.common.base.UiEvent
 import com.tellingus.tellingme.presentation.ui.common.base.UiState
@@ -28,6 +29,8 @@ class TellerCardTuningContract {
         val recordCount : Int = 0,
 
         val cheeseBalance: Int = 0,
+
+        val userColorList : List<UserColorData> = emptyList()
     ) : UiState
 
     sealed class Event : UiEvent {

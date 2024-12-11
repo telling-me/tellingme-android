@@ -1,6 +1,5 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.tellercardtuning
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.model.home.PatchTellerCardRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
@@ -21,8 +20,6 @@ class TellerCardTuningViewModel @Inject constructor(
 ) : BaseViewModel<TellerCardTuningContract.State, TellerCardTuningContract.Event, TellerCardTuningContract.Effect>(
     initialState = TellerCardTuningContract.State()
 ) {
-    val TAG: String = "로그"
-
     init {
         getMobileTellerCard()
         getCheese()
@@ -57,10 +54,8 @@ class TellerCardTuningViewModel @Inject constructor(
             patchTellerCardUseCase(
                 patchTellerCardRequest = PatchTellerCardRequest(colorCode, badgeCode)
             ).onSuccess {
-                Log.d(TAG, "patchTellerCard: success")
                 getMobileTellerCard()
             }.onFailure { s, i ->
-                Log.d(TAG, "patchTellerCard: failure")
             }
         }
     }
@@ -69,6 +64,7 @@ class TellerCardTuningViewModel @Inject constructor(
         when (event) {
             is TellerCardTuningContract.Event.OnClickPatchTellerCard -> {
                 patchTellerCard(colorCode = event.colorCode, badgeCode = event.badgeCode)
+                getCheese()
             }
         }
     }

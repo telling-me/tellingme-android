@@ -18,6 +18,9 @@ data class HomeData(
     val userExp: Int,
     val requiredExp: Int,
     val daysToLevelUp: Int,
+    val todayAnswer: Boolean,
+    val badgeCode: String,
+    val colorCode: String,
 )
 
 data class CommunicationData(

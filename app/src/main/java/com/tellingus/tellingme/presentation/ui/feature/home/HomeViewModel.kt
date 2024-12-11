@@ -51,9 +51,11 @@ class HomeViewModel @Inject constructor(
             )
         }
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
         val request = HomeRequest(
             date = today, page = 0, size = 0, sort = "string"
         )
+
         getMain(request)
 
         FirebaseMessaging.getInstance().token
@@ -116,7 +118,10 @@ class HomeViewModel @Inject constructor(
                                 userLevel = userLevel,
                                 userExp = userExp,
                                 requiredExp = requiredExp,
-                                daysToLevelUp = daysToLevelUp
+                                daysToLevelUp = daysToLevelUp,
+                                todayAnswer = todayAnswer,
+                                badgeCode = badgeCode,
+                                colorCode = colorCode,
                             )
                         )
                     }

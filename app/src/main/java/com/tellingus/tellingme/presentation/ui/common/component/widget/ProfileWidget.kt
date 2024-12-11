@@ -25,7 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.tellingus.tellingme.R
+import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotionBadge
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Profile100
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
@@ -34,9 +34,9 @@ import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 fun ProfileWidget(
     modifier: Modifier = Modifier,
     backgroundColor: Color = Profile100,
-    badge: Int = R.drawable.type_badge_sample,
     nickname: String,
-    description: String
+    description: String,
+    badgeCode: String = "",
 ) {
     Card(
         modifier = modifier.fillMaxWidth().wrapContentSize(),
@@ -89,7 +89,7 @@ fun ProfileWidget(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.type_badge_sample),
+                    painter = painterResource(getMediumEmotionBadge(badgeCode)),
                     contentDescription = "",
                     contentScale = ContentScale.Crop,
                     modifier = modifier

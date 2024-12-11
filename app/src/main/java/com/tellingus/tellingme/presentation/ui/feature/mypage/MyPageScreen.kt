@@ -197,7 +197,7 @@ fun MyPageScreenContent(
                 IconTextItem(
                     id = "tellingme_introduce",
                     iconResId = R.drawable.icon_planet,
-                    text = "텔링미를 소개해요",
+                    text = "텔링미 탄생 이야기",
                     actionType = ActionType.NAVIGATE_SCREEN,
                     destination = MyPageDestinations.ABOUT_TELLING_ME
                 ),
@@ -398,7 +398,7 @@ fun MyPageScreenContent(
                     .background(Color.White, RoundedCornerShape(12.dp))
                     .clickable {
                         val intent =
-                            Intent(Intent.ACTION_VIEW, Uri.parse("https://tally.so/r/3Nlvlp"))
+                            Intent(Intent.ACTION_VIEW, Uri.parse("https://walla.my/v/7XwE0CxFffPanoQ7TneT"))
                         context.startActivity(intent)
                     },
                 verticalAlignment = Alignment.CenterVertically,
@@ -427,7 +427,7 @@ fun MyPageScreenContent(
                         val intent =
                             Intent(
                                 Intent.ACTION_VIEW,
-                                Uri.parse("https://walla.my/v/7XwE0CxFffPanoQ7TneT")
+                                Uri.parse("https://doana.notion.site/FAQ-f7a045872c3b4b02bce5e9f6d6cfc2d8")
                             )
                         context.startActivity(intent)
 

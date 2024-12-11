@@ -41,6 +41,7 @@ import com.tellingus.tellingme.data.model.user.UpdateNotificationRequest
 import com.tellingus.tellingme.data.model.user.UpdateNotificationResponse
 import com.tellingus.tellingme.data.model.user.UsableEmotionResponse
 import com.tellingus.tellingme.data.model.user.UserBadgeResponse
+import com.tellingus.tellingme.data.model.user.UserColorResponse
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -176,6 +177,9 @@ interface NetworkService {
     // 유저 배지 목록
     @GET("${END_POINT}/v2/user/badge")
     suspend fun getUserBadge(): ApiResult<UserBadgeResponse>
+
+    @GET("${END_POINT}/v2/user/color")
+    suspend fun getUserColor(): ApiResult<UserColorResponse>
 
     // 좋아요 누르기/취소하기
     @POST("${END_POINT}/likes")
