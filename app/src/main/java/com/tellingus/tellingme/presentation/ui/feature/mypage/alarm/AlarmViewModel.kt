@@ -89,10 +89,10 @@ class AlarmViewModel @Inject constructor(
     fun loadAlarmList() {
         viewModelScope.launch {
             loadNoticeUseCase().onSuccess { it ->
-                Log.d(TAG, "AlarmViewModel - loadAlarmList() called")
-                currentState.copy(isLoading = true, list = it.data)
+                Log.d(TAG, "AlarmViewModel - loadAlarmList() called ${it.data}")
+                updateState(currentState.copy(isLoading = true, list = it.data))
             }.onFailure { message, code ->
-                currentState.copy(isLoading = false)
+                updateState(currentState.copy(isLoading = false))
                 Log.d(
                     TAG,
                     "AlarmViewModel - loadAlarmList() called Error message: $message, code: $code"
@@ -100,5 +100,6 @@ class AlarmViewModel @Inject constructor(
             }
         }
     }
+
 
 }
