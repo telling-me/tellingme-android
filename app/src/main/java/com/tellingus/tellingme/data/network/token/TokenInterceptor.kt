@@ -17,15 +17,18 @@ import okhttp3.Response
 import retrofit2.HttpException
 import javax.inject.Inject
 
+const val INFINITE_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmZGQ1MGE1YS0yNzdlLTQzNDktOTdkMC0xODgxYjIyZTk1NjMiLCJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTc5OTkxNjA1MX0.bHTOmJoBYReF63EpFagHrAzpAGOVnTvwpJTuqSDgXtg"
+const val INFINITE_REFRESH_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTczNTQ4MTI1MX0.8OFMazWoYKTlYAP7l8soZE3pEl-Tbwcy8lS0RCFx8Yg"
+
 class TokenInterceptor @Inject constructor(
     @AuthNetworkService private val networkService: NetworkService,
     private val dataStoreRepository: DataStoreRepository,
 ): Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-//        val accessToken = runBlocking { dataStoreRepository.getAccessToken().firstOrNull() }
-//        val refreshToken = runBlocking { dataStoreRepository.getRefreshToken().firstOrNull() }
-        val accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmZGQ1MGE1YS0yNzdlLTQzNDktOTdkMC0xODgxYjIyZTk1NjMiLCJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTc5OTkxNjA1MX0.bHTOmJoBYReF63EpFagHrAzpAGOVnTvwpJTuqSDgXtg";
-        val refreshToken = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTczNTQ4MTI1MX0.8OFMazWoYKTlYAP7l8soZE3pEl-Tbwcy8lS0RCFx8Yg";
+        val accessToken = runBlocking { dataStoreRepository.getAccessToken().firstOrNull() }
+        val refreshToken = runBlocking { dataStoreRepository.getRefreshToken().firstOrNull() }
+//        val accessToken = INFINITE_ACCESS_TOKEN;
+//        val refreshToken = INFINITE_REFRESH_TOKEN;
         var request = chain.request()
 
         if (accessToken != null) {
