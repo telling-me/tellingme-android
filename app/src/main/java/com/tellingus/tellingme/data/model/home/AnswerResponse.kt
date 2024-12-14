@@ -7,10 +7,10 @@ data class AnswerResponse(
 )
 
 data class Answer(
+    val answerId: Int = 0,
     val content: String = "",
     val emotion: Int = 0,
-    val date: String = "",
+    val likeCount: Int = 0,
+    val isLiked: Boolean = false,
     val isPublic: Boolean = false,
-    val isSpare: Boolean = false,
-    val likeCount: Int = 0
 )

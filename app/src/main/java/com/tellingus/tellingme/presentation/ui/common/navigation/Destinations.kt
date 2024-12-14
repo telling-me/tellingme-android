@@ -34,6 +34,7 @@ object HomeDestinations {
     const val USER_FEEDBACK = "userFeedback"
     const val USER_FEEDBACK_GOOD = "userFeedbackGood"
     const val USER_FEEDBACK_BAD = "userFeedbackBad"
+    const val HOME_DETAIL = "homeDetail"
 }
 
 object MySpaceDestinations {
