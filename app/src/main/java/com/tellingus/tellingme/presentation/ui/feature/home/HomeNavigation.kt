@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
+import com.tellingus.tellingme.presentation.ui.feature.home.detail.HomeDetailScreen
 import com.tellingus.tellingme.presentation.ui.feature.home.mytellerbadge.MyTellerBadgeScreen
 import com.tellingus.tellingme.presentation.ui.feature.home.record.RecordScreen
 import com.tellingus.tellingme.presentation.ui.feature.home.tellercard.TellerCardScreen
@@ -33,7 +34,7 @@ fun NavGraphBuilder.homeGraph(
                 navArgument("date") { type = NavType.StringType },
                 navArgument("type") { type = NavType.StringType }
             )
-            ) {
+        ) {
             val parentEntry = remember(it) {
                 navController.getBackStackEntry(HomeDestinations.HOME)
             }
@@ -65,6 +66,16 @@ fun NavGraphBuilder.homeGraph(
         }
         composable(route = HomeDestinations.USER_FEEDBACK_BAD) {
             UserFeedbackBadScreen(navController = navController)
+        }
+        composable(route = "${HomeDestinations.HOME_DETAIL}/{title}/{phrase}",
+            arguments = listOf(
+                navArgument("title") { type = NavType.StringType },
+                navArgument("phrase") { type = NavType.StringType }
+            )
+        ) {
+            val title = it.arguments?.getString("title")
+            val phrase = it.arguments?.getString("phrase")
+            HomeDetailScreen(navController = navController, title = title!!, phrase = phrase!!)
         }
 
     }
