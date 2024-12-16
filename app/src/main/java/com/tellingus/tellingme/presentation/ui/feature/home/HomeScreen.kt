@@ -123,7 +123,7 @@ fun HomeScreen(
     }
 
     viewModel.effect.collectWithLifecycle { effect ->
-        when(effect) {
+        when (effect) {
             is HomeContract.Effect.ShowToastMessage -> {
                 Log.d("taag", effect.text)
                 showToast = Pair(true, effect.text)
@@ -135,7 +135,10 @@ fun HomeScreen(
 
     if (showToast.first) {
         Log.d("taag", showToast.second)
-        TellingmeToast(context).showToast(text = showToast.second, icon = R.drawable.icon_reward_cheese)
+        TellingmeToast(context).showToast(
+            text = showToast.second,
+            icon = R.drawable.icon_reward_cheese
+        )
         showToast = Pair(false, "")
     }
 
@@ -272,6 +275,7 @@ fun HomeScreenContent(
                 isTodayAnswer = todayAnswer,
                 onClickButton = {
                     if (todayAnswer) {
+                        navController.navigate("${HomeDestinations.HOME_DETAIL}/${questionTitle}/${questionPhrase}")
 //                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}")
 //                        navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${item.answerId}?date=${date}")
                     } else {

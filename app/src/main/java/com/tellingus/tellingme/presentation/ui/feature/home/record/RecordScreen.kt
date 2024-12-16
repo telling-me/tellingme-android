@@ -54,6 +54,7 @@ import com.holix.android.bottomsheetdialog.compose.BottomSheetDialog
 import com.holix.android.bottomsheetdialog.compose.BottomSheetDialogProperties
 import com.holix.android.bottomsheetdialog.compose.NavigationBarProperties
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.data.model.home.HomeRequest
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
 import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
@@ -69,6 +70,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.widget.ToolTip
 import com.tellingus.tellingme.presentation.ui.common.const.LargeEmotionList
 import com.tellingus.tellingme.presentation.ui.common.const.getEmotionText
 import com.tellingus.tellingme.presentation.ui.common.const.getLargeEmotion
+import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.feature.home.HomeViewModel
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Base0
@@ -80,6 +82,8 @@ import com.tellingus.tellingme.presentation.ui.theme.Gray800
 import com.tellingus.tellingme.presentation.ui.theme.Primary400
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.util.collectWithLifecycle
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun RecordScreen(
@@ -164,12 +168,15 @@ fun RecordScreen(
     }
 
     if (showToastMessage.first) {
-        TellingmeToast(context).showToast(text = showToastMessage.second, icon = R.drawable.icon_warn)
+        TellingmeToast(context).showToast(
+            text = showToastMessage.second,
+            icon = R.drawable.icon_warn
+        )
         showToastMessage = Pair(false, "")
     }
-    
+
     viewModel.effect.collectWithLifecycle { effect ->
-        when(effect) {
+        when (effect) {
             is RecordContract.Effect.ShowRecordDialog -> {
                 showDialogState = true
             }
@@ -187,8 +194,11 @@ fun RecordScreen(
             }
 
             is RecordContract.Effect.CompleteRecord -> {
-                navController.popBackStack()
                 homeViewModel.getNoticeReward()
+                val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                homeViewModel.getMain(HomeRequest(date = today, page = 0, size = 0, sort = ""))
+//                navController.navigate(("${HomeDestinations.HOME}"))
+                navController.popBackStack()
             }
 
             is RecordContract.Effect.CompleteUpdate -> {
@@ -382,6 +392,7 @@ fun RecordScreenContent(
         )
     }
 }
+
 var purchaseIndex = 0
 
 @Composable
@@ -402,7 +413,8 @@ fun EmotionBottomSheet(
     BottomSheetDialog(
         onDismissRequest = onDismiss,
         properties = BottomSheetDialogProperties(
-            navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),  /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
+            navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),
+            /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
             dismissOnClickOutside = false,
             behaviorProperties = BottomSheetBehaviorProperties(isDraggable = false)
         )

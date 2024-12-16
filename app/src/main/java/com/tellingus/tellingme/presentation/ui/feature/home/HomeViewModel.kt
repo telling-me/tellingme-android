@@ -3,24 +3,18 @@ package com.tellingus.tellingme.presentation.ui.feature.home
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
-import com.tellingus.tellingme.data.model.home.CommunicationData
 import com.tellingus.tellingme.data.model.home.HomeRequest
-import com.tellingus.tellingme.data.model.home.NoticeRewardResponse
 import com.tellingus.tellingme.data.model.otherspace.PostLikesRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
-import com.tellingus.tellingme.data.repositoryimpl.HomeRepositoryImpl
 import com.tellingus.tellingme.domain.repository.DataStoreKey
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
-import com.tellingus.tellingme.domain.repository.HomeRepository
-import com.tellingus.tellingme.domain.usecase.GetAnswerByDateUseCase
 import com.tellingus.tellingme.domain.usecase.GetNoticeRewardUseCase
 import com.tellingus.tellingme.domain.usecase.HomeUseCase
 import com.tellingus.tellingme.domain.usecase.UpdatePushTokenUseCase
 import com.tellingus.tellingme.domain.usecase.otherspace.PostLikesUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
-import com.tellingus.tellingme.util.getToday
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -35,7 +29,6 @@ class HomeViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val postLikesUseCase: PostLikesUseCase,
     private val getNoticeRewardUseCase: GetNoticeRewardUseCase,
-    private val getAnswerByDateUseCase: GetAnswerByDateUseCase
 ) : BaseViewModel<HomeContract.State, HomeContract.Event, HomeContract.Effect>(
     initialState = HomeContract.State()
 ) {
@@ -53,7 +46,7 @@ class HomeViewModel @Inject constructor(
         val today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
         val request = HomeRequest(
-            date = today, page = 0, size = 0, sort = "string"
+            date = today, page = 0, size = 0, sort = ""
         )
 
         getMain(request)

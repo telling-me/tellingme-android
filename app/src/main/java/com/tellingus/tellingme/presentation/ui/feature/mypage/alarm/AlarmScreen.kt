@@ -60,6 +60,8 @@ import com.tellingus.tellingme.presentation.ui.theme.Error600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
 @Composable
@@ -116,11 +118,17 @@ fun AlarmScreenContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "알림")
-            if (hasUnread) {
-                ActionChip(onClick = {
-                    viewModel.processEvent(AlarmContract.Event.OnClickTotalRead)
-                }, text = "전체 읽음", hasArrow = false)
-            }
+
+            ActionChip(
+                onClick = {
+                    if (hasUnread) {
+                        viewModel.processEvent(AlarmContract.Event.OnClickTotalRead)
+                    }
+                },
+                text = "전체 읽음",
+                hasArrow = false
+            )
+
         }
         if (list.isEmpty()) {
             // 알림이 없을 경우
@@ -140,12 +148,15 @@ fun AlarmScreenContent(
         } else {
             // 알림이 있을 경우
             LazyColumn {
-                items(items = list) {
+                items(items = list) {it->
+                    val date = "${it.createdAt[0]}-${it.createdAt[1]}-${it.createdAt[2]}";
+                    val parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-M-d")).format(
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                     AlarmCard(
                         alarmType = "",
                         title = it.title,
-                        content = it.content,
-                        date = it.date,
+                        content = it.content ?: "",
+                        date = parsedDate,
                         isRead = it.isRead,
                         onClick = {
                             viewModel.processEvent(AlarmContract.Event.OnClickItemRead(it.noticeId))
@@ -285,70 +296,3 @@ data class AlarmItem(
 fun AlarmScreenPreview() {
     AlarmScreen(navController = rememberNavController())
 }
-
-val dummyList = listOf(
-    AlarmItem(id = 1, "alarm", title = "지난 달 서재가 완성되었어요!", date = "2023.09.20", isRead = true),
-    AlarmItem(
-        id = 2,
-        "event",
-        "텔링미북 모으는 분들 주목!",
-        "더 나은 텔링미 북 제작을 위한 여러분들의 의견이 궁금합니다! 설문 조사에 참여해주세요.",
-        "2023.09.15"
-    ),
-    AlarmItem(id = 3, "alarm", title = "지난 달 서재가 완성되었어요!", date = "2023.09.13", isRead = true),
-    AlarmItem(
-        id = 4,
-        alarmType = "notice",
-        title = "서비스 오류 공지",
-        content = "현재 텔링미에 에러가 발생하고 있어요. 신속하게 처리할게요! 불편을 끼쳐뜨려 죄송합니다.",
-        date = "2023.09.15"
-    ),
-    AlarmItem(
-        id = 5,
-        "event",
-        "텔링미북 모으는 분들 주목!",
-        "더 나은 텔링미 북 제작을 위한 여러분들의 의견이 궁금합니다! 설문 조사에 참여해주세요.",
-        "2023.08.24"
-    ),
-    AlarmItem(
-        id = 6,
-        "event",
-        "텔링미북 모으는 분들 주목!",
-        "더 나은 텔링미 북 제작을 위한 여러분들의 의견이 궁금합니다! 설문 조사에 참여해주세요.",
-        "2023.08.15"
-    ),
-    AlarmItem(
-        id = 7, "alarm", title = "지난 달 서재가 완성되었어요!", date = "2023.09.20"
-    ),
-    AlarmItem(
-        id = 8,
-        "event",
-        "텔링미북 모으는 분들 주목!",
-        "더 나은 텔링미 북 제작을 위한 여러분들의 의견이 궁금합니다! 설문 조사에 참여해주세요.",
-        "2023.09.15"
-    ),
-    AlarmItem(
-        id = 9, "alarm", title = "지난 달 서재가 완성되었어요!", date = "2023.09.13"
-    ),
-    AlarmItem(
-        id = 10,
-        alarmType = "notice",
-        title = "서비스 오류 공지",
-        content = "현재 텔링미에 에러가 발생하고 있어요. 신속하게 처리할게요! 불편을 끼쳐뜨려 죄송합니다.",
-        date = "2023.09.15"
-    ),
-    AlarmItem(
-        id = 11,
-        "event",
-        "텔링미북 모으는 분들 주목!",
-        "더 나은 텔링미 북 제작을 위한 여러분들의 의견이 궁금합니다! 설문 조사에 참여해주세요.",
-        "2023.08.24"
-    ),
-    AlarmItem(
-        id = 12,
-        "event",
-        "텔링미북 모으는 분들 주목!",
-        "더 나은 텔링미 북 제작을 위한 여러분들의 의견이 궁금합니다! 설문 조사에 참여해주세요.",
-        "2023.08.15"
-    ),
-)

@@ -1,8 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.otherspace.detail
 
-import android.text.style.AlignmentSpan
-import android.util.Log
-import android.widget.Toast
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,14 +12,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -99,8 +94,10 @@ fun OtherSpaceDetailScreen(
 
 
     if (isComplaintBottomSheetOpen) {
-        ComplaintBottomSheet(onDismiss = { isComplaintBottomSheetOpen = false },
-            onClick = { isComplainReasonBottomSheetOpen = true })
+        ComplaintBottomSheet(
+            onDismiss = { isComplaintBottomSheetOpen = false },
+            onClick = { isComplainReasonBottomSheetOpen = true },
+        )
     }
     if (isComplainReasonBottomSheetOpen) {
         ComplainReasonBottomSheet(onDismiss = {
@@ -141,7 +138,7 @@ fun ComplainReasonBottomSheet(onConfirm: (String) -> Unit = {}, onDismiss: () ->
         onDismissRequest = { onDismiss }, properties = BottomSheetDialogProperties(
             navigationBarProperties = NavigationBarProperties(navigationBarContrastEnforced = false),
             /** 하단 시스템 내비게이션과 중첩되는 이슈 해결 **/
-            dismissOnClickOutside = false,
+            dismissOnClickOutside = true,
             behaviorProperties = BottomSheetBehaviorProperties(isDraggable = true)
         )
     ) {
@@ -211,6 +208,16 @@ fun ComplaintBottomSheet(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
         )
     ) {
         CustomBottomSheet {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                TellingmeIconButton(
+                    iconRes = R.drawable.icon_close,
+                    size = ButtonSize.MEDIUM,
+                    color = Gray500,
+                    onClick = { onDismiss() },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                )
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -231,8 +238,6 @@ fun ComplaintBottomSheet(onClick: () -> Unit = {}, onDismiss: () -> Unit = {}) {
             }
         }
     }
-
-
 }
 
 @Composable
