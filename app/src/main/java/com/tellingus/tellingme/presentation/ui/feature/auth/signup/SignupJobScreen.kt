@@ -154,11 +154,13 @@ fun SignupJobContentScreen(
                 selectedJob != -1
             },
             onClick = {
-                viewModel.processEvent(
-                    SignupContract.Event.NextButtonClickedInJob(
-                        job = selectedJob
+                if (selectedJob != -1) {
+                    viewModel.processEvent(
+                        SignupContract.Event.NextButtonClickedInJob(
+                            job = selectedJob
+                        )
                     )
-                )
+                }
             }
         )
     }

@@ -166,11 +166,13 @@ fun SignupWorryContentScreen(
             text = "다음",
             enable = selectedWorry.size != 0,
             onClick = {
-                viewModel.processEvent(
-                    SignupContract.Event.NextButtonClickedInWorry(
-                        worry = selectedWorry.toList()
+                if (selectedWorry.isNotEmpty()) {
+                    viewModel.processEvent(
+                        SignupContract.Event.NextButtonClickedInWorry(
+                            worry = selectedWorry.toList()
+                        )
                     )
-                )
+                }
             }
         )
     }
