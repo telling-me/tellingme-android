@@ -50,7 +50,7 @@ fun CommunityCard(
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = title, style = TellingmeTheme.typography.body2Bold)
+            Text(text = title, style = TellingmeTheme.typography.body2Bold, )
             Text(text = date, style = TellingmeTheme.typography.caption1Regular)
         }
 
@@ -118,7 +118,7 @@ data class CommunityItem(
 )
 
 val dummyItem = CommunityItem(
-    id = "1", title = "소속된 집단에서 내가 주로 맡는 역활은?",
+    id = "1", title = "지금 나의목표를 이루기 위해 통제해야 하는 것은?",
     date = "오늘",
     commentCount = 1000
 );

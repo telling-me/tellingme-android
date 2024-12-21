@@ -78,7 +78,7 @@ fun QuestionSection(
                 PrimaryButton(
                     modifier = Modifier.padding(top = 28.dp),
                     size = ButtonSize.MEDIUM,
-                    text = if(isTodayAnswer) "답변완료" else  "기록하기",
+                    text = if(isTodayAnswer) "기록완료" else  "기록하기",
                     onClick = onClickButton
                 )
             }
