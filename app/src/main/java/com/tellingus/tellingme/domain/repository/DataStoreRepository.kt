@@ -29,5 +29,5 @@ object DataStoreKey {
     const val SOCIAL_ID = "socialId"
     const val DENY_PUSH_NOTI = "denyPushNoti"
     const val NICKNAME = "nickname"
-
+    const val KAKAO_OAUTH_KEY = "kakaoOauthKey"
 }

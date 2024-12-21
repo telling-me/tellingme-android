@@ -11,6 +11,7 @@ import com.tellingus.tellingme.data.model.oauth.login.OauthRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.repository.DataStoreKey.KAKAO_OAUTH_KEY
 import com.tellingus.tellingme.domain.repository.DataStoreKey.SOCIAL_ID
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.usecase.LoginUseCase
@@ -115,6 +116,7 @@ class LoginViewModel @Inject constructor(
 
                         // 소셜로그인 결과 404라면 추가정보 기입 화면으로 이동
                         dataStoreRepository.setString(SOCIAL_ID, socialId)
+                        dataStoreRepository.setString(KAKAO_OAUTH_KEY, oauthToken)
                         postEffect(LoginContract.Effect.MoveToSignup(socialId = socialId))
                     }
                     1000 -> {

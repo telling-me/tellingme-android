@@ -163,6 +163,7 @@ class MyPageViewModel @Inject constructor(
         viewModelScope.launch {
             signOutUseCase().onSuccess {
                 Log.d("taag s", it.toString())
+                dataStoreRepository.deleteAll()
             }.onFailure { m, c ->
                 Log.d("taag f", c.toString())
             }

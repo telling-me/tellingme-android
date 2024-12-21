@@ -445,7 +445,7 @@ fun MySpaceScreen(
                         modifier = modifier
                             .clickable(
                                 onClick = {
-                                    navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/detail/${uiState.answerList[index].answerId}?date=${uiState.answerList[index].date}")
+                                    navController.navigate("${MySpaceDestinations.CARD_DETAIL}/$index")
                                 },
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null

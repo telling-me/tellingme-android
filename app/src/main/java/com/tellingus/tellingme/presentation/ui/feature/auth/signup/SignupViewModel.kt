@@ -2,16 +2,24 @@ package com.tellingus.tellingme.presentation.ui.feature.auth.signup
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.tellingus.tellingme.data.model.oauth.login.OauthRequest
 import com.tellingus.tellingme.data.model.oauth.signup.SignUpRequest
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
 import com.tellingus.tellingme.data.network.adapter.onSuccess
+import com.tellingus.tellingme.domain.repository.DataStoreKey.KAKAO_OAUTH_KEY
 import com.tellingus.tellingme.domain.repository.DataStoreKey.NICKNAME
+import com.tellingus.tellingme.domain.repository.DataStoreKey.SOCIAL_ID
 import com.tellingus.tellingme.domain.repository.DataStoreRepository
+import com.tellingus.tellingme.domain.usecase.LoginUseCase
 import com.tellingus.tellingme.domain.usecase.SignUpUseCase
 import com.tellingus.tellingme.domain.usecase.VerifyNicknameUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
+import com.tellingus.tellingme.presentation.ui.feature.auth.login.IsAuto
+import com.tellingus.tellingme.presentation.ui.feature.auth.login.LoginContract
+import com.tellingus.tellingme.presentation.ui.feature.auth.login.LoginType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,7 +27,8 @@ import javax.inject.Inject
 class SignupViewModel @Inject constructor(
     private val verifyNicknameUseCase: VerifyNicknameUseCase,
     private val signupUseCase: SignUpUseCase,
-    private val dataStoreRepository: DataStoreRepository
+    private val dataStoreRepository: DataStoreRepository,
+    private val loginUseCase: LoginUseCase
 ): BaseViewModel<SignupContract.State, SignupContract.Event, SignupContract.Effect>(
     initialState = SignupContract.State()
 ) {
@@ -58,9 +67,24 @@ class SignupViewModel @Inject constructor(
             ).onSuccess {
                 Log.d("taag joinUser", it.toString())
                 dataStoreRepository.setString(NICKNAME, currentState.signupRequest.nickname)
-                postEffect(SignupContract.Effect.CompleteSignup)
+
+                loginUseCase(
+                    oauthToken = dataStoreRepository.getString(KAKAO_OAUTH_KEY).first(),
+                    loginType = LoginType.KAKAO.name.lowercase(),
+                    isAuto = IsAuto.MANUAL.name.lowercase(),
+                    oauthRequest = OauthRequest(socialId = dataStoreRepository.getString(SOCIAL_ID).first())
+                ).onSuccess {
+                    // 자동 로그인인 경우 바로 홈 화면으로 진입
+                    dataStoreRepository.setJwtTokens(
+                        accessToken = it.data.accessToken,
+                        refreshToken = it.data.refreshToken
+                    )
+                    postEffect(SignupContract.Effect.CompleteSignup)
+                }.onFailure { m, s ->
+
+                }
+
             }.onFailure { message, code ->
-                Log.d("taag joinUser", message)
             }
         }
     }
