@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -70,6 +71,7 @@ import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray200
 import com.tellingus.tellingme.presentation.ui.theme.Gray500
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
+import com.tellingus.tellingme.presentation.ui.theme.Profile100
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.util.AppUtils
 import com.tellingus.tellingme.util.collectWithLifecycle
@@ -220,6 +222,7 @@ fun MyPageScreenContent(
         Row {
             val TAG: String = "로그"
             Log.d(TAG, " - MyPageScreenContent() called ${uiState.badgeCode}")
+
             Image(
                 painter = painterResource(getMediumEmotionBadge(uiState.badgeCode)),
                 contentDescription = "",
@@ -227,11 +230,25 @@ fun MyPageScreenContent(
             )
             Spacer(modifier = Modifier.size(16.dp))
             Column {
-                Image(
-                    painter = painterResource(R.drawable.tellingme_plus_box),
-                    contentDescription = "",
-
+                if (uiState.userInfo.isPremium == true) {
+                    Image(
+                        painter = painterResource(R.drawable.tellingme_plus_box),
+                        contentDescription = ""
                     )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .background(Profile100, RoundedCornerShape(100.dp))
+                            .padding(start = 6.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
+                    ) {
+                        Text(
+                            text = "BASIC",
+                            color = Color.White,
+                            style = TellingmeTheme.typography.body2Regular
+                        )
+                    }
+                }
+
                 Text(
                     text = uiState.userInfo.nickname,
                     modifier = Modifier.padding(top = 4.dp),
