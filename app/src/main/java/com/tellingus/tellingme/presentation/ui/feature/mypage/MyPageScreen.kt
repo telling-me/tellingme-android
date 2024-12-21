@@ -324,7 +324,7 @@ fun MyPageScreenContent(
                     )
                     Text(
                         modifier = Modifier.padding(top = 10.dp),
-                        text = "작성글수",
+                        text = "작성글 수",
                         color = Gray600,
                         style = TellingmeTheme.typography.caption2Regular
                     )
@@ -398,7 +398,10 @@ fun MyPageScreenContent(
                     .background(Color.White, RoundedCornerShape(12.dp))
                     .clickable {
                         val intent =
-                            Intent(Intent.ACTION_VIEW, Uri.parse("https://walla.my/v/7XwE0CxFffPanoQ7TneT"))
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://walla.my/v/7XwE0CxFffPanoQ7TneT")
+                            )
                         context.startActivity(intent)
                     },
                 verticalAlignment = Alignment.CenterVertically,
@@ -503,7 +506,7 @@ fun MyPageScreenContent(
                             painter = painterResource(R.drawable.icon_bell), contentDescription = ""
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = "푸시 알림 받기")
+                        Text(text = "푸시 알림 받기", style = TellingmeTheme.typography.body2Regular)
                     }
 
                     Switch(checked = isAlarmChecked, onCheckedChange = { checked ->
@@ -604,7 +607,10 @@ fun MyPageScreenContent(
     }
 
     if (showToastMessage.first) {
-        TellingmeToast(context).showToast(text = showToastMessage.second, icon = R.drawable.icon_unlock)
+        TellingmeToast(context).showToast(
+            text = showToastMessage.second,
+            icon = R.drawable.icon_unlock
+        )
         showToastMessage = Pair(false, "")
     }
 }

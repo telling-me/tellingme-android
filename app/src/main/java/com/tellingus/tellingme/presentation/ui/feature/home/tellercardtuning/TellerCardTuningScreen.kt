@@ -152,7 +152,7 @@ fun TellerCardTuningScreenContent(
         Column(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
             Text(text = "내 마음대로", style = Typography.head2Regular, color = Gray600)
             Row {
-                Text(text = "꾸미는", style = Typography.head2Regular, color = Gray600)
+                Text(text = "꾸미는 ", style = Typography.head2Regular, color = Gray600)
                 Text(text = "텔러카드", style = Typography.head2Bold, color = Gray600)
             }
         }

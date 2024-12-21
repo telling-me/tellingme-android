@@ -74,8 +74,8 @@ fun TellerBadgeList(modifier: Modifier = Modifier, badges: List<Badge> = emptyLi
             ) { page ->
                 val item = badges[page]
                 TellerBadge(
-                    title = "${item.badgeMiddleName}",
-                    content = "${item.badgeName}",
+                    title = "${item.badgeName}",
+                    content = "${item.badgeMiddleName}",
                     badgeCode = item.badgeCode
                 )
             }

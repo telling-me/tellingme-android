@@ -29,6 +29,7 @@ import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 @Composable
 fun OtherSpaceScreen(
@@ -43,6 +44,19 @@ fun OtherSpaceScreen(
         content = { OtherSpaceScreenContent(navController = navController, uiState) },
         isScrollable = false,
     )
+}
+
+fun formatAsDaysAgo(parsedDate: String): String {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val date = LocalDate.parse(parsedDate, formatter)
+    val today = LocalDate.now()
+    val daysAgo = ChronoUnit.DAYS.between(date, today)
+
+    return when {
+        daysAgo == 0L -> "오늘"
+        daysAgo == 1L -> "1일 전"
+        else -> "${daysAgo}일 전"
+    }
 }
 
 @Composable
@@ -82,10 +96,11 @@ fun OtherSpaceScreenContent(navController: NavController, uiState: OtherSpaceCon
                 items(items = communications) {
                     val date = "${it.date[0]}-${it.date[1]}-${it.date[2]}";
                     val parsedDate = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-M-d")).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                    val daysAgoText = formatAsDaysAgo(parsedDate)
                     CommunityCard(
                         id = parsedDate,
                         title = it.title,
-                        date = parsedDate,
+                        date = daysAgoText,
                         commentCount = it.answerCount,
                         onClickCard = { id ->
                             navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${id}")

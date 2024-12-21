@@ -327,7 +327,7 @@ fun HomeScreenContent(
                         contentDescription = "empty_character"
                     )
                     Text(
-                        text = "나와 비슷한 텔러들의 이야기가 없어요",
+                        text = "아직 오늘 첫 글이 없어요.",
                         style = Typography.body2Bold,
                         color = Gray600
                     )
