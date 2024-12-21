@@ -62,6 +62,8 @@ import com.tellingus.tellingme.presentation.ui.common.const.getMediumEmotion
 import com.tellingus.tellingme.presentation.ui.theme.Base0
 import com.tellingus.tellingme.presentation.ui.theme.Gray100
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
+import com.tellingus.tellingme.presentation.ui.theme.Gray800
+import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
 import com.tellingus.tellingme.presentation.ui.theme.Typography
 import kotlinx.coroutines.launch
 
@@ -139,7 +141,10 @@ fun OtherSpaceDetailScreenContent(
                             .padding(
                             top = 24.dp, bottom = 24.dp, start = 16.dp, end = 16.dp
                         ),
-                        text = uiState.answerList[index].content
+                        text = uiState.answerList[index].content,
+                        style = TellingmeTheme.typography.body2Regular.copy(
+                            color = Gray800
+                        )
                     )
 
                 }
