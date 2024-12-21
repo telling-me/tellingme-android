@@ -21,6 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -32,7 +35,10 @@ import com.tellingus.tellingme.R
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
 import com.tellingus.tellingme.presentation.ui.common.component.badge.TellerBadge
+import com.tellingus.tellingme.presentation.ui.common.component.button.PrimaryButton
+import com.tellingus.tellingme.presentation.ui.common.component.dialog.ShowSingleButtonDialog
 import com.tellingus.tellingme.presentation.ui.common.component.layout.MainLayout
+import com.tellingus.tellingme.presentation.ui.common.model.ButtonSize
 import com.tellingus.tellingme.presentation.ui.theme.Background100
 import com.tellingus.tellingme.presentation.ui.theme.Gray600
 import com.tellingus.tellingme.presentation.ui.theme.TellingmeTheme
@@ -44,14 +50,29 @@ fun MyTellerBadgeScreen(
 ) {
     val uiState by myTellerBadgeViewModel.uiState.collectAsStateWithLifecycle()
     MainLayout(isScrollable = false,
-        header = { MyTellerBadgeScreenHeader(navController)},
+        header = { MyTellerBadgeScreenHeader(navController) },
         content = { MyTellerBadgeScreenContent(uiState) })
+}
+
+
+fun getTellerBadgeContentByBadgeCode(badgeCode: String): String {
+    return when (badgeCode) {
+        "BG_AGAIN_001" -> "연속 작성 7일을 달성했어요!"
+        "BG_FIRST" -> "첫 글을 작성했어요!"
+        "BG_NIGHT_001" -> "새벽 시간에 글 3회을 작성했어요!"
+        "BG_MUCH_001" -> "280자 이상 답변 1회 작성했어요!"
+        "BG_SAVE_001" -> "치즈 총 50개 이상 획득했어요!"
+        "BG_CHRISTMAS_2024" -> "2024 크리스마스 한정판 배지예요!"
+        else -> ""
+    }
 }
 
 @Composable
 fun MyTellerBadgeScreenContent(uiState: MyTellerBadgeContract.State) {
     val userBadgeList = uiState.userBadgeList
-
+    var isShowDialog by remember { mutableStateOf(false) }
+    var dialogTitle = ""
+    var dialogContents = ""
 
     Column(modifier = Modifier.fillMaxHeight()) {
         if (userBadgeList.isEmpty()) {
@@ -72,6 +93,11 @@ fun MyTellerBadgeScreenContent(uiState: MyTellerBadgeContract.State) {
             ) {
                 items(userBadgeList) { badge ->
                     TellerBadge(
+                        modifier = Modifier.clickable {
+                            dialogTitle = "${badge.badgeMiddleName}, ${badge.badgeName}"
+                            dialogContents = getTellerBadgeContentByBadgeCode(badge.badgeCode)
+                            isShowDialog = true
+                        },
                         title = badge.badgeName,
                         content = badge.badgeMiddleName,
                         badgeCode = badge.badgeCode
@@ -79,6 +105,21 @@ fun MyTellerBadgeScreenContent(uiState: MyTellerBadgeContract.State) {
                 }
             }
         }
+    }
+
+    if (isShowDialog) {
+        ShowSingleButtonDialog(
+            title = "$dialogTitle",
+            contents = "$dialogContents",
+            completeButton = {
+                PrimaryButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    size = ButtonSize.LARGE,
+                    text = "확인",
+                    onClick = { isShowDialog = false }
+                )
+            }
+        )
     }
 }
 

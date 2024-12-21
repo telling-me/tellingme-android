@@ -55,6 +55,7 @@ import com.tellingus.tellingme.presentation.ui.common.component.section.Question
 import com.tellingus.tellingme.presentation.ui.common.component.toast.TellingmeToast
 import com.tellingus.tellingme.presentation.ui.common.component.widget.LevelSection
 import com.tellingus.tellingme.presentation.ui.common.component.widget.ProfileWidget
+import com.tellingus.tellingme.presentation.ui.common.const.getColorByColorCode
 import com.tellingus.tellingme.presentation.ui.common.model.ButtonState
 import com.tellingus.tellingme.presentation.ui.common.navigation.HomeDestinations
 import com.tellingus.tellingme.presentation.ui.common.navigation.MyPageDestinations
@@ -241,6 +242,7 @@ fun HomeScreenContent(
     val daysToLevelUp = uiState.daysToLevelUp
     val todayAnswer = uiState.todayAnswer
     val badgeCode = uiState.badgeCode
+    val colorCode = uiState.colorCode
 
     Column(
     ) {
@@ -248,6 +250,7 @@ fun HomeScreenContent(
 
             ProfileWidget(
                 badgeCode = badgeCode,
+                backgroundColor = getColorByColorCode(colorCode),
                 nickname = userNickname,
                 description = "연속 $recordCount 일째 기록 중",
                 modifier = Modifier.clickable { navController.navigate(HomeDestinations.TELLER_CARD) })
