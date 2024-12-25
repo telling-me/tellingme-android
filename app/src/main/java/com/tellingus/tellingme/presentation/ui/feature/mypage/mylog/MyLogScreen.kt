@@ -141,7 +141,7 @@ fun MyLogScreenHeader(navigateToPreviousScreen: () -> Unit) {
     BasicAppBar(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 12.dp, top = 5.dp, bottom = 5.dp, end = 10.dp),
+            .padding(start = 12.dp, top = 15.dp, bottom = 15.dp, end = 10.dp),
         leftSlot = {
             TellingmeIconButton(iconRes = R.drawable.icon_caret_left,
                 size = ButtonSize.MEDIUM,

@@ -68,7 +68,7 @@ fun TellerScreenContent(navController: NavController, uiState: TellerCardContrac
                 navController = navController,
                 profileCardResponse = ProfileCardResponse(
                     nickname = userInfo.nickname,
-                    description = userInfo.tellerCard.badgeMiddleName + userInfo.tellerCard.badgeName,
+                    description = userInfo.tellerCard.badgeMiddleName + " " + userInfo.tellerCard.badgeName,
                     level = "LV. ${levelInfo.levelDto.level}",
                     consecutiveWritingDate = "${recordCount}일째",
                     profileIcon = "R.drawable.icon_profile_sample",

@@ -28,7 +28,9 @@ class HomeContract {
         val todayAnswer: Boolean = false,
 
         val badgeCode: String = "",
-        val colorCode: String = ""
+        val colorCode: String = "",
+
+        val isUnReadNotice: Boolean = false,
     ) : UiState {
         data class TodayQuestionCardInfo(val title: String = "", val content: String = "")
     }

@@ -1,5 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.mypage.mylog
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onNetworkError
@@ -17,8 +18,14 @@ class MyLogViewModel @Inject constructor(
 ) : BaseViewModel<MyLogContract.State, MyLogContract.Event, MyLogContract.Effect>(
     initialState = MyLogContract.State()
 ) {
+    val TAG: String = "로그"
 
     init {
+        loadAnswerList()
+    }
+
+
+    fun loadAnswerList() {
         viewModelScope.launch {
             getAnswerListUseCase()
                 .onSuccess {

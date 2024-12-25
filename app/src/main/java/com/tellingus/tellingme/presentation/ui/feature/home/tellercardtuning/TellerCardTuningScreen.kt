@@ -1,7 +1,6 @@
 package com.tellingus.tellingme.presentation.ui.feature.home.tellercardtuning
 
 
-
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.tellingus.tellingme.R
+import com.tellingus.tellingme.data.model.home.Badge
 import com.tellingus.tellingme.presentation.ui.common.component.appbar.BasicAppBar
 import com.tellingus.tellingme.presentation.ui.common.component.badge.CheeseBadge
 import com.tellingus.tellingme.presentation.ui.common.component.badge.DiagonalHalfCircleBadge
@@ -103,9 +103,8 @@ fun TellerCardTuningScreenContent(
     val levelInfo = uiState.levelInfo
     val recordCount = uiState.recordCount
     val cheeseBalance = uiState.cheeseBalance
-    val myColors = uiState.colors;
-
-
+    val myColors = uiState.colors
+    val badges = uiState.badges
 
     var selectedBadgeCode by remember { mutableStateOf(userInfo.tellerCard.badgeCode) }
     var selectedColorCode by remember { mutableStateOf(userInfo.tellerCard.colorCode) }
@@ -114,7 +113,7 @@ fun TellerCardTuningScreenContent(
         mutableStateOf(
             ProfileCardResponse(
                 nickname = userInfo.nickname,
-                description = userInfo.tellerCard.badgeName,
+                description = userInfo.tellerCard.badgeMiddleName + " " + userInfo.tellerCard.badgeName,
                 level = "LV. ${levelInfo.levelDto.level}",
                 consecutiveWritingDate = "${recordCount}일째",
                 profileIcon = "R.drawable.icon_profile_sample",
@@ -133,7 +132,7 @@ fun TellerCardTuningScreenContent(
     LaunchedEffect(profileCardResponse) {
         profileCardResponse = ProfileCardResponse(
             nickname = userInfo.nickname,
-            description = userInfo.tellerCard.badgeName,
+            description = userInfo.tellerCard.badgeMiddleName + " " + userInfo.tellerCard.badgeName,
             level = "LV. ${levelInfo.levelDto.level}",
             consecutiveWritingDate = "${recordCount}일째",
             profileIcon = "R.drawable.icon_profile_sample",
@@ -168,6 +167,7 @@ fun TellerCardTuningScreenContent(
             BadgeChangeSheet(
                 myColors = myColors,
                 cheeseBalance = cheeseBalance,
+                badges = badges,
                 selectedBadgeCode,
                 selectedColorCode,
                 onBadgeCodeSelected = { badgeCode ->
@@ -206,6 +206,7 @@ fun TellerCardTuningScreenContent(
 fun BadgeChangeSheet(
     myColors: List<com.tellingus.tellingme.data.model.home.Color>,
     cheeseBalance: Int,
+    badges: List<Badge>,
     selectedBadgeCode: String,
     selectedColorCode: String,
     onBadgeCodeSelected: (badgeCode: String) -> Unit,
@@ -233,9 +234,12 @@ fun BadgeChangeSheet(
         when (selectedOption) {
             "badge" -> {
                 Column(modifier = Modifier.padding(top = 40.dp)) {
-                    BadgeContent(selectedBadgeCode, onBadgeCodeSelected = { badgeCode ->
-                        onBadgeCodeSelected(badgeCode)
-                    })
+                    BadgeContent(
+                        badges = badges,
+                        selectedBadgeCode,
+                        onBadgeCodeSelected = { badgeCode ->
+                            onBadgeCodeSelected(badgeCode)
+                        })
 
                     Row(
                         modifier = Modifier
@@ -367,31 +371,71 @@ fun BadgeChangeSheet(
     }
 }
 
+// 뱃지 코드에 따른 이미지 리소스 매핑 함수
+private fun getEmotionResourceForBadge(badgeCode: String): Int {
+    return when (badgeCode) {
+        "BG_AGAIN_001" -> R.drawable.teller_emotion_badge_connexion_large
+        "BG_CHRISTMAS_2024" -> R.drawable.teller_emotion_badge_christmas_large
+        "BG_FIRST" -> R.drawable.teller_emotion_badge_traveler_large
+        "BG_MUCH_001" -> R.drawable.teller_emotion_badge_toomuch_large
+        "BG_NEW" -> R.drawable.teller_emotion_badge_mystery_large
+        "BG_NIGHT_001" -> R.drawable.teller_emotion_badge_owl_large
+        "BG_SAVE_001" -> R.drawable.teller_emotion_badge_savings_large
+        else -> R.drawable.teller_emotion_badge_mystery_large // 기본 이미지
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BadgeContent(selectedBadgeCode: String, onBadgeCodeSelected: (badgeCode: String) -> Unit) {
+fun BadgeContent(
+    badges: List<Badge>,
+    selectedBadgeCode: String,
+    onBadgeCodeSelected: (badgeCode: String) -> Unit
+) {
     val cardList = LargeEmotionBadgeList
     val pagerState = rememberPagerState(pageCount = {
-        cardList.size
+        badges.size
     })
     val coroutineScope = rememberCoroutineScope()
 
+    // badges가 비어있으면 early return
+    if (badges.isEmpty()) {
+        Column(
+            modifier = Modifier
+                .padding(start = 20.dp, end = 20.dp)
+                .fillMaxWidth()
+                .height(138.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.empty_character),
+                contentDescription = "empty_character"
+            )
+            Text(text = "아직 획득한 배지가 없어요.", style = TellingmeTheme.typography.body2Regular)
+        }
+        return
+    }
+
     Box(modifier = Modifier.padding(start = 20.dp, end = 20.dp)) {
         HorizontalPager(
-            state = pagerState, pageSpacing = 28.dp, pageSize = PageSize.Fixed(106.dp)
+            state = pagerState,
+            pageSpacing = 28.dp,
+            pageSize = PageSize.Fixed(106.dp)
         ) { page ->
+            val currentBadge = badges[page]
             BadgeCard(
                 index = page,
-                isChecked = selectedBadgeCode == cardList[page].badgeCode,
+                isChecked = selectedBadgeCode == currentBadge.badgeCode,
                 onCheckChange = { index, badgeCode ->
                     onBadgeCodeSelected(badgeCode)
                 },
                 emotionBadge = EmotionBadge(
-                    badgeName = cardList[page].badgeName,
-                    badgeCode = cardList[page].badgeCode,
-                    badgeMiddleName = cardList[page].badgeMiddleName,
-                    badgeCondition = cardList[page].badgeCondition,
-                    emotionRes = cardList[page].emotionRes
+                    badgeName = currentBadge.badgeName,
+                    badgeCode = currentBadge.badgeCode,
+                    badgeMiddleName = currentBadge.badgeMiddleName,
+                    badgeCondition = currentBadge.badgeCondition,
+                    emotionRes = getEmotionResourceForBadge(currentBadge.badgeCode) // 뱃지 코드에 따른 이미지 리소스 매핑 함수 필요
                 )
             )
         }

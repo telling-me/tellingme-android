@@ -3,6 +3,7 @@ package com.tellingus.tellingme.data.repositoryimpl
 import android.util.Log
 import com.tellingus.tellingme.data.model.common.BasicResponse
 import com.tellingus.tellingme.data.model.notice.LoadNoticeResponse
+import com.tellingus.tellingme.data.model.notice.NoticeSummaryResponse
 import com.tellingus.tellingme.data.network.NetworkService
 import com.tellingus.tellingme.data.network.adapter.ApiResult
 import com.tellingus.tellingme.domain.repository.NoticeRepository
@@ -27,6 +28,10 @@ class NoticeRepositoryImpl @Inject constructor(
 
     override suspend fun deleteNoticeByNoticeId(noticeId: Int): ApiResult<BasicResponse> {
         return service.deleteNoticeByNoticeId(noticeId)
+    }
+
+    override suspend fun getNoticeSummary(): ApiResult<NoticeSummaryResponse> {
+        return service.getNoticeSummary()
     }
 
 }

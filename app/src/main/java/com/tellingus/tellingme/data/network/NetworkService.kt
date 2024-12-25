@@ -18,6 +18,7 @@ import com.tellingus.tellingme.data.model.home.UpdateAnswerRequest
 import com.tellingus.tellingme.data.model.myspace.AnswerListResponse
 import com.tellingus.tellingme.data.model.myspace.MyPageResponse
 import com.tellingus.tellingme.data.model.notice.LoadNoticeResponse
+import com.tellingus.tellingme.data.model.notice.NoticeSummaryResponse
 import com.tellingus.tellingme.data.model.oauth.UserRequest
 import com.tellingus.tellingme.data.model.oauth.UserResponse
 import com.tellingus.tellingme.data.model.oauth.login.OauthRequest
@@ -248,4 +249,8 @@ interface NetworkService {
     // 보상 알림 조회 API
     @GET("${END_POINT}/notice/reward")
     suspend fun getNoticeReward(): ApiResult<NoticeRewardResponse>
+
+    // 읽지 않은 알림이 있는지 여부 확인
+    @GET("${END_POINT}/notice/summary")
+    suspend fun getNoticeSummary() : ApiResult<NoticeSummaryResponse>
 }
