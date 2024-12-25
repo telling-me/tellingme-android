@@ -141,7 +141,6 @@ fun ProfileCard(
                     color = Gray50
                 )
                 Text(
-//                    text = "LV.1",
                     text = "${response.level}",
                     style = TellingmeTheme.typography.caption1Bold,
                     color = Base0
@@ -152,7 +151,8 @@ fun ProfileCard(
                 modifier = modifier.constrainAs(dayBox) {
                     end.linkTo(parent.end)
                     bottom.linkTo(parent.bottom)
-                }
+                },
+                horizontalAlignment = Alignment.End
             ) {
                 Text(
                     text = "연속 작성일",
@@ -160,7 +160,6 @@ fun ProfileCard(
                     color = Gray50
                 )
                 Text(
-//                    text = "1일째",
                     text = "${response.consecutiveWritingDate}",
                     style = TellingmeTheme.typography.caption1Bold,
                     color = Base0

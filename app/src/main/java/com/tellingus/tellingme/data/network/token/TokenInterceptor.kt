@@ -17,8 +17,13 @@ import okhttp3.Response
 import retrofit2.HttpException
 import javax.inject.Inject
 
-const val INFINITE_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmZGQ1MGE1YS0yNzdlLTQzNDktOTdkMC0xODgxYjIyZTk1NjMiLCJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTc5OTkxNjA1MX0.bHTOmJoBYReF63EpFagHrAzpAGOVnTvwpJTuqSDgXtg"
-const val INFINITE_REFRESH_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTczNTQ4MTI1MX0.8OFMazWoYKTlYAP7l8soZE3pEl-Tbwcy8lS0RCFx8Yg"
+// dev
+// const val INFINITE_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJmZGQ1MGE1YS0yNzdlLTQzNDktOTdkMC0xODgxYjIyZTk1NjMiLCJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTc5OTkxNjA1MX0.bHTOmJoBYReF63EpFagHrAzpAGOVnTvwpJTuqSDgXtg"
+// const val INFINITE_REFRESH_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3Mjc3MDUyNTEsImV4cCI6OTczNTQ4MTI1MX0.8OFMazWoYKTlYAP7l8soZE3pEl-Tbwcy8lS0RCFx8Yg"
+
+// prod
+//const val INFINITE_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwNWEyYWMzZC1lNzY0LTQ1YTQtOGJmZC1iZDM4MTA3MDRmNmEiLCJpYXQiOjE3MzUwMjA2MzcsImV4cCI6MTgyOTYyODYzN30.TYLWzPG4uWJrAmw9xHRoS4-aifWmHplA6UHlO-ByySw"
+//const val INFINITE_REFRESH_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzQ4NzI2ODYsImV4cCI6MTc0MjY0ODY4Nn0.lhLsy9cvOnoyRTqFuSDg4bf62oG_6xAR7UjVxZrjalY"
 
 class TokenInterceptor @Inject constructor(
     @AuthNetworkService private val networkService: NetworkService,

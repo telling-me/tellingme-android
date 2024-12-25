@@ -13,6 +13,7 @@ import com.tellingus.tellingme.domain.repository.DataStoreRepository
 import com.tellingus.tellingme.domain.usecase.GetNoticeRewardUseCase
 import com.tellingus.tellingme.domain.usecase.HomeUseCase
 import com.tellingus.tellingme.domain.usecase.UpdatePushTokenUseCase
+import com.tellingus.tellingme.domain.usecase.notice.GetNoticeSummaryUseCase
 import com.tellingus.tellingme.domain.usecase.otherspace.PostLikesUseCase
 import com.tellingus.tellingme.presentation.ui.common.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,7 @@ class HomeViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val postLikesUseCase: PostLikesUseCase,
     private val getNoticeRewardUseCase: GetNoticeRewardUseCase,
+    private val getNoticeSummaryUseCase: GetNoticeSummaryUseCase
 ) : BaseViewModel<HomeContract.State, HomeContract.Event, HomeContract.Effect>(
     initialState = HomeContract.State()
 ) {
@@ -50,6 +52,7 @@ class HomeViewModel @Inject constructor(
         )
 
         getMain(request)
+        getNoticeSummary()
 
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener {
@@ -75,6 +78,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             postLikesUseCase(PostLikesRequest((answerId))).onSuccess {
                 onSuccess()
+            }.onFailure { s, i -> }
+        }
+    }
+
+    fun getNoticeSummary() {
+        viewModelScope.launch {
+            getNoticeSummaryUseCase().onSuccess {
+                updateState(currentState.copy(isUnReadNotice = it.data.status))
             }.onFailure { s, i -> }
         }
     }

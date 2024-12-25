@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -87,7 +88,7 @@ fun HomeScreen(
     var showToast by remember { mutableStateOf(Pair(false, "")) }
 
     MainLayout(header = {
-        HomeScreenHeader(navController, unreadNoticeStatus = uiState.unreadNoticeStatus)
+        HomeScreenHeader(navController, unreadNoticeStatus = uiState.isUnReadNotice)
     }, content = {
         HomeScreenContent(
             navController = navController, uiState = uiState, viewModel = viewModel
@@ -307,7 +308,7 @@ fun HomeScreenContent(
                 ) { page ->
                     val item = communicationList[page]
                     OpinionCard(
-                        modifier = Modifier.padding(end = 12.dp),
+                        modifier = Modifier.padding(end = 12.dp).heightIn(max = 148.dp),
                         heartCount = item.likeCount,
                         buttonState = if (item.isLiked) ButtonState.ENABLED else ButtonState.DISABLED,
                         description = item.content,
@@ -337,30 +338,7 @@ fun HomeScreenContent(
                 }
             }
         }
-//        if (communicationList.isNotEmpty()) {
-//            Column(
-//                modifier = Modifier
-//                    .padding(top = 14.dp, bottom = 30.dp)
-//                    .fillMaxWidth(),
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                ActionChip(text = "더보기", onClick = {
-//                    val date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-//                    navController.navigate("${OtherSpaceDestinations.OTHER_SPACE}/list/${date}") {
-//                        navController.navigate(OtherSpaceDestinations.OTHER_SPACE) {
-//                            launchSingleTop = true // 중복 방지
-//                        }
-//                        // 이후 otherSpaceListScreen으로 이동
-//                        launchSingleTop = true
-//                    }
-//                })
-//            }
-//        }
-
-
     } //    Column END
-
-
 }
 
 

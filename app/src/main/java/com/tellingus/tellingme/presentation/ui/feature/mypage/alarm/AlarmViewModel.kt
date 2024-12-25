@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.tellingus.tellingme.data.network.adapter.onFailure
 import com.tellingus.tellingme.data.network.adapter.onSuccess
 import com.tellingus.tellingme.domain.usecase.notice.DeleteNoticeByNoticeIdUseCase
+import com.tellingus.tellingme.domain.usecase.notice.GetNoticeSummaryUseCase
 import com.tellingus.tellingme.domain.usecase.notice.LoadNoticeUseCase
 import com.tellingus.tellingme.domain.usecase.notice.NoticeReadAllUseCase
 import com.tellingus.tellingme.domain.usecase.notice.NoticeReadByNoticeIdUseCase
@@ -19,6 +20,7 @@ class AlarmViewModel @Inject constructor(
     private val noticeReadAllUseCase: NoticeReadAllUseCase,
     private val noticeReadByNoticeIdUseCase: NoticeReadByNoticeIdUseCase,
     private val deleteNoticeByNoticeIdUseCase: DeleteNoticeByNoticeIdUseCase,
+    private val getNoticeSummaryUseCase: GetNoticeSummaryUseCase
 ) : BaseViewModel<AlarmContract.State, AlarmContract.Event, AlarmContract.Effect>(
     initialState = AlarmContract.State()
 ) {
