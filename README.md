@@ -30,7 +30,7 @@
           </td> 
           <td align="center">
               <a href="https://github.com/Ojongseok">                 
-                  <img alt="yihun-kim1" src="https://avatars.githubusercontent.com/u/98886487?v=4" width="100" />            
+                  <img alt="Ojongseok" src="https://avatars.githubusercontent.com/u/98886487?v=4" width="100" />            
               </a>
           </td>
       </tr>
